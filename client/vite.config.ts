@@ -5,6 +5,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: './', // Using relative base path for seamless GitHub Pages deployment
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -12,7 +13,6 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true, // Automatically opens in browser
     host: true,
   },
 });
