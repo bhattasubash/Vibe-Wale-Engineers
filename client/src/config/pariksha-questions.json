@@ -1,0 +1,119 @@
+[
+  {
+    "id": "PAR-01",
+    "param": "vikriti",
+    "title_en": "Current Imbalance",
+    "title_hi": "वर्तमान समस्या / असंतुलन",
+    "question_en": "Are you currently experiencing any specific digestion or bodily imbalance?",
+    "question_hi": "क्या आप वर्तमान में किसी विशिष्ट पाचन या शारीरिक असंतुलन का अनुभव कर रहे हैं?",
+    "options": [
+      { "text_en": "No specific imbalance", "text_hi": "कोई विशेष असंतुलन नहीं" },
+      { "text_en": "Mild occasional issues", "text_hi": "हल्की कभी-कभार समस्या" },
+      { "text_en": "Persistent disturbance", "text_hi": "लगातार परेशानी" }
+    ]
+  },
+  {
+    "id": "PAR-02",
+    "param": "sara",
+    "title_en": "Overall Strength & Vitality",
+    "title_hi": "शारीरिक शक्ति (सार)",
+    "question_en": "How would you describe your overall physical stamina?",
+    "question_hi": "आप अपनी समग्र शारीरिक शक्ति का वर्णन कैसे करेंगे?",
+    "options": [
+      { "text_en": "Strong & robust stamina", "text_hi": "मजबूत और उत्तम शक्ति" },
+      { "text_en": "Average physical strength", "text_hi": "सामान्य / मध्यम शक्ति" },
+      { "text_en": "Weak, tire quickly", "text_hi": "कमजोर, जल्दी थकान" }
+    ]
+  },
+  {
+    "id": "PAR-03",
+    "param": "samhanana",
+    "title_en": "Joint & Bone Structure",
+    "title_hi": "हड्डी और जोड़ों की बनावट (संहनन)",
+    "question_en": "How would you describe your bone and joint firmness?",
+    "question_hi": "आप अपनी हड्डी और जोड़ों की मजबूती का वर्णन कैसे करेंगे?",
+    "options": [
+      { "text_en": "Compact and sturdy", "text_hi": "ठोस और मजबूत" },
+      { "text_en": "Medium firmness", "text_hi": "मध्यम सुगठित" },
+      { "text_en": "Loose and cracking joints", "text_hi": "ढीले अथवा आवाज करने वाले जोड़" }
+    ]
+  },
+  {
+    "id": "PAR-04",
+    "param": "satmya",
+    "title_en": "Adaptability",
+    "title_hi": "अनुकूलन क्षमता (सात्म्य)",
+    "question_en": "How easily do you adapt to changes in food, weather, or routine?",
+    "question_hi": "आप भोजन, मौसम या दिनचर्या में बदलाव के अनुकूल कितनी आसानी से ढल जाते हैं?",
+    "options": [
+      { "text_en": "Very easily without discomfort", "text_hi": "बहुत आसानी से, कोई समस्या नहीं" },
+      { "text_en": "Takes some time to adjust", "text_hi": "मध्यम, थोड़ा समय लगता है" },
+      { "text_en": "Get unwell with small changes", "text_hi": "कठिनाई से, जल्दी बीमार पड़ते हैं" }
+    ]
+  },
+  {
+    "id": "PAR-05",
+    "param": "satva",
+    "title_en": "Mental Resilience",
+    "title_hi": "मानसिक सहनशक्ति (सत्व)",
+    "question_en": "How do you handle stressful or anxious situations?",
+    "question_hi": "आप तनावपूर्ण या कठिन परिस्थितियों को कैसे संभालते हैं?",
+    "options": [
+      { "text_en": "Stay calm and composed", "text_hi": "शांत और धैर्यवान रहते हैं" },
+      { "text_en": "Get anxious sometimes", "text_hi": "कभी-कभी चिंतित हो जाते हैं" },
+      { "text_en": "Become easily overwhelmed", "text_hi": "बहुत जल्दी विचलित / परेशान हो जाते हैं" }
+    ]
+  },
+  {
+    "id": "PAR-06",
+    "param": "ahara_shakti",
+    "title_en": "Digestive Power",
+    "title_hi": "पाचन शक्ति (आहार शक्ति)",
+    "question_en": "How is your digestion of standard meals?",
+    "question_hi": "आपका भोजन पाचन कैसा रहता है?",
+    "options": [
+      { "text_en": "Strong, digests anything easily", "text_hi": "उत्तम, भोजन आसानी से पच जाता है" },
+      { "text_en": "Moderate, takes time", "text_hi": "मध्यम, कभी-कभी गैस/अपच" },
+      { "text_en": "Weak, frequently bloated or heavy", "text_hi": "कमजोर, अक्सर भारीपन रहता है" }
+    ]
+  },
+  {
+    "id": "PAR-07",
+    "param": "vyayama_shakti",
+    "title_en": "Physical Exertion",
+    "title_hi": "व्यायाम / श्रम सहने की क्षमता (व्यायाम शक्ति)",
+    "question_en": "How much physical work or walking can you comfortably handle?",
+    "question_hi": "आप आराम से कितनी शारीरिक मेहनत या चलना संभाल सकते हैं?",
+    "options": [
+      { "text_en": "High endurance for heavy work", "text_hi": "अधिक श्रम आसानी से कर सकते हैं" },
+      { "text_en": "Moderate walking / normal routine", "text_hi": "सामान्य दैनिक कार्य कर लेते हैं" },
+      { "text_en": "Low stamina, get breathless easily", "text_hi": "कम श्रम में ही हांफने/थकने लगते हैं" }
+    ]
+  },
+  {
+    "id": "PAR-08",
+    "param": "pramana",
+    "title_en": "Body Proportions",
+    "title_hi": "शारीरिक अनुपात (प्रमाण)",
+    "question_en": "How proportionate is your height relative to your frame?",
+    "question_hi": "आपकी लंबाई और शारीरिक बनावट का अनुपात कैसा है?",
+    "options": [
+      { "text_en": "Well-balanced and proportionate", "text_hi": "संतुलित और आनुपातिक" },
+      { "text_en": "Tall and lean", "text_hi": "लंबा और दुबला" },
+      { "text_en": "Short and broad", "text_hi": "छोटा और चौड़ा" }
+    ]
+  },
+  {
+    "id": "PAR-09",
+    "param": "vaya",
+    "title_en": "Age Classification",
+    "title_hi": "आयु वर्ग (वय)",
+    "question_en": "Ayurvedic age group classification",
+    "question_hi": "आयुर्वेदिक आयु वर्ग",
+    "options": [
+      { "text_en": "Bala (0 to 16 years)", "text_hi": "बाल्यावस्था (0-16 वर्ष)" },
+      { "text_en": "Madhyama (17 to 60 years)", "text_hi": "मध्यमावस्था (17-60 वर्ष)" },
+      { "text_en": "Vriddha (61+ years)", "text_hi": "वृद्धावस्था (61+ वर्ष)" }
+    ]
+  }
+]

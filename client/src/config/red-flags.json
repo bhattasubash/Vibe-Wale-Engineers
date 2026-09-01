@@ -1,0 +1,93 @@
+[
+  {
+    "id": "RF-01",
+    "name": "Cardiac and Respiratory Alert",
+    "trigger_keywords": [
+      "chest pain",
+      "angina",
+      "shortness of breath",
+      "difficulty breathing",
+      "breathless",
+      "छाती में दर्द",
+      "सीने में दर्द",
+      "सांस लेने में तकलीफ",
+      "दम फूलना"
+    ],
+    "required_combination": "OR",
+    "severity": "Critical",
+    "alert_message_en": "Critical: Possible acute cardiac or respiratory emergency. Immediate medical attention required.",
+    "alert_message_hi": "गंभीर: संभावित तीव्र हृदय या श्वसन आपातकाल। तत्काल चिकित्सा सहायता आवश्यक है।"
+  },
+  {
+    "id": "RF-02",
+    "name": "Neurological & Stroke Signs",
+    "trigger_keywords": [
+      "sudden severe headache",
+      "facial drooping",
+      "slurred speech",
+      "loss of consciousness",
+      "paralysis",
+      "vision loss",
+      "अचानक गंभीर सिरदर्द",
+      "मुंह टेढ़ा होना",
+      "बोलने में लड़खड़ाहट",
+      "बेहोशी",
+      "लकवा",
+      "अंधापन"
+    ],
+    "required_combination": "OR",
+    "severity": "Critical",
+    "alert_message_en": "Critical: Possible acute neurological event. Seek emergency medical care immediately.",
+    "alert_message_hi": "गंभीर: संभावित तीव्र न्यूरोलॉजिकल घटना। तुरंत आपातकालीन चिकित्सा देखभाल लें।"
+  },
+  {
+    "id": "RF-03",
+    "name": "Meningitis & Sepsis Signs",
+    "trigger_keywords": [
+      "stiff neck",
+      "high fever with confusion",
+      "seizure",
+      "fit",
+      "गर्दन में अकड़न",
+      "दौरा",
+      "तेज बुखार के साथ बेहोशी"
+    ],
+    "required_combination": "OR",
+    "severity": "Critical",
+    "alert_message_en": "Critical: Signs of severe infection or central nervous system distress. Urgent evaluation required.",
+    "alert_message_hi": "गंभीर: गंभीर संक्रमण या तंत्रिका तंत्र संकट के संकेत। तत्काल मूल्यांकन आवश्यक है।"
+  },
+  {
+    "id": "RF-04",
+    "name": "Severe Internal Bleeding",
+    "trigger_keywords": [
+      "vomiting blood",
+      "black tarry stools",
+      "coughing blood",
+      "खून की उल्टी",
+      "खून का दस्त",
+      "खांसी में खून"
+    ],
+    "required_combination": "OR",
+    "severity": "High",
+    "alert_message_en": "High Alert: Potential active internal bleeding. Seek physician review right away.",
+    "alert_message_hi": "उच्च चेतावनी: संभावित सक्रिय आंतरिक रक्तस्राव। तुरंत चिकित्सक से संपर्क करें।"
+  },
+  {
+    "id": "RF-05",
+    "name": "Self Harm Ideation",
+    "trigger_keywords": [
+      "suicide",
+      "kill myself",
+      "self-harm",
+      "end my life",
+      "आत्महत्या",
+      "खुद को मारना",
+      "खुद को नुकसान"
+    ],
+    "required_combination": "OR",
+    "severity": "Critical",
+    "alert_message_en": "Critical: Patient expressing distress or thoughts of self-harm. Immediate clinical support alerted.",
+    "alert_message_hi": "गंभीर: रोगी संकट या आत्म-नुकसान के विचार व्यक्त कर रहा है। तत्काल नैदानिक सहायता को सूचित किया गया।"
+  }
+]

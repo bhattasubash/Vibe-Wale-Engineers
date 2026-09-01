@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: none !important;
+  }
+  
+  html, body {
+    background-color: #eaedf0;
+    color: #212529;
+    font-family: "Open Sans", "Noto Sans Devanagari", Arial, Helvetica, sans-serif;
+  }
+
+  /* GIGW Strict Flat Corners */
+  button, input, select, textarea, div {
+    border-radius: 2px !important;
+  }
+}
+
+/* Official Government Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #eaedf0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0a2d65;
+}
