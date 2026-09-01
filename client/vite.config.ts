@@ -5,7 +5,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './', // Using relative base path for seamless GitHub Pages deployment
+  base: '/Vibe-Wale-Engineers/', // Explicit GitHub Pages repository path
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
