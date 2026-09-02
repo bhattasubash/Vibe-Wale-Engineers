@@ -1,0 +1,194 @@
+<mxfile host="app.diagrams.net" modified="2026-09-02T05:25:00.000Z" agent="Antigravity User Flow Engine" version="21.6.8" type="device">
+  <diagram id="ayush-user-flow" name="Complete Patient & Physician User Flow">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1400" background="#F8FAFC" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Header Banner -->
+        <mxCell id="uf_title" value="AYUSH-Care End-to-End Patient Intake, Clinical Assessment &amp; Physician EMR User Flow&#xa;Classical Ayurveda (Charaka Samhita) | ABDM / ABHA Interoperability | DPDP Act 2023 Compliant" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0A2D65;strokeColor=#071F45;fontColor=#FFFFFF;fontStyle=1;fontSize=18;fontFamily=Open Sans, Arial, sans-serif;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="2320" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- STAGE 1: ONBOARDING & IDENTIFICATION -->
+        <mxCell id="st1" value="STAGE 1: ONBOARDING, LANGUAGE &amp; PATIENT IDENTIFICATION" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAEDF0;strokeColor=#0A2D65;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0A2D65;fontFamily=Open Sans, Arial, sans-serif;startSize=28;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="420" height="1220" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="p_start" value="Patient Approaches Kiosk Terminal&#xa;(All India Institute of Ayurveda OPD)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0A2D65;strokeColor=#071F45;fontColor=#FFFFFF;fontStyle=1;fontSize=11;fontFamily=Open Sans, Arial, sans-serif;" vertex="1" parent="st1">
+          <mxGeometry x="60" y="50" width="300" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s01" value="S-01: Welcome Screen&#xa;- Ashoka Lion Capital &amp; National Tricolor Header&#xa;- Bilingual Voice Prompter (Hindi 1st -&gt; English 2nd)&#xa;- 3-Step Information Strip&#xa;- Tap &quot;BEGIN CASE INTAKE&quot;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st1">
+          <mxGeometry x="30" y="140" width="360" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s02" value="S-02: Language Selection&#xa;- Large Dual Touch Cards: हिन्दी (Hindi) / English&#xa;- Voice Guidance in selected language&#xa;- Instant inline toggle &quot;अ/A Switch&quot; available" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st1">
+          <mxGeometry x="30" y="270" width="360" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="dec_ident" value="Identification Mode Selection" style="rhombus;whiteSpace=wrap;html=1;fillColor=#E8EDF5;strokeColor=#0A2D65;fontColor=#0A2D65;fontStyle=1;fontSize=11;fontFamily=Open Sans, Arial, sans-serif;" vertex="1" parent="st1">
+          <mxGeometry x="70" y="390" width="280" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s03_a" value="Path A: Scan ABHA QR Code&#xa;- Camera Viewfinder scan&#xa;- Fetches existing ABDM Health ID" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=10;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=6;" vertex="1" parent="st1">
+          <mxGeometry x="20" y="500" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s03_b" value="Path B: Enter ABHA / Aadhaar&#xa;- 14-digit ABHA or Aadhaar last 4&#xa;- OTP / Demographics lookup" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=10;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=6;" vertex="1" parent="st1">
+          <mxGeometry x="220" y="500" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s03_c" value="Path C: Manual Walk-in Registration&#xa;- Name, Age, Gender, Phone Number&#xa;- Large on-screen numeric keypad" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=10;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=6;" vertex="1" parent="st1">
+          <mxGeometry x="120" y="590" width="180" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s04" value="S-04: DPDP Act 2023 Audio Consent&#xa;- Full-screen explanation read aloud automatically&#xa;- Strict ephemeral session data agreement&#xa;- Buttons: &quot;I AGREE&quot; (Navy) vs &quot;DECLINE&quot; (Red)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0A2D65;strokeWidth=1.5;fontSize=11;fontColor=#0A2D65;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st1">
+          <mxGeometry x="30" y="700" width="360" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="dec_consent" value="Consent Granted?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#E8EDF5;strokeColor=#0A2D65;fontColor=#0A2D65;fontStyle=1;fontSize=11;fontFamily=Open Sans, Arial, sans-serif;" vertex="1" parent="st1">
+          <mxGeometry x="110" y="830" width="200" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="term_abort" value="Consent Declined: Session Terminated&#xa;- Show explanation &amp; reset to S-01&#xa;- Directs patient to Swasthya Mitra Helpdesk" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#B91C1C;fontSize=10;fontColor=#B91C1C;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=center;" vertex="1" parent="st1">
+          <mxGeometry x="60" y="930" width="300" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- STAGE 2: CLINICAL INTAKE & EMERGENCY SAFETY NET -->
+        <mxCell id="st2" value="STAGE 2: CHIEF COMPLAINT &amp; EMERGENCY SAFETY NET" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAEDF0;strokeColor=#0A2D65;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0A2D65;fontFamily=Open Sans, Arial, sans-serif;startSize=28;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="500" y="110" width="440" height="1220" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s05" value="S-05: Comprehension Check &amp; Prompter&#xa;- Spoken Audio: &quot;Now I will ask about your health...&quot;&#xa;- &quot;I Understand&quot; button unlocks after audio" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st2">
+          <mxGeometry x="30" y="50" width="380" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s06" value="S-06: Dual-Mode Chief Complaint Intake&#xa;- Mode 1: 72px Voice Mic (Web Speech API)&#xa;- Mode 2: Quick Symptom Touch Grid + Keyboard&#xa;- Text / Voice confirmation: &quot;What is bothering you?&quot;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0A2D65;strokeWidth=1.5;fontSize=11;fontColor=#0A2D65;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st2">
+          <mxGeometry x="30" y="160" width="380" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s07" value="S-07: Adaptive SOCRATES Questioning (1-3 Turns)&#xa;- Evaluates Site, Onset, Character, Radiation, Timing&#xa;- Conversational AI Prompt + Suggested Touch Chips&#xa;- Runs silent emergency analysis on each turn" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st2">
+          <mxGeometry x="30" y="290" width="380" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="dec_redflag" value="🚨 Emergency Red Flag Triggered?&#xa;(Chest Pain, Stroke Signs, Severe Trauma, Hemoptysis)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#B91C1C;fontColor=#B91C1C;fontStyle=1;fontSize=11;fontFamily=Open Sans, Arial, sans-serif;" vertex="1" parent="st2">
+          <mxGeometry x="40" y="420" width="360" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s08" value="S-08: Emergency Triage Alert Overlay&#xa;- High-contrast Red Alert Modal&#xa;- Audio: &quot;Your symptoms require immediate attention!&quot;&#xa;- Urgent notification sent to Doctor OPD Queue&#xa;- Staff dispatch triggered immediately" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#B91C1C;strokeWidth=2;fontSize=11;fontColor=#B91C1C;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st2">
+          <mxGeometry x="30" y="550" width="380" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s07_complete" value="Conversation Complete Signal&#xa;- Chief Complaint &amp; HPI structured&#xa;- Ready for Ayurvedic assessment" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#15803D;fontSize=11;fontColor=#15803D;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=center;" vertex="1" parent="st2">
+          <mxGeometry x="30" y="700" width="380" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- STAGE 3: CLASSICAL AYURVEDIC PRAKRITI & PARIKSHA -->
+        <mxCell id="st3" value="STAGE 3: CLASSICAL PRAKRITI &amp; DASHAVIDHA PARIKSHA" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAEDF0;strokeColor=#0A2D65;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0A2D65;fontFamily=Open Sans, Arial, sans-serif;startSize=28;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="980" y="110" width="440" height="1220" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s09_intro" value="S-09: 15-Trait Prakriti Assessment&#xa;- Step Progress Bar (Question X / 15)&#xa;- Grounded in Charaka Samhita (Vimana Sthana 8)&#xa;- 1 Question per Screen (Elderly-Friendly)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0A2D65;strokeWidth=1.5;fontSize=11;fontColor=#0A2D65;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st3">
+          <mxGeometry x="30" y="50" width="380" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s09_mcq" value="3 Large Plain-Language Option Cards&#xa;- Option A (Mapped to Vata trait in background)&#xa;- Option B (Mapped to Pitta trait in background)&#xa;- Option C (Mapped to Kapha trait in background)&#xa;- Audio reads question and options aloud" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st3">
+          <mxGeometry x="30" y="170" width="380" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="prakriti_math" value="Deterministic Dosha Arithmetic Engine (O(1))&#xa;- Vata Score = sum(Vata answers)&#xa;- Pitta Score = sum(Pitta answers)&#xa;- Kapha Score = sum(Kapha answers)&#xa;- Computes Dominant Dosha &amp; Confidence Gap" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0A2D65;strokeColor=#071F45;fontSize=11;fontColor=#FFFFFF;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st3">
+          <mxGeometry x="30" y="300" width="380" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s10" value="S-10: Dashavidha Pariksha Rapid Parameters&#xa;- 9 Remaining Classical Parameters&#xa;- Sara, Samhanana, Pramana, Satmya, Satva&#xa;- Ahara Shakti (Digestion), Vyayama Shakti, Vaya&#xa;- Fast swipe/tap format" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st3">
+          <mxGeometry x="30" y="430" width="380" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s11" value="S-11: Medical Document Capture (Optional)&#xa;- &quot;Do you have old prescriptions / lab reports?&quot;&#xa;- Camera viewfinder captures document photo&#xa;- Background OCR entity extraction (Pharmacopoeia)&#xa;- Displays extracted medication tags" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st3">
+          <mxGeometry x="30" y="560" width="380" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- STAGE 4: SYNTHESIS, REVIEW & TOKEN DISPATCH -->
+        <mxCell id="st4" value="STAGE 4: SUMMARY REVIEW, CONFIRMATION &amp; TOKEN DISPATCH" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAEDF0;strokeColor=#0A2D65;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0A2D65;fontFamily=Open Sans, Arial, sans-serif;startSize=28;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="110" width="440" height="1220" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s12" value="S-12: Structured Summary Generation&#xa;- Gemini 2.0 Flash synthesizes Case Sheet:&#xa;  * Chief Complaint &amp; SOCRATES Timeline&#xa;  * Tridosha Scorecard (Vata/Pitta/Kapha %)&#xa;  * Dashavidha Pariksha Notes &amp; Verified Meds&#xa;- Bilingual Audio reads summary aloud" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0A2D65;strokeWidth=1.5;fontSize=11;fontColor=#0A2D65;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st4">
+          <mxGeometry x="30" y="50" width="380" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s13" value="S-13: Patient Confirmation&#xa;- Buttons: &quot;THIS IS CORRECT&quot; vs &quot;SOMETHING IS WRONG&quot;&#xa;- If Wrong: Select section to edit (re-routes to S-06/S-09)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st4">
+          <mxGeometry x="30" y="200" width="380" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s14" value="S-14: Submission &amp; Mock ABHA / HIS Sync&#xa;- Pushes structured FHIR bundle to ABHA Sandbox&#xa;- Routes case file into Doctor OPD Queue&#xa;- Live animation: &quot;Sent to Doctor Queue&quot;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#15803D;strokeWidth=1.5;fontSize=11;fontColor=#15803D;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st4">
+          <mxGeometry x="30" y="310" width="380" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s15" value="S-15: Session End &amp; Ephemeral Purge&#xa;- Displays Printed OPD Token Number (e.g., #A-42)&#xa;- Audio: &quot;Thank you, please proceed to Room 104&quot;&#xa;- Auto-clears terminal memory after 10s (DPDP 2023)&#xa;- Kiosk returns to S-01 Idle Welcome" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0A2D65;strokeColor=#071F45;fontSize=11;fontColor=#FFFFFF;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st4">
+          <mxGeometry x="30" y="430" width="380" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- STAGE 5: PHYSICIAN EMR DASHBOARD & CONSULTATION -->
+        <mxCell id="st5" value="STAGE 5: PHYSICIAN EMR DASHBOARD &amp; OPD CONSULTATION" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAEDF0;strokeColor=#0A2D65;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0A2D65;fontFamily=Open Sans, Arial, sans-serif;startSize=28;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1940" y="110" width="420" height="1220" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s16" value="S-16: Physician Auth &amp; Login&#xa;- Doctor secure login (Ayush Department ID)&#xa;- Selects Assigned OPD Room" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st5">
+          <mxGeometry x="25" y="50" width="370" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s17" value="S-17: Prioritized Patient Queue&#xa;- Red-Flag Urgent cases pinned at top in RED&#xa;- Real-time WebSocket updates as kiosks submit&#xa;- Table: Token #, Patient Name, Age, Prakriti, Wait Time" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0A2D65;strokeWidth=1.5;fontSize=11;fontColor=#0A2D65;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st5">
+          <mxGeometry x="25" y="150" width="370" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s18" value="S-18: Dense Physician Clinical Case File&#xa;- Section 1: Demographics &amp; ABHA Profile&#xa;- Section 2: Chief Complaint &amp; SOCRATES HPI&#xa;- Section 3: Interactive Prakriti Radar Chart&#xa;- Section 4: Dashavidha Pariksha &amp; Extracted Meds&#xa;- Section 5: Inline Edit Affordances on all sections" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st5">
+          <mxGeometry x="25" y="280" width="370" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="doc_actions" value="Physician Actions &amp; Sign-off:&#xa;[ ACCEPT ] - Confirms summary into hospital EMR&#xa;[ AMEND &amp; ACCEPT ] - Edits dosha/symptoms &amp; saves&#xa;[ RETAKE ] - Requests patient re-assessment" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0A2D65;strokeColor=#071F45;fontSize=11;fontColor=#FFFFFF;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="st5">
+          <mxGeometry x="25" y="440" width="370" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="p_end" value="Consultation Completed&#xa;- Rx generated &amp; saved to ABDM / e-Hospital" style="ellipse;whiteSpace=wrap;html=1;fillColor=#15803D;strokeColor=#15803D;fontColor=#FFFFFF;fontStyle=1;fontSize=11;fontFamily=Open Sans, Arial, sans-serif;" vertex="1" parent="st5">
+          <mxGeometry x="60" y="560" width="300" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Connecting Flows -->
+        <mxCell id="f1" edge="1" parent="1" source="p_start" target="s01"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f2" edge="1" parent="1" source="s01" target="s02"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f3" edge="1" parent="1" source="s02" target="dec_ident"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f4a" edge="1" parent="1" source="dec_ident" target="s03_a"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f4b" edge="1" parent="1" source="dec_ident" target="s03_b"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f4c" edge="1" parent="1" source="dec_ident" target="s03_c"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f5a" edge="1" parent="1" source="s03_a" target="s04"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f5b" edge="1" parent="1" source="s03_b" target="s04"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f5c" edge="1" parent="1" source="s03_c" target="s04"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f6" edge="1" parent="1" source="s04" target="dec_consent"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f7_no" edge="1" parent="1" source="dec_consent" target="term_abort"><mxGeometry relative="1" as="geometry"><mxPoint as="offset" value="-10"/></mxGeometry></mxCell>
+        <mxCell id="f7_yes" edge="1" parent="1" source="dec_consent" target="s05"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f8" edge="1" parent="1" source="s05" target="s06"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f9" edge="1" parent="1" source="s06" target="s07"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f10" edge="1" parent="1" source="s07" target="dec_redflag"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f11_rf_yes" edge="1" parent="1" source="dec_redflag" target="s08"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f11_rf_no" edge="1" parent="1" source="dec_redflag" target="s07_complete"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f12" edge="1" parent="1" source="s07_complete" target="s09_intro"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f13" edge="1" parent="1" source="s09_intro" target="s09_mcq"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f14" edge="1" parent="1" source="s09_mcq" target="prakriti_math"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f15" edge="1" parent="1" source="prakriti_math" target="s10"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f16" edge="1" parent="1" source="s10" target="s11"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f17" edge="1" parent="1" source="s11" target="s12"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f18" edge="1" parent="1" source="s12" target="s13"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f19" edge="1" parent="1" source="s13" target="s14"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f20" edge="1" parent="1" source="s14" target="s15"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f21" edge="1" parent="1" source="s14" target="s17"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f22" edge="1" parent="1" source="s16" target="s17"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f23" edge="1" parent="1" source="s17" target="s18"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f24" edge="1" parent="1" source="s18" target="doc_actions"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="f25" edge="1" parent="1" source="doc_actions" target="p_end"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
