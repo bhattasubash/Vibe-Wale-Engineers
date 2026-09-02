@@ -15,7 +15,7 @@
     font-optical-sizing: auto;
   }
 
-  /* GIGW Strict Flat Corners */
+  /* GIGW Strict Flat 2px Corners */
   button, input, select, textarea, div {
     border-radius: 2px !important;
   }
@@ -34,6 +34,32 @@
   font-optical-sizing: auto;
   font-style: normal;
   font-variation-settings: "wdth" 100;
+}
+
+/* GIGW Functional Motion Rules & Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Functional Recording State Pulse (Non-decorative feedback) */
+@keyframes mic-active-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.88;
+  }
+}
+
+.animate-mic-recording {
+  animation: mic-active-pulse 1.5s ease-in-out infinite;
 }
 
 /* Official Government Scrollbar */

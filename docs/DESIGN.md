@@ -1,6 +1,6 @@
 # AYUSH-Care Design System & Screen Blueprint Specification (GIGW Compliant)
 
-This document is the **authoritative master guide for UI/UX designers and frontend developers** working on **AYUSH-Care (MediKiosk)**. It defines all visual tokens, government compliance standards, and the **4 core screen archetype wireframes** used across all 18 patient and physician screens.
+This document is the **authoritative master guide for UI/UX designers and frontend developers** working on **AYUSH-Care (MediKiosk)**. It defines all visual tokens, government compliance standards, iconography rules, motion accessibility guidelines, and the **4 core screen archetype wireframes** used across all 18 patient and physician screens.
 
 ---
 
@@ -9,7 +9,7 @@ This document is the **authoritative master guide for UI/UX designers and fronte
 1. **Government Utilitarian Standard:** Follows the **Guidelines for Indian Government Websites (GIGW)** and **NIC conventions** — dense, structured, information-first.
 2. **100% Flat Elevation (Zero Shadows):** No floating drop shadows or blurred cards. All panels sit flat on the `#EAEDF0` canvas with clean 1px borders (`#CED4DA`).
 3. **Sharp 2px Square Corners:** All buttons, cards, input fields, badges, and tabs use `rounded-[2px]`. No rounded pills or circular cards.
-4. **Authoritative National Identity:** Official placement of the **Ashoka Lion Capital (National Emblem with सत्यमेव जयते)** top-left and the **Indian National Tricolor Accent Ribbon (`#FF9933` - `#FFFFFF` - `#138808`)** directly under the header.
+4. **Authoritative National Identity:** Official placement of the **Ashoka Lion Capital (National Emblem with सत्यमेव जयते)** top-left and the **Indian National Tricolor Accent Ribbon (`#FF9933` - `#FFFFFF` - `#138808`)** directly under the header. National symbols must always appear in correct official proportions and colors, never stylized or distorted.
 5. **Dual-Mode Accessibility:** Every interactive element has a minimum touch target of **48px–64px** and is paired with sequential bilingual Text-to-Speech (**Hindi audio first $\rightarrow$ English audio second**).
 
 ---
@@ -36,9 +36,9 @@ This document is the **authoritative master guide for UI/UX designers and fronte
 
 ## 3. Typography Stack & Font Hierarchy
 
-* **English Font:** `"Open Sans", Arial, Helvetica, sans-serif`
-* **Hindi Font:** `"Noto Sans Devanagari", sans-serif`
-* **Tailwind Config:** `fontFamily: { sans: ['"Open Sans"', '"Noto Sans Devanagari"', 'Arial', 'sans-serif'] }`
+* **English Font:** `"Noto Sans", Arial, Helvetica, sans-serif` (Weights 100..900)
+* **Hindi Font:** `"Noto Sans Devanagari", sans-serif` (Weights 100..900)
+* **Tailwind Config:** `fontFamily: { sans: ['"Noto Sans"', '"Noto Sans Devanagari"', 'Arial', 'sans-serif'] }`
 
 ### Hierarchy Scale:
 * **Kiosk Main Title:** `text-2xl sm:text-4xl md:text-5xl font-extrabold` (Color: `rgb(10, 45, 101)`)
@@ -49,11 +49,56 @@ This document is the **authoritative master guide for UI/UX designers and fronte
 
 ---
 
-## 4. The 4 Standard Screen Layout Archetypes (Wireframe Blueprints)
+## 4. Iconography Standards (GIGW Compliant)
 
-To build any of the 18 screens in the system, use one of these 4 standardized templates:
+GIGW requires icons to be simple, self-explanatory, and legible at arm's length on high-resolution touchscreens.
+
+### Rules & Guidelines:
+1. **Outline/Line-Style Icons Only:** Use **Lucide React** (`lucide-react`). Clean outline geometry (1.5px–2px stroke) without gradients, drop-shadows, glossy bubbles, or 3D fills.
+2. **Literal and Universal Symbolism:**
+   * 🎙️ `Mic` for Voice Input
+   * 🔊 `Volume2` / `VolumeX` for Spoken Audio Prompter
+   * 📄 `FileText` for Prescriptions / Documents
+   * ⚖️ `Scale` for Classical Ayurvedic Tridosha Balance (Vata-Pitta-Kapha)
+   * 🌐 `Globe` for Language Selection
+   * ✓ `CheckCircle2` / `Check` for Selection Confirmations
+   * 📞 `PhoneCall` for OPD Helpdesk
+3. **Always Paired with Text Labels:** An icon must **never be the sole signal** for an action. Low-literacy patients rely on icon + text combined with audio.
+4. **Strictly Forbidden:** 
+   * ❌ Sparkle / Star "AI-Magic" icons (universal tell of generic AI generators).
+   * ❌ 3D/Skeuomorphic icon sets.
+   * ❌ Abstract/clever symbols that confuse first-time rural users.
 
 ---
+
+## 5. Animation & Motion Standards (Accessibility-First)
+
+Government accessibility guidelines treat animation as a **functional necessity**, never as decorative delight.
+
+### Rules & Guidelines:
+1. **Fast, Functional Transitions Only (150ms – 250ms):** Quick slide/fade between kiosk screens to orient the patient. No sluggish multi-second animations.
+2. **No Decorative Motion:** No floating background particles, no bouncing elements, no parallax scrolling, no auto-playing loops.
+3. **Subtle State Feedback:** The only recurring animation permitted is a **gentle, functional pulse on the Microphone button (`.animate-mic-recording`)** to signal to a low-literacy patient that the system is actively listening.
+4. **Respect `prefers-reduced-motion`:**
+   ```css
+   @media (prefers-reduced-motion: reduce) {
+     *, ::before, ::after {
+       animation-duration: 0.01ms !important;
+       animation-iteration-count: 1 !important;
+       transition-duration: 0.01ms !important;
+     }
+   }
+   ```
+
+### Summary Table for Design Team:
+| Element | Do | Avoid |
+|---|---|---|
+| **Icons** | Lucide/outline-style, literal meaning, large (20–28px), always paired with text label | Filled/gradient/3D icons, sparkle "AI" icons, abstract decorative symbols |
+| **Animation** | Fast functional transitions (~200ms), active recording pulse state | Decorative motion, auto-play loops, parallax, bouncing/floating cards |
+
+---
+
+## 6. The 4 Standard Screen Layout Archetypes (Wireframe Blueprints)
 
 ### 🏛️ TEMPLATE 1: Form & Identification Screen (S-03, S-04, S-11)
 Used for: **ABHA QR Scan, Patient Registration, Consent Capture, Document Upload**.
@@ -84,11 +129,6 @@ Used for: **ABHA QR Scan, Patient Registration, Consent Capture, Document Upload
 |  Footer: AIIA OPD Terminal 01 | DPDP Act 2023 Compliant               |
 +-----------------------------------------------------------------------+
 ```
-
-* **Key Guidelines:**
-  * Clean white central container (`max-w-2xl bg-white border border-[#CED4DA] p-6`).
-  * Inputs must have minimum **52px height** and clear numeric keypad support for touchscreens.
-  * For **Consent Screen (S-04)**: Display 2 side-by-side action buttons: **`सहमत हैं • I AGREE`** (Navy `#0A2D65`) and **`असहमत • DECLINE`** (Flat Red Outline `#B91C1C`).
 
 ---
 
@@ -123,11 +163,6 @@ Used for: **Chief Complaint Intake, Adaptive SOCRATES Follow-up, Red-Flag Triage
 +-----------------------------------------------------------------------+
 ```
 
-* **Key Guidelines:**
-  * The **Mic Button** is a prominent 72px square/circle with pulse animation while recording.
-  * Patients can always tap suggested chips if they don't want to speak.
-  * Emergency Red-Flag banner locks navigation and displays immediate priority triage notice.
-
 ---
 
 ### ⚖️ TEMPLATE 3: Classical Prakriti Assessment Screen (S-09, S-10)
@@ -160,12 +195,6 @@ Used for: **15-Trait Charaka Samhita Prakriti Questionnaire & Dashavidha Pariksh
 +-----------------------------------------------------------------------+
 ```
 
-* **Key Guidelines:**
-  * Exactly **1 Question per screen** to avoid cognitive overload for elderly patients.
-  * Options: **3 Large Horizontal Option Cards** (60px height).
-  * State: White background by default $\rightarrow$ solid `rgb(10, 45, 101)` with white text when selected.
-  * Classical tags (*Vata, Pitta, Kapha*) are calculated mathematically in the background and are never shown as medical jargon to the patient.
-
 ---
 
 ### 📋 TEMPLATE 4: Dense Clinical Summary & Doctor Dashboard (S-12, S-17, S-18)
@@ -196,48 +225,15 @@ Used for: **Patient Summary Review, Token Dispatch, and Physician EMR Review**.
 +-----------------------------------------------------------------------+
 ```
 
-* **Key Guidelines:**
-  * Dense 2-column or 3-column information grid.
-  * Tridosha Prakriti breakdown displayed via exact deterministic percentage bars.
-  * Instant 1-click action bar for physician approval.
-
 ---
 
-## 5. UI Component Specs Reference for Developers
-
-### A. KioskButton (Primary CTA)
-```tsx
-<button
-  className="w-full py-3.5 px-6 text-base sm:text-xl font-black rounded-[2px] border border-[#071F45] text-white flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
-  style={{ backgroundColor: 'rgb(10, 45, 101)', color: 'rgb(255, 255, 255)' }}
->
-  <span>पंजीकरण आरंभ करें • TAP TO BEGIN</span>
-  <ArrowRight className="w-5 h-5 text-white" />
-</button>
-```
-
-### B. Option / MCQ Selection Button
-```tsx
-<button
-  className="w-full p-4 rounded-[2px] border border-[#CED4DA] text-left transition-colors font-bold text-sm sm:text-base cursor-pointer"
-  style={{
-    backgroundColor: isSelected ? 'rgb(10, 45, 101)' : 'rgb(255, 255, 255)',
-    color: isSelected ? 'rgb(255, 255, 255)' : '#212529',
-    borderColor: isSelected ? '#071F45' : '#CED4DA',
-  }}
->
-  {optionText}
-</button>
-```
-
----
-
-## 6. Verification & Accessibility Checklist
+## 7. Verification & Accessibility Checklist
 
 - [x] **WCAG AAA Contrast Ratio (10.04:1)** on primary navy / white buttons.
 - [x] **GIGW (Guidelines for Indian Government Websites)** flat styling rules strictly observed.
-- [x] **Ashoka Lion Capital** state emblem with *"सत्यमेव जयते"* positioned top-left.
+- [x] **Lucide outline-style icons only**, literal symbolism, always paired with text.
+- [x] **`prefers-reduced-motion` compliance** in CSS, zero decorative loops/parallax.
+- [x] **Ashoka Lion Capital** state emblem with *"सत्यमेव जयते"* positioned top-left in correct proportion.
 - [x] **Indian National Tricolor** accent ribbon integrated across all page headers.
 - [x] **DPDP Act 2023** privacy and ephemeral session data notice displayed.
 - [x] **Dual-Mode Access:** Complete touch usability + sequential bilingual voice readout.
-- [x] **Zero Disorientation:** 100% flat, instantaneous UI state transitions with zero floating shadows.
