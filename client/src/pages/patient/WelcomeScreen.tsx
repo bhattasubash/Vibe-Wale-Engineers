@@ -27,21 +27,26 @@ export const WelcomeScreen: React.FC = () => {
         {/* Government Sub-Badge */}
         <div
           className="inline-block px-3.5 py-1 rounded-[2px] border text-xs font-bold uppercase tracking-wider mb-2.5"
-          style={{ backgroundColor: '#E8EDF5', borderColor: 'rgba(10, 45, 101, 0.25)', color: 'rgb(10, 45, 101)' }}
+          style={{ backgroundColor: '#E8F3ED', borderColor: 'rgba(27, 94, 63, 0.3)', color: '#1B5E3F' }}
         >
           {language === 'hi'
             ? 'रोगी स्वयं-पंजीकरण एवं प्रकृति परीक्षण केंद्र'
             : 'Patient Intake & Ayurvedic Constitution Kiosk'}
         </div>
 
-        {/* Clear Bold Headline */}
+        {/* Clear Bold Headline with Secondary Neutral Ink + Primary Green Accent */}
         <h1
-          className="text-3xl sm:text-5xl font-black tracking-tight leading-tight max-w-2xl"
-          style={{ color: 'rgb(10, 45, 101)' }}
+          className="text-3xl sm:text-5xl font-black tracking-tight leading-tight max-w-2xl text-[#1F3864]"
         >
-          {language === 'hi'
-            ? 'नमस्ते! आयुष-केयर स्वागत केंद्र'
-            : 'Welcome to AYUSH-Care Kiosk'}
+          {language === 'hi' ? (
+            <>
+              नमस्ते! <span style={{ color: '#1B5E3F' }}>आयुष-केयर</span> स्वागत केंद्र
+            </>
+          ) : (
+            <>
+              Welcome to <span style={{ color: '#1B5E3F' }}>AYUSH-Care</span> Kiosk
+            </>
+          )}
         </h1>
 
         {/* Single Short Subtitle */}
@@ -61,31 +66,35 @@ export const WelcomeScreen: React.FC = () => {
           />
         </div>
 
-        {/* 3-Step Visual Process Card (Plain White Boxes, Uniform Navy Outline Icons) */}
+        {/* 3-Step Visual Process Card */}
         <div className="w-full max-w-2xl my-2 bg-white rounded-[2px] border border-[#CED4DA] p-4 sm:p-5 text-left">
           
-          <div className="text-xs font-extrabold uppercase tracking-wider text-[#495057] mb-3 border-b border-[#CED4DA] pb-2">
-            <span style={{ color: 'rgb(10, 45, 101)' }}>
+          {/* Warm Saffron / Turmeric Highlight on Section Label */}
+          <div className="text-xs font-black uppercase tracking-wider mb-3 border-b border-[#CED4DA] pb-2 flex items-center justify-between">
+            <span style={{ color: '#C77A1E' }}>
               {language === 'hi' ? 'कियोस्क प्रक्रिया (3 आसान चरण)' : 'How It Works (3 Easy Steps)'}
+            </span>
+            <span className="text-[11px] font-semibold text-[#6C757D]">
+              {language === 'hi' ? 'समय: ~2 मिनट' : 'Duration: ~2 mins'}
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             
-            {/* Step 1 */}
+            {/* Step 1: Deep AYUSH Green Badge & Outline Icon */}
             <div className="flex items-start gap-2.5 p-3 rounded-[2px] bg-white border border-[#CED4DA]">
               <div
                 className="w-7 h-7 rounded-[2px] font-black flex items-center justify-center shrink-0 text-xs"
-                style={{ backgroundColor: 'rgb(10, 45, 101)', color: 'rgb(255, 255, 255)' }}
+                style={{ backgroundColor: '#1B5E3F', color: '#FFFFFF' }}
               >
                 1
               </div>
               <div>
                 <div
                   className="flex items-center gap-1.5 font-extrabold text-xs sm:text-sm"
-                  style={{ color: 'rgb(10, 45, 101)' }}
+                  style={{ color: '#1B5E3F' }}
                 >
-                  <Mic className="w-4 h-4 text-[#0A2D65]" strokeWidth={1.75} />
+                  <Mic className="w-4 h-4" style={{ color: '#1B5E3F' }} strokeWidth={1.75} />
                   <span>{language === 'hi' ? 'बोलकर बताएं' : 'Speak / Select'}</span>
                 </div>
                 <p className="text-[11px] sm:text-xs text-[#495057] mt-0.5 font-medium leading-tight">
@@ -96,20 +105,20 @@ export const WelcomeScreen: React.FC = () => {
               </div>
             </div>
 
-            {/* Step 2 */}
+            {/* Step 2: Deep AYUSH Green Badge & Outline Icon */}
             <div className="flex items-start gap-2.5 p-3 rounded-[2px] bg-white border border-[#CED4DA]">
               <div
                 className="w-7 h-7 rounded-[2px] font-black flex items-center justify-center shrink-0 text-xs"
-                style={{ backgroundColor: 'rgb(10, 45, 101)', color: 'rgb(255, 255, 255)' }}
+                style={{ backgroundColor: '#1B5E3F', color: '#FFFFFF' }}
               >
                 2
               </div>
               <div>
                 <div
                   className="flex items-center gap-1.5 font-extrabold text-xs sm:text-sm"
-                  style={{ color: 'rgb(10, 45, 101)' }}
+                  style={{ color: '#1B5E3F' }}
                 >
-                  <Scale className="w-4 h-4 text-[#0A2D65]" strokeWidth={1.75} />
+                  <Scale className="w-4 h-4" style={{ color: '#1B5E3F' }} strokeWidth={1.75} />
                   <span>{language === 'hi' ? 'प्रकृति जांच' : 'Prakriti Balance'}</span>
                 </div>
                 <p className="text-[11px] sm:text-xs text-[#495057] mt-0.5 font-medium leading-tight">
@@ -120,20 +129,20 @@ export const WelcomeScreen: React.FC = () => {
               </div>
             </div>
 
-            {/* Step 3 */}
+            {/* Step 3: Deep AYUSH Green Badge & Outline Icon */}
             <div className="flex items-start gap-2.5 p-3 rounded-[2px] bg-white border border-[#CED4DA]">
               <div
                 className="w-7 h-7 rounded-[2px] font-black flex items-center justify-center shrink-0 text-xs"
-                style={{ backgroundColor: 'rgb(10, 45, 101)', color: 'rgb(255, 255, 255)' }}
+                style={{ backgroundColor: '#1B5E3F', color: '#FFFFFF' }}
               >
                 3
               </div>
               <div>
                 <div
                   className="flex items-center gap-1.5 font-extrabold text-xs sm:text-sm"
-                  style={{ color: 'rgb(10, 45, 101)' }}
+                  style={{ color: '#1B5E3F' }}
                 >
-                  <FileText className="w-4 h-4 text-[#0A2D65]" strokeWidth={1.75} />
+                  <FileText className="w-4 h-4" style={{ color: '#1B5E3F' }} strokeWidth={1.75} />
                   <span>{language === 'hi' ? 'डॉक्टर पर्ची' : 'Doctor File'}</span>
                 </div>
                 <p className="text-[11px] sm:text-xs text-[#495057] mt-0.5 font-medium leading-tight">
@@ -148,13 +157,13 @@ export const WelcomeScreen: React.FC = () => {
 
         </div>
 
-        {/* Big Tactile Rectangular Start CTA Button */}
+        {/* Big Tactile Rectangular Start CTA Button in Deep AYUSH Green */}
         <div className="w-full max-w-md mt-4 mb-2">
           <button
             type="button"
             onClick={handleStart}
-            className="w-full py-4 px-6 text-lg sm:text-2xl font-black rounded-[2px] border border-[#071F45] text-white flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] cursor-pointer"
-            style={{ backgroundColor: 'rgb(10, 45, 101)', color: 'rgb(255, 255, 255)' }}
+            className="w-full py-4 px-6 text-lg sm:text-2xl font-black rounded-[2px] border border-[#14462F] text-white flex items-center justify-center gap-2.5 transition-transform active:scale-[0.99] cursor-pointer"
+            style={{ backgroundColor: '#1B5E3F', color: '#FFFFFF' }}
           >
             <span>
               {language === 'hi'
@@ -180,7 +189,7 @@ export const WelcomeScreen: React.FC = () => {
       {/* 1-Line Minimal Clean Kiosk Terminal Footer */}
       <footer className="w-full bg-white border-t border-[#CED4DA] py-2.5 px-6 text-xs text-[#495057] select-none">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
-          <div className="flex items-center gap-2 font-bold" style={{ color: 'rgb(10, 45, 101)' }}>
+          <div className="flex items-center gap-2 font-bold text-[#1F3864]">
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
             <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
