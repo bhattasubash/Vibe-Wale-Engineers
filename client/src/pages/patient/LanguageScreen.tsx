@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Globe, ArrowLeft, Check } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 
@@ -22,11 +22,11 @@ export const LanguageScreen: React.FC = () => {
   const audioEnglish = 'Please choose your preferred language for consultation.';
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between py-4 px-3 sm:px-6 font-sans select-none">
+    <div className="flex flex-col min-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between py-6 px-4 sm:px-6 font-sans select-none">
       <main className="max-w-3xl w-full mx-auto flex-1 flex flex-col justify-center items-center text-center">
         
         {/* Bilingual Voice Prompter Bar */}
-        <div className="mb-3 sm:mb-4">
+        <div className="mb-4">
           <AudioSpeaker
             hindiText={audioHindi}
             englishText={audioEnglish}
@@ -35,19 +35,23 @@ export const LanguageScreen: React.FC = () => {
           />
         </div>
 
-        {/* Title Badge */}
+        {/* Title Badge in ABDM Blue */}
         <div
-          className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[2px] border text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2"
-          style={{ backgroundColor: '#E8EDF5', borderColor: 'rgba(10, 45, 101, 0.25)', color: 'rgb(10, 45, 101)' }}
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[3px] border text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2.5"
+          style={{
+            backgroundColor: '#E8F1F8',
+            borderColor: 'rgba(11, 95, 165, 0.3)',
+            color: '#0B5FA5',
+          }}
         >
           <Globe className="w-3.5 h-3.5" />
           <span>भाषा चयन / LANGUAGE SELECTION</span>
         </div>
 
-        {/* Headline */}
+        {/* Headline in Trust Blue */}
         <h1
-          className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-1 tracking-tight"
-          style={{ color: 'rgb(10, 45, 101)' }}
+          className="text-2xl sm:text-4xl md:text-5xl font-black mb-1.5 tracking-tight"
+          style={{ color: '#0B5FA5' }}
         >
           आप किस भाषा में बात करना चाहते हैं?
         </h1>
@@ -55,8 +59,8 @@ export const LanguageScreen: React.FC = () => {
           Which language would you prefer for your OPD consultation?
         </p>
 
-        {/* 2 Big Language Cards with Squared-off Checkmark Box */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 w-full max-w-xl mb-6">
+        {/* 2 Big Language Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full max-w-xl mb-6">
           
           {/* Hindi Card */}
           {(() => {
@@ -68,18 +72,18 @@ export const LanguageScreen: React.FC = () => {
                 onClick={() => handleSelectLanguage('hi')}
                 onMouseEnter={() => setHoveredLang('hi')}
                 onMouseLeave={() => setHoveredLang(null)}
-                className="group relative p-5 sm:p-6 rounded-[2px] border text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#0A2D65]/20 cursor-pointer active:scale-[0.99]"
+                className="group relative p-5 sm:p-6 rounded-[3px] border text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#0B5FA5]/30 cursor-pointer active:scale-[0.99]"
                 style={{
-                  backgroundColor: isHoveredOrClicked ? 'rgb(10, 45, 101)' : 'rgb(255, 255, 255)',
-                  borderColor: isHoveredOrClicked ? 'rgb(7, 31, 69)' : '#CED4DA',
-                  color: isHoveredOrClicked ? 'rgb(255, 255, 255)' : '#212529',
+                  backgroundColor: isHoveredOrClicked ? '#0B5FA5' : '#FFFFFF',
+                  borderColor: isHoveredOrClicked ? '#084B83' : '#CED4DA',
+                  color: isHoveredOrClicked ? '#FFFFFF' : '#212529',
                 }}
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <span
                       className="text-2xl sm:text-3xl font-black block mb-0.5 tracking-tight"
-                      style={{ color: isHoveredOrClicked ? 'rgb(255, 255, 255)' : 'rgb(10, 45, 101)' }}
+                      style={{ color: isHoveredOrClicked ? '#FFFFFF' : '#0B5FA5' }}
                     >
                       हिन्दी
                     </span>
@@ -91,16 +95,16 @@ export const LanguageScreen: React.FC = () => {
                     </span>
                   </div>
                   
-                  {/* Squared-off Status Box */}
+                  {/* Status Indicator Box */}
                   <div
-                    className="w-9 h-9 rounded-[2px] border flex items-center justify-center transition-all"
+                    className="w-8 h-8 rounded-[2px] border flex items-center justify-center transition-all"
                     style={{
-                      backgroundColor: isHoveredOrClicked ? 'rgb(255, 255, 255)' : '#EAEDF0',
-                      borderColor: isHoveredOrClicked ? 'rgb(255, 255, 255)' : '#CED4DA',
-                      color: isHoveredOrClicked ? 'rgb(10, 45, 101)' : '#495057',
+                      backgroundColor: isHoveredOrClicked ? '#FFFFFF' : '#EAEDF0',
+                      borderColor: isHoveredOrClicked ? '#FFFFFF' : '#CED4DA',
+                      color: isHoveredOrClicked ? '#0B5FA5' : '#495057',
                     }}
                   >
-                    <CheckCircle2 className="w-5 h-5" />
+                    <Check className="w-4 h-4 stroke-[3]" />
                   </div>
                 </div>
 
@@ -108,7 +112,7 @@ export const LanguageScreen: React.FC = () => {
                   className="mt-3 text-xs font-semibold leading-relaxed border-t pt-2.5"
                   style={{
                     color: isHoveredOrClicked ? 'rgba(255, 255, 255, 0.95)' : '#495057',
-                    borderColor: isHoveredOrClicked ? 'rgba(255, 255, 255, 0.2)' : '#E8EDF5',
+                    borderColor: isHoveredOrClicked ? 'rgba(255, 255, 255, 0.2)' : '#E8F1F8',
                   }}
                 >
                   स्क्रीन के सभी प्रश्न एवं आवाज़ हिन्दी में उपलब्ध होंगे।
@@ -127,18 +131,18 @@ export const LanguageScreen: React.FC = () => {
                 onClick={() => handleSelectLanguage('en')}
                 onMouseEnter={() => setHoveredLang('en')}
                 onMouseLeave={() => setHoveredLang(null)}
-                className="group relative p-5 sm:p-6 rounded-[2px] border text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#0A2D65]/20 cursor-pointer active:scale-[0.99]"
+                className="group relative p-5 sm:p-6 rounded-[3px] border text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#0B5FA5]/30 cursor-pointer active:scale-[0.99]"
                 style={{
-                  backgroundColor: isHoveredOrClicked ? 'rgb(10, 45, 101)' : 'rgb(255, 255, 255)',
-                  borderColor: isHoveredOrClicked ? 'rgb(7, 31, 69)' : '#CED4DA',
-                  color: isHoveredOrClicked ? 'rgb(255, 255, 255)' : '#212529',
+                  backgroundColor: isHoveredOrClicked ? '#0B5FA5' : '#FFFFFF',
+                  borderColor: isHoveredOrClicked ? '#084B83' : '#CED4DA',
+                  color: isHoveredOrClicked ? '#FFFFFF' : '#212529',
                 }}
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <span
                       className="text-2xl sm:text-3xl font-black block mb-0.5 tracking-tight"
-                      style={{ color: isHoveredOrClicked ? 'rgb(255, 255, 255)' : 'rgb(10, 45, 101)' }}
+                      style={{ color: isHoveredOrClicked ? '#FFFFFF' : '#0B5FA5' }}
                     >
                       English
                     </span>
@@ -150,16 +154,16 @@ export const LanguageScreen: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Squared-off Status Box */}
+                  {/* Status Indicator Box */}
                   <div
-                    className="w-9 h-9 rounded-[2px] border flex items-center justify-center transition-all"
+                    className="w-8 h-8 rounded-[2px] border flex items-center justify-center transition-all"
                     style={{
-                      backgroundColor: isHoveredOrClicked ? 'rgb(255, 255, 255)' : '#EAEDF0',
-                      borderColor: isHoveredOrClicked ? 'rgb(255, 255, 255)' : '#CED4DA',
-                      color: isHoveredOrClicked ? 'rgb(10, 45, 101)' : '#495057',
+                      backgroundColor: isHoveredOrClicked ? '#FFFFFF' : '#EAEDF0',
+                      borderColor: isHoveredOrClicked ? '#FFFFFF' : '#CED4DA',
+                      color: isHoveredOrClicked ? '#0B5FA5' : '#495057',
                     }}
                   >
-                    <CheckCircle2 className="w-5 h-5" />
+                    <Check className="w-4 h-4 stroke-[3]" />
                   </div>
                 </div>
 
@@ -167,7 +171,7 @@ export const LanguageScreen: React.FC = () => {
                   className="mt-3 text-xs font-semibold leading-relaxed border-t pt-2.5"
                   style={{
                     color: isHoveredOrClicked ? 'rgba(255, 255, 255, 0.95)' : '#495057',
-                    borderColor: isHoveredOrClicked ? 'rgba(255, 255, 255, 0.2)' : '#E8EDF5',
+                    borderColor: isHoveredOrClicked ? 'rgba(255, 255, 255, 0.2)' : '#E8F1F8',
                   }}
                 >
                   All questionnaire prompts and voice will be in English.
@@ -182,13 +186,27 @@ export const LanguageScreen: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[2px] border border-[#CED4DA] bg-white hover:border-[#0A2D65] hover:text-[#0A2D65] text-xs font-bold text-[#212529] transition-all cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[3px] border border-[#CED4DA] bg-white hover:border-[#0B5FA5] hover:text-[#0B5FA5] text-xs font-bold text-[#212529] transition-all cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>मुख्य पृष्ठ पर वापस जाएं (Back to Welcome)</span>
         </button>
 
       </main>
+
+      {/* Persistent Single-Line Clean Kiosk Footer */}
+      <footer className="w-full bg-white border-t border-[#CED4DA] py-2.5 px-6 text-xs text-[#495057] select-none">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
+          <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
+            <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
+            <span className="text-[#CED4DA]">|</span>
+            <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
+          </div>
+          <div className="text-[11px] font-semibold text-[#6C757D]">
+            <span>राष्ट्रीय आयुष हेल्पलाइन: 1800-11-2233</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

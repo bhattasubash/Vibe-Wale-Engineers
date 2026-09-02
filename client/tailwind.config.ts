@@ -8,26 +8,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ayush: {
-          navy: '#0A2D65',        // rgb(10, 45, 101) - Official Deep AYUSH Navy
-          navyDark: '#071F45',    // rgb(7, 31, 69)
-          navyLight: '#E8EDF5',   // Soft navy tint
-          blue: '#0066CC',       // Action highlight blue
-          blueHover: '#0052A3',
-          canvas: '#EAEDF0',     // Standard government light grey canvas
-          surface: '#FFFFFF',    // Pure white
-          border: '#CED4DA',     // Crisp 1px NIC border
-          borderDark: '#0A2D65',
-          textDark: '#212529',
-          textMuted: '#495057',
+        abdm: {
+          blue: '#0B5FA5',         // ABDM/CoWIN Trust Blue (Primary Brand)
+          blueDark: '#084B83',     // Active/Hover Blue
+          blueLight: '#E8F1F8',    // Soft Blue Tint
+          saffron: '#E07B1A',      // National Tricolor Accent (Used sparingly)
+          saffronLight: '#FFF4EB',
+          ayushGreen: '#2F7D4F',   // AYUSH / Ayurveda Muted Green (Exclusively for Prakriti)
+          ayushGreenLight: '#EDF7F1',
+          canvas: '#EAEDF0',       // Neutral Pale Grey Canvas
+          surface: '#FFFFFF',      // Pure White Surface
+          border: '#CED4DA',       // Clean 1px NIC Border
+          textPrimary: '#212529',  // Dark Text
+          textMuted: '#495057',    // Secondary Text
           textLight: '#6C757D',
         },
         status: {
           success: '#15803D',
           successBg: '#F0FDF4',
-          danger: '#B91C1C',
+          danger: '#DC2626',
           dangerBg: '#FEF2F2',
-          warning: '#B45309',
+          warning: '#D97706',
         },
       },
       fontFamily: {
@@ -35,13 +36,11 @@ const config: Config = {
       },
       borderRadius: {
         'kiosk-sm': '2px',
-        'kiosk-md': '2px',
-        'kiosk-lg': '2px',
-        'kiosk-btn': '2px',
+        'kiosk-md': '3px',
+        'kiosk-lg': '4px',
       },
       boxShadow: {
-        'kiosk-panel': 'none',
-        'kiosk-btn': 'none',
+        'none': 'none',
       },
     },
   },

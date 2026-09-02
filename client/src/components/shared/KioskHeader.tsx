@@ -1,53 +1,54 @@
 import React from 'react';
-import { Volume2, PhoneCall } from 'lucide-react';
-import { StateEmblem } from './StateEmblem';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { PhoneCall } from 'lucide-react';
+import { StateEmblem } from '@/components/ui/StateEmblem';
 import { useSessionStore } from '@/stores/sessionStore';
-import { speechEngine } from '@/lib/speech';
 
 export const KioskHeader: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { language, setLanguage } = useSessionStore();
 
   const toggleLanguage = () => {
-    setLanguage(language === 'hi' ? 'en' : 'hi');
-  };
-
-  const speakHeader = () => {
-    const text = language === 'hi'
-      ? 'भारत सरकार, आयुष मंत्रालय, अखिल भारतीय आयुर्वेद संस्थान, नई दिल्ली'
-      : 'Government of India, Ministry of Ayush, All India Institute of Ayurveda, New Delhi';
-    speechEngine.speak(text, language);
+    const nextLang = language === 'hi' ? 'en' : 'hi';
+    setLanguage(nextLang);
   };
 
   return (
-    <header className="w-full bg-white border-b border-[#CED4DA] select-none">
+    <header className="w-full bg-white border-b border-[#CED4DA] select-none sticky top-0 z-40">
       
-      {/* 1. Indian National Tricolor Accent Ribbon */}
-      <div className="h-1 w-full flex">
-        <div className="w-1/3 bg-[#FF9933]" />
-        <div className="w-1/3 bg-white" />
-        <div className="w-1/3 bg-[#138808]" />
+      {/* 1. Indian National Tricolor Continuous Strip (Saffron, White, Green in Equal Thirds, No Gaps) */}
+      <div className="w-full h-1.5 flex flex-row">
+        <div className="w-1/3 h-full bg-[#FF9933]" />
+        <div className="w-1/3 h-full bg-[#FFFFFF]" />
+        <div className="w-1/3 h-full bg-[#138808]" />
       </div>
 
-      {/* 2. Official Ministry Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      {/* 2. Official Government Branding Bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between">
         
-        {/* Left: State Emblem (Ashoka Lion Capital) & Ministry Typography */}
-        <div className="flex items-center gap-3.5">
-          <div className="text-[#212529] flex items-center justify-center shrink-0">
-            <StateEmblem className="w-10 h-13 sm:w-11 sm:h-15" />
+        {/* Left: Ashoka Lion Capital Emblem + Ministry & Institute Typography */}
+        <div
+          onClick={() => navigate('/')}
+          className="flex items-center gap-3 cursor-pointer group"
+          title="Return to Welcome Screen"
+        >
+          {/* Authentic Ashoka Lion Capital (Emblem with सत्यमेव जयते) */}
+          <div className="shrink-0 flex items-center justify-center">
+            <StateEmblem className="w-9 h-11 text-[#212529]" />
           </div>
 
-          <div className="flex flex-col">
-            <span className="text-xs sm:text-sm font-semibold text-[#495057] leading-tight">
-              {language === 'hi' ? 'भारत सरकार' : 'Government of India'}
+          <div className="flex flex-col border-l border-[#CED4DA] pl-3 py-0.5">
+            <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#495057] leading-none">
+              भारत सरकार / Government of India
             </span>
             <span
-              className="text-xl sm:text-2xl font-extrabold tracking-tight leading-tight"
-              style={{ color: 'rgb(10, 45, 101)' }}
+              className="text-sm sm:text-lg font-black tracking-tight leading-tight mt-0.5"
+              style={{ color: '#0B5FA5' }}
             >
               {language === 'hi' ? 'आयुष मंत्रालय' : 'Ministry of Ayush'}
             </span>
-            <span className="text-[11px] sm:text-xs font-bold text-[#0066CC] mt-0.5">
+            <span className="text-[10px] sm:text-xs font-bold text-[#495057] leading-none mt-0.5">
               {language === 'hi'
                 ? 'अखिल भारतीय आयुर्वेद संस्थान (AIIA), नई दिल्ली'
                 : 'All India Institute of Ayurveda (AIIA), New Delhi'}
@@ -55,33 +56,33 @@ export const KioskHeader: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Inline Language Switcher & OPD Helpdesk */}
-        <div className="flex items-center gap-3">
+        {/* Right: Quick Accessibility Tools (Inline Language Switcher & Helpline) */}
+        <div className="flex items-center gap-2 sm:gap-3">
           
-          {/* Official Inline Language Toggle */}
+          {/* Inline Language Toggle Button */}
           <button
             type="button"
             onClick={toggleLanguage}
-            className="flex items-center gap-1.5 px-3 py-1.5 border border-[#CED4DA] bg-white hover:bg-gray-50 text-xs sm:text-sm font-bold text-[#212529] transition-colors focus:outline-none cursor-pointer"
-            title="Switch Language / भाषा बदलें"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] border border-[#CED4DA] bg-[#F8FAFC] hover:bg-[#E8F1F8] hover:border-[#0B5FA5] text-xs font-bold transition-colors cursor-pointer"
+            style={{ color: '#0B5FA5' }}
+            title="Toggle between Hindi and English"
           >
-            <span className="font-extrabold" style={{ color: 'rgb(10, 45, 101)' }}>
-              {language === 'hi' ? 'अ/A' : 'A/अ'}
-            </span>
-            <span className="underline">
+            <span className="font-extrabold">{language === 'hi' ? 'अ/A' : 'A/अ'}</span>
+            <span className="hidden sm:inline">
               {language === 'hi' ? 'Switch to English' : 'हिन्दी में बदलें'}
             </span>
           </button>
 
-          {/* OPD Helpdesk badge */}
-          <div className="hidden sm:flex items-center gap-1.5 text-[#495057] bg-[#EAEDF0] px-3 py-1.5 border border-[#CED4DA] text-xs font-bold">
-            <PhoneCall className="w-3.5 h-3.5 text-[#0A2D65]" />
-            <span>1800-11-2233</span>
+          {/* OPD Helpline Badge */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] border border-[#CED4DA] bg-[#F8FAFC] text-xs font-bold text-[#495057]">
+            <PhoneCall className="w-3.5 h-3.5" style={{ color: '#0B5FA5' }} />
+            <span className="font-semibold text-[11px] sm:text-xs">1800-11-2233</span>
           </div>
 
         </div>
 
       </div>
+
     </header>
   );
 };
