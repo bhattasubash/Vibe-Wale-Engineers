@@ -22,7 +22,6 @@ export const PrakritiScreen: React.FC = () => {
     setPrakritiAnswer(currentQuestion.id, { optionIndex: idx, doshaTag: dosha });
   };
 
-  // Deterministic Math Execution when all 15 questions finish
   const calculateFinalScores = () => {
     let vScore = 0;
     let pScore = 0;
@@ -82,7 +81,6 @@ export const PrakritiScreen: React.FC = () => {
       const nextAns = prakritiAnswers[PRAKRITI_15_QUESTIONS[nextIdx].id];
       setSelectedOptionIdx(nextAns !== undefined ? nextAns.optionIndex : null);
     } else {
-      // Finished 15 Questions -> Compute & Proceed to Review Screen
       calculateFinalScores();
       navigate('/kiosk/review');
     }
@@ -100,13 +98,13 @@ export const PrakritiScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none">
+    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-hidden">
       
-      {/* Central Prakriti Card */}
-      <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-8 flex-1 flex flex-col items-center">
+      {/* Non-Scrollable Centered Main Container */}
+      <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-2 flex-1 flex flex-col justify-evenly items-center">
         
-        {/* Prompter */}
-        <div className="mb-3">
+        {/* Top Prompter */}
+        <div className="shrink-0">
           <AudioSpeaker
             hindiText={currentQuestion.questionHindi}
             englishText={currentQuestion.questionEnglish}
@@ -115,58 +113,53 @@ export const PrakritiScreen: React.FC = () => {
           />
         </div>
 
-        {/* Top Header Badge */}
-        <div className="w-full max-w-2xl flex items-center justify-between mb-2">
-          <div
-            className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[3px] border text-[11px] font-bold uppercase tracking-wider"
-            style={{
-              backgroundColor: '#EDF7F1',
-              borderColor: 'rgba(47, 125, 79, 0.4)',
-              color: '#2F7D4F',
-            }}
-          >
-            <Scale className="w-3.5 h-3.5 text-[#2F7D4F]" />
-            <span>चरक संहिता प्रकृति परीक्षण • प्रश्न {currentIndex + 1} / 15</span>
+        {/* Progress & Category Header */}
+        <div className="w-full max-w-2xl shrink-0">
+          <div className="flex items-center justify-between mb-1.5">
+            <div
+              className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[3px] border text-[11px] font-bold uppercase tracking-wider"
+              style={{
+                backgroundColor: '#EDF7F1',
+                borderColor: 'rgba(47, 125, 79, 0.4)',
+                color: '#2F7D4F',
+              }}
+            >
+              <Scale className="w-3.5 h-3.5 text-[#2F7D4F]" />
+              <span>चरक संहिता प्रकृति परीक्षण • प्रश्न {currentIndex + 1} / 15</span>
+            </div>
+
+            <span className="text-xs font-extrabold text-[#495057]">
+              {language === 'hi' ? currentQuestion.categoryHindi : currentQuestion.categoryEnglish}
+            </span>
           </div>
 
-          <span className="text-xs font-extrabold text-[#495057]">
-            {language === 'hi' ? currentQuestion.categoryHindi : currentQuestion.categoryEnglish}
-          </span>
+          <div className="w-full h-1.5 bg-[#CED4DA] rounded-full overflow-hidden">
+            <div
+              className="h-full transition-all duration-300"
+              style={{
+                width: `${((currentIndex + 1) / 15) * 100}%`,
+                backgroundColor: '#2F7D4F',
+              }}
+            />
+          </div>
         </div>
 
-        {/* 15-Step Progress Bar */}
-        <div className="w-full max-w-2xl h-1.5 bg-[#CED4DA] rounded-full overflow-hidden mb-4">
-          <div
-            className="h-full transition-all duration-300"
-            style={{
-              width: `${((currentIndex + 1) / 15) * 100}%`,
-              backgroundColor: '#2F7D4F',
-            }}
-          />
-        </div>
-
-        {/* Question Container */}
-        <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-5 mb-4">
+        {/* Current Question Container */}
+        <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-4 sm:p-5 shrink-0">
           
-          <div className="text-[10px] font-bold text-[#6C757D] uppercase tracking-wider mb-1">
+          <div className="text-[10px] font-bold text-[#6C757D] uppercase tracking-wider mb-0.5">
             शास्त्रीय मापदंड: {currentQuestion.sanskritParam}
           </div>
 
           <h2
-            className="text-lg sm:text-2xl font-black mb-1 leading-snug"
+            className="text-lg sm:text-2xl font-black mb-3 leading-tight"
             style={{ color: '#0B5FA5' }}
           >
             {language === 'hi' ? currentQuestion.questionHindi : currentQuestion.questionEnglish}
           </h2>
 
-          <p className="text-xs text-[#495057] font-semibold mb-4">
-            {language === 'hi'
-              ? 'अपनी स्वाभाविक शारीरिक स्थिति के अनुसार सबसे उपयुक्त विकल्प चुनें:'
-              : 'Choose the option that best matches your lifelong bodily nature:'}
-          </p>
-
-          {/* 3 LAYMAN TOUCH OPTIONS */}
-          <div className="space-y-3">
+          {/* EXACTLY 3 SPACIOUS TOUCH OPTIONS (72px Height) */}
+          <div className="space-y-2.5">
             {currentQuestion.options.map((opt, idx) => {
               const isSelected = selectedOptionIdx === idx;
               return (
@@ -174,7 +167,7 @@ export const PrakritiScreen: React.FC = () => {
                   key={idx}
                   type="button"
                   onClick={() => handleSelectOption(idx, opt.dosha)}
-                  className="w-full p-4 rounded-[3px] border text-left transition-colors cursor-pointer flex items-center justify-between active:scale-[0.99]"
+                  className="w-full h-16 sm:h-18 p-3.5 rounded-[3px] border text-left transition-transform active:scale-[0.98] cursor-pointer flex items-center justify-between"
                   style={{
                     backgroundColor: isSelected ? '#0B5FA5' : '#FFFFFF',
                     borderColor: isSelected ? '#084B83' : '#CED4DA',
@@ -192,7 +185,7 @@ export const PrakritiScreen: React.FC = () => {
                       {idx + 1}
                     </div>
                     <span
-                      className="text-xs sm:text-sm font-extrabold leading-tight"
+                      className="text-xs sm:text-sm font-extrabold leading-snug"
                       style={{ color: isSelected ? '#FFFFFF' : '#212529' }}
                     >
                       {language === 'hi' ? opt.textHindi : opt.textEnglish}
@@ -216,23 +209,22 @@ export const PrakritiScreen: React.FC = () => {
 
         </div>
 
-        {/* Bottom Nav */}
-        <div className="w-full max-w-2xl flex items-center justify-between gap-3">
-          
+        {/* Bottom Nav Buttons */}
+        <div className="w-full max-w-2xl flex items-center justify-between gap-3 shrink-0">
           <button
             type="button"
             onClick={handlePrev}
             className="py-3 px-5 rounded-[3px] border border-[#CED4DA] bg-white hover:border-[#0B5FA5] hover:text-[#0B5FA5] text-xs font-bold text-[#212529] flex items-center gap-1.5 cursor-pointer transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{currentIndex === 0 ? 'SOCRATES पर वापस' : 'पिछला प्रश्न (Previous)'}</span>
+            <span>{currentIndex === 0 ? 'SOCRATES पर वापस' : 'पिछला प्रश्न'}</span>
           </button>
 
           <button
             type="button"
             onClick={handleNext}
             disabled={selectedOptionIdx === null}
-            className="py-3 px-6 rounded-[3px] border border-[#084B83] text-sm font-black text-white flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-transform active:scale-[0.99]"
+            className="py-3 px-6 rounded-[3px] border border-[#084B83] text-sm font-black text-white flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-transform active:scale-[0.98]"
             style={{ backgroundColor: '#0B5FA5' }}
           >
             <span>
@@ -242,13 +234,12 @@ export const PrakritiScreen: React.FC = () => {
             </span>
             <ArrowRight className="w-4 h-4 text-white" />
           </button>
-
         </div>
 
       </main>
 
       {/* Persistent Single-Line Clean Footer */}
-      <footer className="w-full bg-white border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none">
+      <footer className="w-full bg-white border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
