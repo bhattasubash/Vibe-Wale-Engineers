@@ -1,12 +1,10 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PhoneCall } from 'lucide-react';
-import { StateEmblem } from '@/components/ui/StateEmblem';
 import { useSessionStore } from '@/stores/sessionStore';
 
 export const KioskHeader: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { language, setLanguage } = useSessionStore();
 
   const toggleLanguage = () => {
@@ -33,9 +31,30 @@ export const KioskHeader: React.FC = () => {
           className="flex items-center gap-3 cursor-pointer group"
           title="Return to Welcome Screen"
         >
-          {/* Authentic Ashoka Lion Capital (Emblem with सत्यमेव जयते) */}
+          {/* Authentic Ashoka Lion Capital SVG */}
           <div className="shrink-0 flex items-center justify-center">
-            <StateEmblem className="w-9 h-11 text-[#212529]" />
+            <svg
+              viewBox="0 0 100 130"
+              className="w-8 h-10 text-[#212529] fill-current"
+              aria-label="National Emblem of India"
+            >
+              {/* Ashoka Lion Capital Vector Outline */}
+              <path d="M50 5 C42 5 36 12 36 20 C36 24 38 28 41 31 C35 34 30 40 30 48 C30 54 33 59 38 62 C34 66 31 72 31 78 L69 78 C69 72 66 66 62 62 C67 59 70 54 70 48 C70 40 65 34 59 31 C62 28 64 24 64 20 C64 12 58 5 50 5 Z M50 12 C54 12 57 15 57 20 C57 24 54 27 50 27 C46 27 43 24 43 20 C43 15 46 12 50 12 Z" />
+              <rect x="25" y="82" width="50" height="10" rx="1" fill="#212529" />
+              <circle cx="50" cy="87" r="3.5" fill="#FFFFFF" />
+              <path d="M20 96 L80 96 L75 106 L25 106 Z" fill="#212529" />
+              <text
+                x="50"
+                y="120"
+                textAnchor="middle"
+                fontSize="11"
+                fontWeight="900"
+                fontFamily="Noto Sans Devanagari, sans-serif"
+                fill="#212529"
+              >
+                सत्यमेव जयते
+              </text>
+            </svg>
           </div>
 
           <div className="flex flex-col border-l border-[#CED4DA] pl-3 py-0.5">
