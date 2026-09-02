@@ -1,23 +1,12 @@
 /**
- * Hybrid Web Speech & Audio Engine for AYUSH-Care Kiosk
- * 
- * Root Cause Fix for Windows Chrome/Brave:
- * Windows OS default installations only include English voices (Microsoft David/Zira) and lack
- * the Hindi TTS voice pack. When Chromium encounters Devanagari text on an English-only OS,
- * it silently errors or skips to English.
- * 
- * Solution:
- * 1. Checks if the browser/OS has a native Hindi voice installed (e.g., Google हिन्दी, Hemant, Kalpana).
- * 2. If a native Hindi voice exists -> Uses native SpeechSynthesis.
- * 3. If NO native Hindi voice exists (Standard Windows Chrome/Brave) -> Automatically plays authentic,
- *    crystal-clear Hindi audio stream via HTML5 Audio element.
- * 4. Chains sequentially: Hindi audio plays FIRST -> English voice plays SECOND.
+ * Web Speech API Engine for AYUSH-Care Kiosk
+ * Handles text-to-speech (TTS) with async voice loading, Chrome "Google हिन्दी" female voice detection,
+ * and guaranteed sequential bilingual playback (Hindi FIRST -> English SECOND).
  */
 
 class SpeechEngine {
   private synth: SpeechSynthesis | null = null;
   private currentUtterance: SpeechSynthesisUtterance | null = null;
-  private currentAudio: HTMLAudioElement | null = null;
   private voices: SpeechSynthesisVoice[] = [];
 
   constructor() {
@@ -32,31 +21,61 @@ class SpeechEngine {
     }
   }
 
-  private loadVoices(): SpeechSynthesisVoice[] {
+  public loadVoices(): SpeechSynthesisVoice[] {
     if (!this.synth) return [];
-    this.voices = this.synth.getVoices();
+    const v = this.synth.getVoices();
+    if (v.length > 0) {
+      this.voices = v;
+    }
     return this.voices;
   }
 
+  public async ensureVoicesLoaded(): Promise<SpeechSynthesisVoice[]> {
+    if (!this.synth) return [];
+    let v = this.synth.getVoices();
+    if (v && v.length > 0) {
+      this.voices = v;
+      return v;
+    }
+
+    return new Promise((resolve) => {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        v = this.synth?.getVoices() || [];
+        if (v.length > 0 || attempts >= 20) {
+          clearInterval(interval);
+          this.voices = v;
+          resolve(v);
+        }
+      }, 50);
+    });
+  }
+
   public getHindiVoice(): SpeechSynthesisVoice | undefined {
-    const vList = this.voices.length > 0 ? this.voices : this.loadVoices();
+    const vList = this.voices.length > 0 ? this.voices : (this.synth?.getVoices() || []);
     return (
+      // 1. Chrome built-in "Google हिन्दी" female voice
+      vList.find(v => v.name.includes('Google') && (v.lang.includes('hi') || v.name.includes('हिन्दी') || v.name.includes('Hindi'))) ||
+      // 2. Exact hi-IN / hi_IN
       vList.find(v => v.lang === 'hi-IN' || v.lang === 'hi_IN') ||
       vList.find(v => v.lang.toLowerCase().startsWith('hi')) ||
+      // 3. Named Hindi voices (Microsoft Swara, Kalpana, Hemant)
       vList.find(v => v.name.toLowerCase().includes('hindi')) ||
-      vList.find(v => v.name.toLowerCase().includes('hemant')) ||
+      vList.find(v => v.name.toLowerCase().includes('swara')) ||
       vList.find(v => v.name.toLowerCase().includes('kalpana')) ||
-      vList.find(v => v.name.toLowerCase().includes('swara'))
+      vList.find(v => v.name.toLowerCase().includes('hemant'))
     );
   }
 
   public getEnglishVoice(): SpeechSynthesisVoice | undefined {
-    const vList = this.voices.length > 0 ? this.voices : this.loadVoices();
+    const vList = this.voices.length > 0 ? this.voices : (this.synth?.getVoices() || []);
     return (
+      // 1. Indian English Accent (Google English India, Microsoft Heera / Neerja)
+      vList.find(v => v.name.includes('Google') && v.lang.includes('en-IN')) ||
       vList.find(v => v.lang === 'en-IN' || v.lang === 'en_IN') ||
-      vList.find(v => v.name.toLowerCase().includes('india')) ||
-      vList.find(v => v.name.toLowerCase().includes('heera')) ||
-      vList.find(v => v.name.toLowerCase().includes('ravi')) ||
+      vList.find(v => v.name.toLowerCase().includes('india') || v.name.toLowerCase().includes('heera') || v.name.toLowerCase().includes('neerja')) ||
+      // 2. Standard English Fallbacks
       vList.find(v => v.lang === 'en-GB') ||
       vList.find(v => v.lang === 'en-US') ||
       vList.find(v => v.lang.startsWith('en'))
@@ -64,48 +83,24 @@ class SpeechEngine {
   }
 
   /**
-   * Play text using high-clarity TTS audio stream (Works on 100% of Windows PCs without Hindi voice pack).
+   * Speak in a single language (Used after user chooses language).
    */
-  private playAudioStream(text: string, lang: 'hi' | 'en', onEnd?: () => void) {
-    this.stop();
-    const encodedText = encodeURIComponent(text.trim());
-    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodedText}`;
-
-    const audio = new Audio(ttsUrl);
-    this.currentAudio = audio;
-
-    audio.onended = () => {
-      this.currentAudio = null;
-      if (onEnd) onEnd();
-    };
-
-    audio.onerror = () => {
-      this.currentAudio = null;
-      // If network audio stream fails, fallback to local speech synthesis
-      this.speakFallbackSynth(text, lang, onEnd);
-    };
-
-    audio.play().catch((err) => {
-      console.warn('Audio stream autoplay policy caught, falling back to synth:', err);
-      this.speakFallbackSynth(text, lang, onEnd);
-    });
-  }
-
-  private speakFallbackSynth(text: string, lang: 'hi' | 'en', onEnd?: () => void) {
+  public async speak(text: string, lang: 'hi' | 'en' = 'hi', onEnd?: () => void) {
     if (!this.synth) {
       if (onEnd) onEnd();
       return;
     }
 
-    if (this.synth.paused) {
-      this.synth.resume();
-    }
+    await this.ensureVoicesLoaded();
+    this.stop();
 
+    const isHindi = lang === 'hi';
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
+    utterance.lang = isHindi ? 'hi-IN' : 'en-IN';
     utterance.rate = 0.88;
+    utterance.pitch = 1.0;
 
-    const voice = lang === 'hi' ? this.getHindiVoice() : this.getEnglishVoice();
+    const voice = isHindi ? this.getHindiVoice() : this.getEnglishVoice();
     if (voice) {
       utterance.voice = voice;
     }
@@ -115,82 +110,125 @@ class SpeechEngine {
       if (onEnd) onEnd();
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (err) => {
+      console.warn('Speech error:', err);
       this.currentUtterance = null;
       if (onEnd) onEnd();
     };
 
     this.currentUtterance = utterance;
-    this.synth.speak(utterance);
-  }
 
-  /**
-   * Speak a single utterance in the chosen language.
-   */
-  public speak(text: string, lang: 'hi' | 'en' = 'hi', onEnd?: () => void) {
-    this.stop();
-
-    if (lang === 'hi') {
-      const hiVoice = this.getHindiVoice();
-      if (hiVoice) {
-        this.speakFallbackSynth(text, 'hi', onEnd);
-      } else {
-        // No native Hindi voice on Windows -> use authentic Hindi audio stream
-        this.playAudioStream(text, 'hi', onEnd);
+    // Chrome bug fix: slight timeout prevents speech cancellation
+    setTimeout(() => {
+      if (this.synth) {
+        if (this.synth.paused) {
+          this.synth.resume();
+        }
+        this.synth.speak(utterance);
       }
-    } else {
-      this.speakFallbackSynth(text, 'en', onEnd);
-    }
+    }, 50);
   }
 
   /**
    * Sequential Bilingual Speech: Plays Hindi audio FIRST -> then English audio SECOND.
    */
-  public speakBilingual(
+  public async speakBilingual(
     hindiText: string,
     englishText: string,
     onEnd?: () => void
   ) {
+    if (!this.synth) {
+      if (onEnd) onEnd();
+      return;
+    }
+
+    // Ensure Chrome has loaded Google हिन्दी voice
+    await this.ensureVoicesLoaded();
     this.stop();
 
     const hiVoice = this.getHindiVoice();
+    const enVoice = this.getEnglishVoice();
 
-    // Step 2: English Speech Callback
-    const playEnglish = () => {
-      this.speakFallbackSynth(englishText, 'en', onEnd);
+    // 1. Hindi Utterance (Plays 1st)
+    const hiUtterance = new SpeechSynthesisUtterance(hindiText);
+    hiUtterance.lang = 'hi-IN';
+    hiUtterance.rate = 0.88;
+    hiUtterance.pitch = 1.0;
+    if (hiVoice) {
+      hiUtterance.voice = hiVoice;
+    }
+
+    // 2. English Utterance (Plays 2nd)
+    const enUtterance = new SpeechSynthesisUtterance(englishText);
+    enUtterance.lang = 'en-IN';
+    enUtterance.rate = 0.90;
+    enUtterance.pitch = 1.0;
+    if (enVoice) {
+      enUtterance.voice = enVoice;
+    }
+
+    // Sequence chaining: When Hindi finishes -> automatically play English
+    hiUtterance.onend = () => {
+      if (this.synth) {
+        this.currentUtterance = enUtterance;
+        setTimeout(() => {
+          if (this.synth) {
+            this.synth.speak(enUtterance);
+          }
+        }, 150);
+      }
     };
 
-    // Step 1: Play Hindi First
-    if (hiVoice) {
-      this.speakFallbackSynth(hindiText, 'hi', playEnglish);
-    } else {
-      // Stream authentic Hindi audio on Windows Chrome/Brave
-      this.playAudioStream(hindiText, 'hi', playEnglish);
-    }
+    hiUtterance.onerror = (err) => {
+      console.warn('Hindi utterance error/skipped, proceeding to English:', err);
+      if (this.synth) {
+        this.currentUtterance = enUtterance;
+        setTimeout(() => {
+          if (this.synth) {
+            this.synth.speak(enUtterance);
+          }
+        }, 150);
+      }
+    };
+
+    enUtterance.onend = () => {
+      this.currentUtterance = null;
+      if (onEnd) onEnd();
+    };
+
+    enUtterance.onerror = () => {
+      this.currentUtterance = null;
+      if (onEnd) onEnd();
+    };
+
+    this.currentUtterance = hiUtterance;
+
+    // Chrome bug fix: slight timeout prevents cancel collision
+    setTimeout(() => {
+      if (this.synth) {
+        if (this.synth.paused) {
+          this.synth.resume();
+        }
+        this.synth.speak(hiUtterance);
+      }
+    }, 50);
   }
 
   /**
-   * Stop any active audio speech or stream.
+   * Stop any active audio speech.
    */
   public stop() {
     if (this.synth) {
       this.synth.cancel();
     }
-    if (this.currentAudio) {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
-      this.currentAudio = null;
-    }
     this.currentUtterance = null;
   }
 
   /**
-   * Check if audio is currently playing.
+   * Check if speech synthesis is currently active.
    */
   public isSpeaking(): boolean {
-    const isSynthSpeaking = !!(this.synth && this.synth.speaking);
-    const isAudioPlaying = !!(this.currentAudio && !this.currentAudio.paused);
-    return isSynthSpeaking || isAudioPlaying;
+    return !!(this.synth && this.synth.speaking);
   }
 }
 
