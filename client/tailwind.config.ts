@@ -15,7 +15,7 @@ const config: Config = {
           blue: '#0066CC',       // Action highlight blue
           blueHover: '#0052A3',
           canvas: '#EAEDF0',     // Standard government light grey canvas
-          surface: '#FFFFFF',    // rgb(255, 255, 255) Pure white
+          surface: '#FFFFFF',    // Pure white
           border: '#CED4DA',     // Crisp 1px NIC border
           borderDark: '#0A2D65',
           textDark: '#212529',
@@ -31,17 +31,17 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['"Open Sans"', '"Noto Sans Devanagari"', 'Arial', 'Helvetica', 'sans-serif'],
+        sans: ['"Noto Sans"', '"Noto Sans Devanagari"', 'Arial', 'Helvetica', 'sans-serif'],
       },
       borderRadius: {
-        'kiosk-sm': '4px',
-        'kiosk-md': '8px',
-        'kiosk-lg': '12px',
-        'kiosk-btn': '8px',
+        'kiosk-sm': '2px',
+        'kiosk-md': '2px',
+        'kiosk-lg': '2px',
+        'kiosk-btn': '2px',
       },
       boxShadow: {
-        'kiosk-panel': '0 2px 8px rgba(10, 45, 101, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
-        'kiosk-btn': '0 4px 12px rgba(10, 45, 101, 0.35)',
+        'kiosk-panel': 'none',
+        'kiosk-btn': 'none',
       },
     },
   },
