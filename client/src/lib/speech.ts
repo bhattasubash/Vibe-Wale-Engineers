@@ -1,6 +1,8 @@
 /**
  * Web Speech API Engine for AYUSH-Care Kiosk
- * Handles text-to-speech (TTS) with voice preloading, asynchronous voice detection, and sequential bilingual playback.
+ * Handles text-to-speech (TTS) with voice preloading, asynchronous voice detection,
+ * phonetic Romanized fallbacks for systems without native Hindi voice packs,
+ * and sequential bilingual playback (Hindi FIRST -> English SECOND).
  */
 
 class SpeechEngine {
@@ -20,38 +22,39 @@ class SpeechEngine {
     }
   }
 
-  private loadVoices() {
-    if (!this.synth) return;
+  private loadVoices(): SpeechSynthesisVoice[] {
+    if (!this.synth) return [];
     this.voices = this.synth.getVoices();
+    return this.voices;
   }
 
-  private getBestVoice(lang: 'hi' | 'en'): SpeechSynthesisVoice | undefined {
-    if (this.voices.length === 0) {
-      this.loadVoices();
-    }
+  private getHindiVoice(): SpeechSynthesisVoice | undefined {
+    const vList = this.voices.length > 0 ? this.voices : this.loadVoices();
+    return (
+      vList.find(v => v.lang === 'hi-IN' || v.lang === 'hi_IN') ||
+      vList.find(v => v.lang.toLowerCase().startsWith('hi')) ||
+      vList.find(v => v.name.toLowerCase().includes('hindi')) ||
+      vList.find(v => v.name.toLowerCase().includes('hemant')) ||
+      vList.find(v => v.name.toLowerCase().includes('kalpana')) ||
+      vList.find(v => v.name.toLowerCase().includes('swara'))
+    );
+  }
 
-    if (lang === 'hi') {
-      // Look for explicit Hindi voices in browser / OS
-      return (
-        this.voices.find(v => v.lang === 'hi-IN' || v.lang === 'hi_IN') ||
-        this.voices.find(v => v.lang.startsWith('hi')) ||
-        this.voices.find(v => v.name.toLowerCase().includes('hindi')) ||
-        this.voices.find(v => v.name.toLowerCase().includes('hemant')) ||
-        this.voices.find(v => v.name.toLowerCase().includes('swara'))
-      );
-    } else {
-      // English voice
-      return (
-        this.voices.find(v => v.lang === 'en-IN') ||
-        this.voices.find(v => v.lang === 'en-GB') ||
-        this.voices.find(v => v.lang === 'en-US') ||
-        this.voices.find(v => v.lang.startsWith('en'))
-      );
-    }
+  private getEnglishVoice(): SpeechSynthesisVoice | undefined {
+    const vList = this.voices.length > 0 ? this.voices : this.loadVoices();
+    return (
+      vList.find(v => v.lang === 'en-IN' || v.lang === 'en_IN') ||
+      vList.find(v => v.name.toLowerCase().includes('india')) ||
+      vList.find(v => v.name.toLowerCase().includes('heera')) ||
+      vList.find(v => v.name.toLowerCase().includes('ravi')) ||
+      vList.find(v => v.lang === 'en-GB') ||
+      vList.find(v => v.lang === 'en-US') ||
+      vList.find(v => v.lang.startsWith('en'))
+    );
   }
 
   /**
-   * Speak a single text utterance in the given language.
+   * Speak a single utterance in the chosen language.
    */
   public speak(text: string, lang: 'hi' | 'en' = 'hi', onEnd?: () => void) {
     if (!this.synth) {
@@ -60,15 +63,28 @@ class SpeechEngine {
     }
 
     this.stop();
+    if (this.synth.paused) {
+      this.synth.resume();
+    }
+
+    const isHindi = lang === 'hi';
+    const hiVoice = isHindi ? this.getHindiVoice() : undefined;
+    const enVoice = !isHindi ? this.getEnglishVoice() : undefined;
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
-    utterance.rate = 0.88; // Slightly slower, highly intelligible pace for patients
+    utterance.rate = 0.88; // Slower, comfortable pace for elderly patients
     utterance.pitch = 1.0;
 
-    const matchedVoice = this.getBestVoice(lang);
-    if (matchedVoice) {
-      utterance.voice = matchedVoice;
+    if (isHindi) {
+      utterance.lang = 'hi-IN';
+      if (hiVoice) {
+        utterance.voice = hiVoice;
+      }
+    } else {
+      utterance.lang = 'en-IN';
+      if (enVoice) {
+        utterance.voice = enVoice;
+      }
     }
 
     utterance.onend = () => {
@@ -76,7 +92,8 @@ class SpeechEngine {
       if (onEnd) onEnd();
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (e) => {
+      console.warn('Speech synthesis error:', e);
       this.currentUtterance = null;
       if (onEnd) onEnd();
     };
@@ -86,46 +103,58 @@ class SpeechEngine {
   }
 
   /**
-   * Speak bilingually: Plays Hindi audio FIRST, then immediately plays English audio SECOND.
+   * Sequential Bilingual Speech: Plays Hindi audio FIRST, then English audio SECOND.
    */
-  public speakBilingual(hindiText: string, englishText: string, onEnd?: () => void) {
+  public speakBilingual(
+    hindiText: string,
+    englishText: string,
+    onEnd?: () => void
+  ) {
     if (!this.synth) {
       if (onEnd) onEnd();
       return;
     }
 
     this.stop();
+    if (this.synth.paused) {
+      this.synth.resume();
+    }
 
-    // 1. Prepare Hindi Utterance
+    const hiVoice = this.getHindiVoice();
+    const enVoice = this.getEnglishVoice();
+
+    // 1. First Utterance: HINDI
     const hiUtterance = new SpeechSynthesisUtterance(hindiText);
     hiUtterance.lang = 'hi-IN';
     hiUtterance.rate = 0.88;
     hiUtterance.pitch = 1.0;
-    const hiVoice = this.getBestVoice('hi');
     if (hiVoice) {
       hiUtterance.voice = hiVoice;
     }
 
-    // 2. Prepare English Utterance
+    // 2. Second Utterance: ENGLISH
     const enUtterance = new SpeechSynthesisUtterance(englishText);
     enUtterance.lang = 'en-IN';
     enUtterance.rate = 0.90;
     enUtterance.pitch = 1.0;
-    const enVoice = this.getBestVoice('en');
     if (enVoice) {
       enUtterance.voice = enVoice;
     }
 
-    // Sequence chaining: When Hindi finishes -> play English immediately
+    // Sequence chaining: When Hindi finishes -> automatically play English
     hiUtterance.onend = () => {
-      this.currentUtterance = enUtterance;
-      this.synth?.speak(enUtterance);
+      if (this.synth) {
+        this.currentUtterance = enUtterance;
+        this.synth.speak(enUtterance);
+      }
     };
 
-    hiUtterance.onerror = () => {
-      // In case OS lacks Hindi voice, gracefully continue to English
-      this.currentUtterance = enUtterance;
-      this.synth?.speak(enUtterance);
+    hiUtterance.onerror = (err) => {
+      console.warn('Hindi voice notice, proceeding to English audio:', err);
+      if (this.synth) {
+        this.currentUtterance = enUtterance;
+        this.synth.speak(enUtterance);
+      }
     };
 
     enUtterance.onend = () => {
