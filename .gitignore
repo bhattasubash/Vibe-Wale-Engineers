@@ -45,3 +45,6 @@ Thumbs.db
 *.swp
 *.swo
 ~$*.docx
+
+# Cloned Sub-repositories
+Vibe-Wale-Engineers/
