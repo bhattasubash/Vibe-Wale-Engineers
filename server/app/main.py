@@ -8,11 +8,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import time
 
-from app.routers import patients, sessions, prakriti, physician
+from app.routers import patients, sessions, prakriti, physician, documents
 
 app = FastAPI(
     title="AYUSH-Care Clinical Kiosk API",
-    description="Enterprise OPD Triage & Deterministic Prakriti Calculation Engine for AIIA",
+    description="Enterprise OPD Triage, Dual-Engine OCR & Deterministic Prakriti Calculation Engine for AIIA",
     version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -42,6 +42,7 @@ app.include_router(patients.router)
 app.include_router(sessions.router)
 app.include_router(prakriti.router)
 app.include_router(physician.router)
+app.include_router(documents.router)
 
 
 @app.get("/api/health", tags=["Health"])

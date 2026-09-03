@@ -4,6 +4,7 @@ Strict typing ensures zero runtime deserialization failures.
 """
 
 from typing import List, Dict, Any, Optional
+from enum import Enum
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -128,3 +129,96 @@ class DoctorReviewRequest(BaseModel):
     doctor_id: str
     doctor_notes: Optional[str] = None
     amended_summary: Optional[Dict[str, Any]] = None
+
+
+# --- OCR & REPORT EXTRACTION SCHEMAS ---
+class VerificationStatus(str, Enum):
+    VERIFIED = "verified"
+    UNCLEAR = "unclear"
+    MISMATCH = "mismatch"
+    NOT_FOUND = "not_found"
+
+
+class ValueVerification(BaseModel):
+    test_name: str
+    gemini_value: str
+    tesseract_value: Optional[str] = None
+    tesseract_confidence: Optional[float] = None
+    verification_status: VerificationStatus
+    final_value: str
+
+
+class ReportFinding(BaseModel):
+    test_name: str
+    value: str
+    unit: Optional[str] = None
+    reference_range: Optional[str] = None
+    flag: Optional[str] = None
+    verified_status: Optional[str] = None
+
+
+class IndividualReportExtraction(BaseModel):
+    report_type: str = "Prescription / Lab Report"
+    medical_specialty: Optional[str] = "Kayachikitsa (Ayurveda)"
+    report_date: Optional[str] = None
+    facility_name: Optional[str] = None
+    summary: str = ""
+    findings: List[ReportFinding] = Field(default_factory=list)
+    observations: List[str] = Field(default_factory=list)
+    impression: Optional[str] = None
+    doctor_remarks: Optional[str] = None
+    diagnoses: List[str] = Field(default_factory=list)
+    medications: List[Dict[str, Any]] = Field(default_factory=list)
+    clinical_history: Optional[str] = None
+    uncertain_information: List[str] = Field(default_factory=list)
+
+
+class IndividualReportOutput(BaseModel):
+    report_id: str
+    report_type: str
+    medical_specialty: str = "General Medicine"
+    report_date: Optional[str] = None
+    facility_name: Optional[str] = None
+    source_pages: List[str] = Field(default_factory=list)
+    summary: str
+    findings: List[ReportFinding] = Field(default_factory=list)
+    observations: List[str] = Field(default_factory=list)
+    impression: Optional[str] = None
+    doctor_remarks: Optional[str] = None
+    diagnoses: List[str] = Field(default_factory=list)
+    medications: List[Dict[str, Any]] = Field(default_factory=list)
+    clinical_history: Optional[str] = None
+    uncertain_information: List[str] = Field(default_factory=list)
+    value_verification: List[ValueVerification] = Field(default_factory=list)
+
+
+class OverallPatientHistory(BaseModel):
+    past_medical_surgical_history: Optional[str] = "Not available."
+    drug_allergy_history: Optional[str] = "No known drug allergies reported."
+    family_history: Optional[str] = "Not reported."
+    personal_history: Optional[str] = "Not reported."
+    review_of_systems: Optional[str] = "Not reported."
+    prior_investigations_summary: Optional[str] = "See extracted reports."
+
+
+class ReportSummaryReference(BaseModel):
+    report_id: str
+    report_type: str
+    medical_specialty: str
+    report_summary_file: Optional[str] = None
+
+
+class PatientSessionOutput(BaseModel):
+    patient_session_id: str
+    overall_summary: OverallPatientHistory
+    reports: List[ReportSummaryReference] = Field(default_factory=list)
+    reports_by_specialty: Dict[str, List[ReportSummaryReference]] = Field(default_factory=dict)
+    uncertain_information: List[str] = Field(default_factory=list)
+
+
+class ProcessReportsResponse(BaseModel):
+    status: str
+    patient_session_id: str
+    reports_processed: int
+    result_file: Optional[str] = None
+    message: str
