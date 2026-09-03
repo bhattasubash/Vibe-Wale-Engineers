@@ -1,0 +1,160 @@
+<mxfile host="app.diagrams.net" modified="2026-09-02T05:20:00.000Z" agent="Antigravity Architecture Engine" version="21.6.8" type="device">
+  <diagram id="ayush-system-design" name="High-Scale System Architecture">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" background="#F8FAFC" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title Banner -->
+        <mxCell id="title" value="AYUSH-Care (MediKiosk) High-Scale System Design&#xa;Target Capacity: 50,000 - 100,000 Daily Active Users (DAU) | 5,000+ Concurrent Kiosk Sessions | Peak Load: 1,000 RPS" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0A2D65;strokeColor=#071F45;fontColor=#FFFFFF;fontStyle=1;fontSize=18;fontFamily=Open Sans, Arial, sans-serif;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="30" width="1840" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 1: Client & Hospital Edge Layer -->
+        <mxCell id="z1" value="ZONE 1: HOSPITAL CLIENT &amp; KIOSK EDGE LAYER (5,000+ CONCURRENT TOUCHPOINTS)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAEDF0;strokeColor=#0A2D65;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0A2D65;fontFamily=Open Sans, Arial, sans-serif;startSize=28;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="400" height="1030" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z1_kiosk" value="Hospital Kiosk Terminals&#xa;(All India Institute of Ayurveda OPD)&#xa;- 15.6&quot; / 21&quot; Touch Screen&#xa;- Chrome Kiosk OS / Android Kiosk&#xa;- Hardware Mic Array &amp; Camera&#xa;- Thermal Slip Printer" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z1">
+          <mxGeometry x="20" y="50" width="360" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z1_client_engine" value="Client-Side Offline Engine&#xa;- React 18 + Vite 5 SPA&#xa;- IndexedDB Local Question Cache&#xa;- Web Speech API (Local STT / TTS)&#xa;- Tesseract.js (Client Pre-OCR)&#xa;- Deterministic Prakriti State Store" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z1">
+          <mxGeometry x="20" y="200" width="360" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z1_doctor" value="Physician OPD Dashboard&#xa;(BAMS Doctor Workstation)&#xa;- Real-time Prioritized Queue (WebSocket)&#xa;- Dense Clinical EMR Case File&#xa;- Interactive Radar Chart &amp; Dosha Breakdown&#xa;- One-Click Prescription &amp; Sign-off" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z1">
+          <mxGeometry x="20" y="350" width="360" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z1_admin" value="Hospital Admin &amp; Queue Console&#xa;- Real-time Throughput Analytics&#xa;- Red-Flag Emergency Safety Monitor&#xa;- Hardware Kiosk Telemetry &amp; Heartbeat" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z1">
+          <mxGeometry x="20" y="500" width="360" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z1_offline_sync" value="Offline Survivability &amp; Sync Buffer&#xa;- Local SQLite / IndexedDB Queue&#xa;- Automatic Exponential Backoff Sync&#xa;- Zero Data Loss during Network Drops" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8EDF5;strokeColor=#0A2D65;strokeWidth=1.5;fontSize=11;fontColor=#0A2D65;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z1">
+          <mxGeometry x="20" y="620" width="360" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 2: Edge CDN, Security & Ingress Layer -->
+        <mxCell id="z2" value="ZONE 2: EDGE CDN, WAF &amp; INGRESS GATEWAY" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAEDF0;strokeColor=#0A2D65;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0A2D65;fontFamily=Open Sans, Arial, sans-serif;startSize=28;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="480" y="110" width="360" height="1030" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z2_cdn" value="NIC Bharat CDN / Cloudflare Edge&#xa;- Static Bundle Caching (React SPA, CSS)&#xa;- Google Fonts &amp; Devanagari Typography&#xa;- Pre-rendered Audio Prompts (.wav/.mp3)&#xa;- Edge TLS 1.3 Termination" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z2">
+          <mxGeometry x="20" y="50" width="320" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z2_waf" value="WAF &amp; Rate Limiting Tier&#xa;- Kiosk IP Whitelisting &amp; Hardware Fingerprint&#xa;- Distributed Rate Limiter (Token Bucket)&#xa;- DDoS &amp; Bot Protection&#xa;- DPDP Act 2023 Consent Token Validator" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z2">
+          <mxGeometry x="20" y="190" width="320" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z2_alb" value="NGINX Ingress / Application Load Balancer&#xa;- Least-Connection &amp; Round-Robin Balancing&#xa;- WebSocket Session Affinity (Doctor Queue)&#xa;- Health Probes (Liveness &amp; Readiness)&#xa;- Target: 1,000 Peak HTTP RPS" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0A2D65;strokeWidth=2;fontSize=11;fontColor=#0A2D65;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z2">
+          <mxGeometry x="20" y="330" width="320" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 3: Stateless Core Microservices & Business Logic -->
+        <mxCell id="z3" value="ZONE 3: STATELESS FASTAPI GATEWAY PODS (KUBERNETES AUTO-CLUSTER)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAEDF0;strokeColor=#0A2D65;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0A2D65;fontFamily=Open Sans, Arial, sans-serif;startSize=28;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="880" y="110" width="460" height="1030" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z3_fastapi" value="FastAPI ASGI Application Pods (8 to 16 Replicas)&#xa;- Async Non-Blocking I/O (Uvicorn / Gunicorn)&#xa;- Stateless Ephemeral Token Processor&#xa;- Pydantic v2 Request/Response Validation" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0A2D65;strokeColor=#071F45;strokeWidth=1.5;fontSize=11;fontColor=#FFFFFF;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z3">
+          <mxGeometry x="20" y="50" width="420" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z3_redflag" value="Real-Time Red-Flag Safety Engine&#xa;- O(1) In-Memory Critical Symptom Matcher&#xa;- Detects: Stroke Signs, Chest Pain, High Fever&#xa;- Immediate Triage Priority Flagging&#xa;- Latency: &lt; 5ms (Zero LLM Dependency)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#B91C1C;strokeWidth=2;fontSize=11;fontColor=#B91C1C;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z3">
+          <mxGeometry x="20" y="160" width="420" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z3_prakriti" value="Deterministic Prakriti Calculation Engine&#xa;- 15 Classical Charaka Samhita Questions&#xa;- Fixed Scoring Matrix (Vata, Pitta, Kapha)&#xa;- Percentage Breakdown &amp; Dominance Gap Math&#xa;- Deterministic &amp; Instant (0ms LLM Delay)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0A2D65;strokeWidth=1.5;fontSize=11;fontColor=#0A2D65;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z3">
+          <mxGeometry x="20" y="280" width="420" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z3_socrates" value="Adaptive SOCRATES Questioning Router&#xa;- Evaluates Chief Complaint Category&#xa;- Triggers Contextual Follow-up Turns (1-3 Turns)&#xa;- Dynamic Option Generation for Touch Fallback" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z3">
+          <mxGeometry x="20" y="400" width="420" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z3_router_group" value="API Endpoints: /patients | /sessions | /conversation | /prakriti | /documents | /summary | /physician" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8EDF5;strokeColor=#0A2D65;strokeWidth=1;fontSize=10;fontColor=#0A2D65;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=center;" vertex="1" parent="z3">
+          <mxGeometry x="20" y="510" width="420" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- ZONE 4: Message Queue, Cache, Workers & Persistence -->
+        <mxCell id="z4" value="ZONE 4: ASYNC WORKERS, CACHE, STORAGE &amp; PERSISTENCE" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EAEDF0;strokeColor=#0A2D65;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#0A2D65;fontFamily=Open Sans, Arial, sans-serif;startSize=28;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1380" y="110" width="500" height="1030" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z4_redis" value="Redis Cluster (In-Memory Tier)&#xa;- Ephemeral Session State (TTL = 30 mins)&#xa;- Distributed Rate Limiting &amp; Lock Keys&#xa;- Pub/Sub for Live Doctor Queue Updates&#xa;- Semantic LLM Response Cache" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B91C1C;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z4">
+          <mxGeometry x="20" y="50" width="460" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z4_kafka" value="Kafka / Celery Distributed Task Broker&#xa;- ocr.process.queue (Document ingestion jobs)&#xa;- summary.generate.queue (LLM synthesis jobs)&#xa;- abdm.sync.queue (FHIR bundle uploads)&#xa;- session.cleanup.queue (DPDP 2023 purge jobs)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z4">
+          <mxGeometry x="20" y="160" width="460" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z4_workers" value="Async Heavy Compute Worker Pods&#xa;1. OCR Worker: Tesseract / PaddleOCR with Ayurvedic entity extraction&#xa;2. LLM Engine: Gemini 2.0 Flash / Gemma inference gateway&#xa;3. FHIR Bundler: Transforms session data into ABDM JSON format" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0A2D65;strokeWidth=1.5;fontSize=11;fontColor=#0A2D65;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z4">
+          <mxGeometry x="20" y="275" width="460" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z4_postgres" value="Primary PostgreSQL Master (Write Tier)&#xa;- Tables: patients, sessions, prakriti_results, pariksha_notes, summaries&#xa;- Strict Row-Level Security (RLS) &amp; Encrypted at Rest&#xa;- High-Performance SSD Storage (Write TPS: ~250)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0A2D65;strokeColor=#071F45;strokeWidth=1.5;fontSize=11;fontColor=#FFFFFF;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z4">
+          <mxGeometry x="20" y="395" width="460" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z4_replicas" value="PostgreSQL Read Replicas (2x Instances)&#xa;- Serves Physician Queue Lookups &amp; Summaries&#xa;- Powers Hospital Admin Throughput Analytics" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z4">
+          <mxGeometry x="20" y="510" width="460" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z4_s3" value="S3 / MinIO Encrypted Document Store&#xa;- Patient Prescription Photos &amp; OCR Results&#xa;- Lifecycle Policy: Auto-purge non-archived files" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CED4DA;strokeWidth=1.5;fontSize=11;fontColor=#212529;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z4">
+          <mxGeometry x="20" y="595" width="460" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="z4_abdm" value="National &amp; Hospital Integrations (ABDM / HIS)&#xa;- ABDM M1 (ABHA Creation), M2 (HIP Provider), M3 (HIU Consumer)&#xa;- Hospital Information System (e-Hospital HL7 / FHIR R4 Export)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8EDF5;strokeColor=#0A2D65;strokeWidth=1.5;fontSize=11;fontColor=#0A2D65;fontStyle=1;fontFamily=Open Sans, Arial, sans-serif;align=left;spacing=8;" vertex="1" parent="z4">
+          <mxGeometry x="20" y="680" width="460" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- Connectors -->
+        <mxCell id="c1" edge="1" parent="1" source="z1_kiosk" target="z2_cdn">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2" edge="1" parent="1" source="z1_doctor" target="z2_alb">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3" edge="1" parent="1" source="z2_cdn" target="z2_waf">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c4" edge="1" parent="1" source="z2_waf" target="z2_alb">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c5" edge="1" parent="1" source="z2_alb" target="z3_fastapi">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c6" edge="1" parent="1" source="z3_fastapi" target="z3_redflag">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c7" edge="1" parent="1" source="z3_fastapi" target="z3_prakriti">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c8" edge="1" parent="1" source="z3_fastapi" target="z4_redis">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c9" edge="1" parent="1" source="z3_fastapi" target="z4_kafka">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c10" edge="1" parent="1" source="z4_kafka" target="z4_workers">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c11" edge="1" parent="1" source="z3_fastapi" target="z4_postgres">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c12" edge="1" parent="1" source="z4_postgres" target="z4_replicas">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c13" edge="1" parent="1" source="z4_workers" target="z4_abdm">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c14" edge="1" parent="1" source="z4_workers" target="z4_s3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

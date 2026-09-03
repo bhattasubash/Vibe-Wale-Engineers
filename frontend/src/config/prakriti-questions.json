@@ -1,0 +1,197 @@
+[
+  {
+    "id": "PK-01",
+    "title_en": "Body Frame & Build",
+    "title_hi": "शारीरिक बनावट",
+    "question_en": "How would you describe your natural body build?",
+    "question_hi": "आपके शरीर की प्राकृतिक बनावट कैसी है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/96-98",
+    "options": [
+      { "id": "A", "text_en": "Thin, lean frame; hard to gain weight", "text_hi": "पतला, दुबला शरीर; वजन बढ़ाना कठिन", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Medium, athletic build; moderate weight", "text_hi": "मध्यम, सामान्य सुगठित बनावट", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Heavy, solid, broad frame; gain weight easily", "text_hi": "भारी, मजबूत और चौड़ा शरीर; वजन आसानी से बढ़ता है", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-02",
+    "title_en": "Weight Tendency",
+    "title_hi": "वजन की प्रवृत्ति",
+    "question_en": "How does your body weight usually fluctuate?",
+    "question_hi": "आपका वजन आमतौर पर कैसा रहता है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/96",
+    "options": [
+      { "id": "A", "text_en": "Always underweight or loses weight fast", "text_hi": "कम वजन रहता है या तेजी से घटता है", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Stays stable with normal diet", "text_hi": "सामान्य आहार से स्थिर रहता है", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Tends to gain easily and hard to lose", "text_hi": "जल्दी बढ़ता है और घटाना मुश्किल होता है", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-03",
+    "title_en": "Skin Texture",
+    "title_hi": "त्वचा की प्रकृति",
+    "question_en": "How does your skin feel naturally?",
+    "question_hi": "आपकी त्वचा प्राकृतिक रूप से कैसी महसूस होती है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/97",
+    "options": [
+      { "id": "A", "text_en": "Dry, rough, cracks easily in winter", "text_hi": "रूखी, खुरदरी, सर्दियों में जल्दी फटती है", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Warm, reddish, prone to acne or moles", "text_hi": "गर्म, तैलीय, तिल या मुँहासे जल्दी होते हैं", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Thick, soft, smooth, oily and cool", "text_hi": "मुलायम, चिकनी, घनी और चमकदार", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-04",
+    "title_en": "Hair Quality",
+    "title_hi": "बालों की बनावट",
+    "question_en": "What is the texture and density of your hair?",
+    "question_hi": "आपके बालों का स्वभाव कैसा है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/97",
+    "options": [
+      { "id": "A", "text_en": "Dry, brittle, frizzy or thin", "text_hi": "रूखे, पतले, दोमुंहे या जल्दी टूटने वाले", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Fine, soft, prone to early graying or thinning", "text_hi": "मुलायम, जल्दी सफेद होने या झड़ने वाले", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Thick, lustrous, dark and wavy", "text_hi": "घने, मजबूत, काले और चमकदार", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-05",
+    "title_en": "Facial Features",
+    "title_hi": "चेहरे की बनावट",
+    "question_en": "How would you describe your facial structure?",
+    "question_hi": "आपके चेहरे की बनावट कैसी है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/96",
+    "options": [
+      { "id": "A", "text_en": "Long, angular, thin with prominent bones", "text_hi": "लंबा, नुकीला, हड्डियां उभरी हुई", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Moderate, sharp chin and defined contours", "text_hi": "मध्यम, तीखे नैन-नक्श और स्पष्ट रेखाएं", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Round, full cheeks, pleasant and broad", "text_hi": "गोल, भरे हुए गाल, सौम्य और चौड़ा", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-06",
+    "title_en": "Eye Characteristics",
+    "title_hi": "नेत्र लक्षण",
+    "question_en": "How would you describe your eyes?",
+    "question_hi": "आपकी आँखें कैसी हैं?",
+    "reference": "Charaka Samhita Vimana Sthana 8/97",
+    "options": [
+      { "id": "A", "text_en": "Small, dry, blink frequently, dull", "text_hi": "छोटी, रूखी, बार-बार झपकने वाली", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Medium, sharp, sensitive to light, red tinge", "text_hi": "मध्यम, तीक्ष्ण, धूप में लाल होने वाली", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Large, clear, attractive with thick eyelashes", "text_hi": "बड़ी, आकर्षक, घनी पलकों वाली", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-07",
+    "title_en": "Appetite Pattern (Agni)",
+    "title_hi": "भूख और पाचन (अग्नि)",
+    "question_en": "How is your regular hunger pattern?",
+    "question_hi": "आपको भूख कैसी लगती है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/98",
+    "options": [
+      { "id": "A", "text_en": "Irregular — sometimes very hungry, sometimes not", "text_hi": "अनियमित — कभी बहुत भूख, कभी बिल्कुल नहीं (विषमाग्नि)", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Strong and sharp — cannot tolerate skipping meals", "text_hi": "तीव्र भूख — समय पर खाना न मिले तो बेचैनी (तीक्ष्णाग्नि)", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Slow, steady — can easily skip meals without issue", "text_hi": "मंद और स्थिर — देर से खाना भी सह लेते हैं (मंदाग्नि)", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-08",
+    "title_en": "Bowel Habit (Koshtha)",
+    "title_hi": "पेट साफ होना (कोष्ठ)",
+    "question_en": "How is your daily bowel habit?",
+    "question_hi": "आपका पेट साफ कैसे होता है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/98",
+    "options": [
+      { "id": "A", "text_en": "Dry, hard stools, tendency towards constipation", "text_hi": "कठिन, सूखा, कब्ज की शिकायत (क्रूर कोष्ठ)", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Soft, loose, multiple times a day easily", "text_hi": "मुलायम, ढीला, दिन में कई बार (मृदु कोष्ठ)", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Regular, well-formed, once daily without strain", "text_hi": "नियमित, बंधा हुआ, दिन में एक बार (मध्यम कोष्ठ)", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-09",
+    "title_en": "Thirst Pattern (Trishna)",
+    "title_hi": "प्यास की मात्रा",
+    "question_en": "How much thirst do you generally experience?",
+    "question_hi": "आपको प्यास कितनी लगती है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/97",
+    "options": [
+      { "id": "A", "text_en": "Variable, sometimes forget to drink water", "text_hi": "परिवर्तनशील, कभी कम तो कभी ज्यादा", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Excessive, always prefer cold drinks", "text_hi": "बहुत अधिक, ठंडा पानी पीने की इच्छा", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Low to moderate, comfortable with little water", "text_hi": "कम, थोड़ा पानी पीने से भी काम चल जाता है", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-10",
+    "title_en": "Sleep Pattern (Nidra)",
+    "title_hi": "नींद की गुणवत्ता",
+    "question_en": "How is your regular sleep quality?",
+    "question_hi": "आपकी नींद कैसी रहती है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/96",
+    "options": [
+      { "id": "A", "text_en": "Light, broken, wake up easily, insomnia prone", "text_hi": "कच्ची नींद, जल्दी खुल जाने वाली, कम नींद", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Moderate, sound sleep 6-7 hours", "text_hi": "मध्यम, 6-7 घंटे की अच्छी नींद", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Deep, heavy sleep, hard to wake up early", "text_hi": "गहरी, भारी नींद, सुबह उठने में सुस्ती", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-11",
+    "title_en": "Weather Preference (Ritu)",
+    "title_hi": "मौसम की पसंद",
+    "question_en": "Which weather or temperature causes you most discomfort?",
+    "question_hi": "आपको किस मौसम से सबसे अधिक असुविधा होती है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/97",
+    "options": [
+      { "id": "A", "text_en": "Cannot tolerate cold or windy weather", "text_hi": "ठंड और सूखी हवा बिल्कुल सहन नहीं होती", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Cannot tolerate hot sun or summer heat", "text_hi": "गर्मी और तेज धूप बिल्कुल सहन नहीं होती", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Cannot tolerate damp, humid, cloudy cold weather", "text_hi": "गीला, उमस भरा या ठंडा-बादल वाला मौसम भारी लगता है", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-12",
+    "title_en": "Memory & Grasping (Smriti)",
+    "title_hi": "स्मरण शक्ति (स्मृति)",
+    "question_en": "How would you describe your memory and learning style?",
+    "question_hi": "आपकी याददाश्त और सीखने का तरीका कैसा है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/96",
+    "options": [
+      { "id": "A", "text_en": "Learn very quickly, but forget quickly", "text_hi": "जल्दी सीखते हैं, लेकिन जल्दी भूल भी जाते हैं", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Sharp, logical, remember key facts well", "text_hi": "तीक्ष्ण, तार्किक, मुख्य बातें अच्छी तरह याद रहती हैं", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Take time to learn, but never forget once learned", "text_hi": "सीखने में समय लगता है, लेकिन लंबे समय तक याद रहता है", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-13",
+    "title_en": "Temperament (Manas)",
+    "title_hi": "मानसिक स्वभाव",
+    "question_en": "How do you react under pressure or emotional situations?",
+    "question_hi": "कठिन समय या गुस्से में आपका स्वभाव कैसा होता है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/97",
+    "options": [
+      { "id": "A", "text_en": "Worry, get anxious, fearful, overthink", "text_hi": "जल्दी घबरा जाना, चिंता या डर लगना", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Irritable, angry quickly, highly critical", "text_hi": "जल्दी गुस्सा आना, अधीर और चिड़चिड़ा होना", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Calm, slow to react, forgiving, peaceful", "text_hi": "शांत, धैर्यवान, जल्दी विचलित न होना", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-14",
+    "title_en": "Speech Pattern (Vak)",
+    "title_hi": "बोलने का ढंग (वाक्)",
+    "question_en": "How is your natural style of speaking?",
+    "question_hi": "आपकी बात करने की शैली कैसी है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/96",
+    "options": [
+      { "id": "A", "text_en": "Fast, talkative, changes topics rapidly", "text_hi": "तेज बोलना, अधिक बोलना, विषय जल्दी बदलना", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Sharp, convincing, precise, authoritative", "text_hi": "स्पष्ट, सटीक, तार्किक और प्रभावशाली", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Slow, deep, sweet voice, speaks only when needed", "text_hi": "धीमी, गंभीर, मीठी आवाज, नपा-तुला बोलना", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  },
+  {
+    "id": "PK-15",
+    "title_en": "Physical Movement (Cheshta)",
+    "title_hi": "शारीरिक चाल-ढाल",
+    "question_en": "How is your usual speed of walking and moving?",
+    "question_hi": "आपकी चलने और काम करने की गति कैसी है?",
+    "reference": "Charaka Samhita Vimana Sthana 8/96",
+    "options": [
+      { "id": "A", "text_en": "Fast, restless, always fidgeting or on the move", "text_hi": "तेज चाल, चंचल, लगातार कुछ न कुछ करते रहना", "points": { "vata": 1, "pitta": 0, "kapha": 0 }, "dosha": "vata" },
+      { "id": "B", "text_en": "Purposeful, moderate, energetic and decisive", "text_hi": "सटीक, ऊर्जावान और उद्देश्यपूर्ण गति", "points": { "vata": 0, "pitta": 1, "kapha": 0 }, "dosha": "pitta" },
+      { "id": "C", "text_en": "Slow, graceful, relaxed, steady and unhurried", "text_hi": "धीमी, स्थिर, शांत और आरामदायक चाल", "points": { "vata": 0, "pitta": 0, "kapha": 1 }, "dosha": "kapha" }
+    ]
+  }
+]

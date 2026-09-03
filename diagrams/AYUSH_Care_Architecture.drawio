@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-09-01T22:20:00.000Z" agent="Mozilla/5.0" version="24.0.0" type="device">
+
+  <!-- ========================================== -->
+  <!-- PAGE 1: HIGH-LEVEL SYSTEM ARCHITECTURE    -->
+  <!-- ========================================== -->
+  <diagram id="p1" name="1. System Architecture">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1100" background="#FAFBFC">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TIER 1: PHYSICAL KIOSK TOUCHPOINT -->
+        <mxCell id="t1" value="1. PHYSICAL KIOSK TOUCHPOINT (OPD Waiting Area)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0D6E6E;rounded=1;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="40" width="1480" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="hw1" value="🖥️ 15.6' Touch Display&#xa;(1080p Anti-Glare)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1A1A2E;" vertex="1" parent="t1">
+          <mxGeometry x="40" y="40" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="hw2" value="🎙️ Directional Mic Array&#xa;(Noise-Cancelling)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1A1A2E;" vertex="1" parent="t1">
+          <mxGeometry x="410" y="40" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="hw3" value="🔊 Stereo Speakers&#xa;(Voice / Audio Prompts)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1A1A2E;" vertex="1" parent="t1">
+          <mxGeometry x="780" y="40" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="hw4" value="📷 Document Camera&#xa;(Prescription Capture)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1A1A2E;" vertex="1" parent="t1">
+          <mxGeometry x="1150" y="40" width="290" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- TIER 2: FRONTEND CLIENT -->
+        <mxCell id="t2" value="2. FRONTEND CLIENT (React 18 + Vite + Tailwind CSS SPA)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0D6E6E;rounded=1;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="200" width="1480" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe1" value="🎨 Layman UI Components&#xa;(64px Touch Targets, High Contrast)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#0D6E6E;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1A1A2E;" vertex="1" parent="t2">
+          <mxGeometry x="40" y="45" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe2" value="🗣️ Web Speech API Engine&#xa;(Native Speech-to-Text &amp; TTS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#0D6E6E;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1A1A2E;" vertex="1" parent="t2">
+          <mxGeometry x="410" y="45" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe3" value="📦 Zustand Client Store&#xa;(Ephemeral Local Session Memory)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#0D6E6E;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1A1A2E;" vertex="1" parent="t2">
+          <mxGeometry x="780" y="45" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="fe4" value="🧭 Kiosk Router (S-01 to S-14)&#xa;(1-Question Progressive Flow)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#0D6E6E;strokeWidth=1.5;fontStyle=1;fontSize=12;fontColor=#1A1A2E;" vertex="1" parent="t2">
+          <mxGeometry x="1150" y="45" width="290" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- TIER 3: BACKEND API SERVICE -->
+        <mxCell id="t3" value="3. BACKEND API SERVICE (FastAPI / Python 3.11 Microservice)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#F59E0B;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#D97706;rounded=1;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="370" width="1480" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="be1" value="👤 /api/patients&#xa;(Register / ABHA Lookup)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;strokeWidth=1.5;fontSize=11;fontStyle=1;" vertex="1" parent="t3">
+          <mxGeometry x="30" y="45" width="170" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="be2" value="⏱️ /api/sessions&#xa;(Consent &amp; Complaint)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;strokeWidth=1.5;fontSize=11;fontStyle=1;" vertex="1" parent="t3">
+          <mxGeometry x="235" y="45" width="170" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="be3" value="🌿 /api/prakriti&#xa;(15 Qs Answers &amp; Score)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;strokeWidth=1.5;fontSize=11;fontStyle=1;" vertex="1" parent="t3">
+          <mxGeometry x="440" y="45" width="180" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="be4" value="📋 /api/pariksha&#xa;(Dashavidha Parameters)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;strokeWidth=1.5;fontSize=11;fontStyle=1;" vertex="1" parent="t3">
+          <mxGeometry x="655" y="45" width="180" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="be5" value="📄 /api/documents&#xa;(OCR Extraction Storage)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;strokeWidth=1.5;fontSize=11;fontStyle=1;" vertex="1" parent="t3">
+          <mxGeometry x="870" y="45" width="180" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="be6" value="📝 /api/summary&#xa;(Clinical EMR Template)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;strokeWidth=1.5;fontSize=11;fontStyle=1;" vertex="1" parent="t3">
+          <mxGeometry x="1085" y="45" width="175" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="be7" value="👨‍⚕️ /api/physician&#xa;(Queue &amp; Triage Actions)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;strokeWidth=1.5;fontSize=11;fontStyle=1;" vertex="1" parent="t3">
+          <mxGeometry x="1295" y="45" width="155" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- TIER 4: DETERMINISTIC CLINICAL CORE -->
+        <mxCell id="t4" value="4. DETERMINISTIC CLINICAL CORE (Zero-AI Logic, Pure JSON Rule &amp; Arithmetic Engines)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#B45309;rounded=1;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="540" width="1480" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="eng1" value="🌳 Complaint Decision Tree&#xa;(47 Pre-Authored Questions)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;strokeWidth=1.5;fontStyle=1;fontSize=12;" vertex="1" parent="t4">
+          <mxGeometry x="40" y="45" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="eng2" value="⚖️ Dosha Arithmetic Engine&#xa;(Charaka Samhita Algorithm)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;strokeWidth=1.5;fontStyle=1;fontSize=12;" vertex="1" parent="t4">
+          <mxGeometry x="410" y="45" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="eng3" value="🚨 Red-Flag Pattern Matcher&#xa;(8 Emergency Symptom Rules)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DC2626;strokeWidth=2;fontStyle=1;fontSize=12;fontColor=#DC2626;" vertex="1" parent="t4">
+          <mxGeometry x="780" y="45" width="280" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="eng4" value="📑 Clinical Template Formatter&#xa;(9-Section Structured EMR)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;strokeWidth=1.5;fontStyle=1;fontSize=12;" vertex="1" parent="t4">
+          <mxGeometry x="1150" y="45" width="290" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- TIER 5: PERSISTENCE & PHYSICIAN -->
+        <mxCell id="t5" value="5. DATA PERSISTENCE (Supabase PostgreSQL)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#1D4ED8;rounded=1;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="80" y="710" width="720" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="db1" value="🗄️ PostgreSQL Database&#xa;(10 Relational Tables)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=1.5;fontStyle=1;" vertex="1" parent="t5">
+          <mxGeometry x="40" y="40" width="190" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="db2" value="📁 Supabase Storage&#xa;(Prescription Images)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=1.5;fontStyle=1;" vertex="1" parent="t5">
+          <mxGeometry x="270" y="40" width="190" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="db3" value="🔐 Supabase Auth&#xa;(Doctor JWT Token)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=1.5;fontStyle=1;" vertex="1" parent="t5">
+          <mxGeometry x="500" y="45" width="180" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t6" value="6. PHYSICIAN WORKSTATION (Doctor Cabin)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#059669;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#047857;rounded=1;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="840" y="710" width="720" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="doc1" value="📋 Priority Triage Queue&#xa;(Pinned Red-Flag Alerts)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#059669;strokeWidth=1.5;fontStyle=1;" vertex="1" parent="t6">
+          <mxGeometry x="40" y="45" width="190" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="doc2" value="🖥️ Clinical Review Workbench&#xa;(Dosha Radar + Timeline)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#059669;strokeWidth=1.5;fontStyle=1;" vertex="1" parent="t6">
+          <mxGeometry x="270" y="45" width="200" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="doc3" value="✅ 1-Click EMR Accept&#xa;(Doctor Final Control)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#059669;strokeColor=#047857;strokeWidth=1.5;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="t6">
+          <mxGeometry x="500" y="45" width="180" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- CONNECTORS -->
+        <mxCell id="c1" edge="1" parent="1" source="t1" target="t2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0D6E6E;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2" edge="1" parent="1" source="t2" target="t3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#0D6E6E;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="lbl_https" value="HTTPS / JSON Payloads" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontColor=#0D6E6E;fillColor=#FFFFFF;" vertex="1" connectable="0" parent="c2">
+          <mxGeometry x="-0.1" relative="1" as="geometry">
+            <mxPoint y="-5" as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c3" edge="1" parent="1" source="t3" target="t4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#D97706;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="c4" edge="1" parent="1" source="t3" target="t5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#2563EB;">
+          <mxGeometry relative="1" as="geometry">
+            <Array points="440 520, 440 710"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c5" edge="1" parent="1" source="t5" target="t6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#059669;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- ========================================== -->
+  <!-- PAGE 2: PATIENT KIOSK STATE MACHINE       -->
+  <!-- ========================================== -->
+  <diagram id="p2" name="2. Kiosk State Machine">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1100" background="#FAFBFC">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="sm_start" value="START" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0D6E6E;strokeColor=#0D6E6E;fontColor=#FFFFFF;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="100" y="80" width="100" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s01" value="S-01: Welcome Screen&#xa;• Ambient Greeting&#xa;• Big 'Tap to Begin' CTA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="70" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s02" value="S-02: Language Select&#xa;• 🪧 हिन्दी (Hindi)&#xa;• 🪧 English&#xa;• Auto-TTS Welcome" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="70" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s03" value="S-03: Patient Identify&#xa;• ABHA QR / Aadhaar&#xa;• Manual 3-Field Reg&#xa;• POST /api/sessions/start" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="70" width="210" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s04" value="S-04: Audio Consent&#xa;• Native TTS Voice&#xa;• 64px 'I Agree' Button&#xa;• 64px 'Decline' Button" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="70" width="200" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s05" value="S-05: Comprehension&#xa;• 'Please answer honestly'&#xa;• 'I Understand' button&#xa;  enabled after speech" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="70" width="210" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- ROW 2 -->
+        <mxCell id="s06" value="S-06: Chief Complaint&#xa;• Big Category Cards&#xa;  (Joints / Fever / GI)&#xa;• Web Speech API Mic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="240" width="210" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s07" value="S-07: SOCRATES Qs&#xa;• 1 Question per screen&#xa;• Location, Duration, Triggers&#xa;• Silent Red-Flag Check" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="240" width="200" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s08" value="🚨 S-08: Red-Flag Alert&#xa;• Urgent Audio Warning&#xa;• Doctor Queue Bumped&#xa;• Auto-Resumes in 6s" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#DC2626;strokeWidth=2.5;fontStyle=1;fontColor=#DC2626;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="390" width="200" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s09" value="S-09: Prakriti Assessment&#xa;• 15 Classical Questions&#xa;• No Dosha Jargon&#xa;• Progress Bar (1/15)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="240" width="210" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s10" value="S-10: Dashavidha Pariksha&#xa;• 9 Quick-Fire Cards&#xa;• Digestion, Sleep, Stress&#xa;• Fast Swipe / Tap" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="240" width="200" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s11" value="S-11: Document Upload&#xa;• Camera OCR Snapshot&#xa;• Edge Detection&#xa;• Live Preview / Skip" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="240" width="200" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- ROW 3 -->
+        <mxCell id="s12" value="S-12: Summary Review&#xa;• Interactive Dosha Radar&#xa;• Plain Audio Summary&#xa;• 'Confirm' / 'Flag for Doc'" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="400" width="200" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s13" value="S-13: Submission Confirm&#xa;• Mock ABHA Link&#xa;• Sent to Doctor's Queue&#xa;• POST /api/summary/submit" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="400" width="200" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s14" value="S-14: Session End&#xa;• 'Token # A-42'&#xa;• Audio: 'धन्यवाद'&#xa;• 10s Cache Wipe &amp; Reset" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="400" width="210" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- CONNECTORS -->
+        <mxCell id="sm1" edge="1" parent="1" source="sm_start" target="s01" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm2" edge="1" parent="1" source="s01" target="s02" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm3" edge="1" parent="1" source="s02" target="s03" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm4" edge="1" parent="1" source="s03" target="s04" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm5" edge="1" parent="1" source="s04" target="s05" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm6" edge="1" parent="1" source="s05" target="s06" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm7" edge="1" parent="1" source="s06" target="s07" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm8" edge="1" parent="1" source="s07" target="s08" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#DC2626;dashed=1;" />
+        <mxCell id="sm9" edge="1" parent="1" source="s08" target="s07" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#059669;" />
+        <mxCell id="sm10" edge="1" parent="1" source="s07" target="s09" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm11" edge="1" parent="1" source="s09" target="s10" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm12" edge="1" parent="1" source="s10" target="s11" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm13" edge="1" parent="1" source="s11" target="s12" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm14" edge="1" parent="1" source="s12" target="s13" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm15" edge="1" parent="1" source="s13" target="s14" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="sm16" edge="1" parent="1" source="s14" target="s01" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#6B7280;dashed=1;">
+          <mxGeometry relative="1" as="geometry">
+            <Array points="885 530, 360 530"/>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- ========================================== -->
+  <!-- PAGE 3: CLINICAL KNOWLEDGE ENGINE         -->
+  <!-- ========================================== -->
+  <diagram id="p3" name="3. Clinical Knowledge Engine">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1100" background="#FAFBFC">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="e_inp" value="1. PATIENT INTAKE&#xa;Chief Complaint Selection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#0D6E6E;strokeWidth=2;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="680" y="40" width="240" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e_cat" value="2. DETERMINISTIC CATEGORIZATION&#xa;Decision Tree Lookup Table" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#F59E0B;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#D97706;" vertex="1" parent="1">
+          <mxGeometry x="80" y="140" width="1440" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="b1" value="Branch A: MSK &amp; Joints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;fontStyle=1;" vertex="1" parent="e_cat">
+          <mxGeometry x="30" y="40" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2" value="Branch B: Fever &amp; Infection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;fontStyle=1;" vertex="1" parent="e_cat">
+          <mxGeometry x="270" y="40" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="b3" value="Branch C: Agni &amp; GI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;fontStyle=1;" vertex="1" parent="e_cat">
+          <mxGeometry x="510" y="40" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="b4" value="Branch D: Respiratory" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;fontStyle=1;" vertex="1" parent="e_cat">
+          <mxGeometry x="750" y="40" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="b5" value="Branch E: Dermatology" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;fontStyle=1;" vertex="1" parent="e_cat">
+          <mxGeometry x="990" y="40" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="b6" value="Branch F: General Health" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F59E0B;fontStyle=1;" vertex="1" parent="e_cat">
+          <mxGeometry x="1230" y="40" width="180" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- SOCRATES QUESTIONS -->
+        <mxCell id="e_soc" value="3. SOCRATES QUESTION BANK (questions.json)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#B45309;" vertex="1" parent="1">
+          <mxGeometry x="80" y="290" width="1440" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="q_s" value="Site (स्थान)&#xa;Location of symptom" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;fontStyle=1;" vertex="1" parent="e_soc">
+          <mxGeometry x="30" y="45" width="200" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="q_o" value="Onset (शुरुआत)&#xa;Duration &amp; suddenness" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;fontStyle=1;" vertex="1" parent="e_soc">
+          <mxGeometry x="270" y="45" width="200" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="q_c" value="Character (प्रकार)&#xa;Burning, sharp, dull" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;fontStyle=1;" vertex="1" parent="e_soc">
+          <mxGeometry x="510" y="45" width="200" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="q_t" value="Timing (समय)&#xa;Morning stiffness, night" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;fontStyle=1;" vertex="1" parent="e_soc">
+          <mxGeometry x="750" y="45" width="200" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="q_e" value="Exacerbating (ट्रिगर)&#xa;What makes it worse" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;fontStyle=1;" vertex="1" parent="e_soc">
+          <mxGeometry x="990" y="45" width="200" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="q_a" value="Associated (अन्य)&#xa;Swelling, breathlessness" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;fontStyle=1;" vertex="1" parent="e_soc">
+          <mxGeometry x="1230" y="45" width="180" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- SCANNER -->
+        <mxCell id="e_rf" value="4. RED-FLAG PATTERN MATCHER (red-flags.json)&#xa;In-Memory Regex Scanner (&lt;10ms) with OR Sensitivity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#DC2626;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#DC2626;" vertex="1" parent="1">
+          <mxGeometry x="530" y="450" width="540" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- COMORBIDITY -->
+        <mxCell id="e_comorb" value="5. COMORBIDITY &amp; SYSTEMIC REVIEW&#xa;Past Medical (Sugar/BP/Thyroid) + Active Medications &amp; Allergies" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#1D4ED8;" vertex="1" parent="1">
+          <mxGeometry x="530" y="550" width="540" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- TEMPLATE FORMATTER -->
+        <mxCell id="e_tpl" value="6. CLINICAL SUMMARY TEMPLATE ENGINE (summary_template.py)&#xa;Zero-AI Deterministic String Formatter generating 9-Section EMR Note" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#059669;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#047857;" vertex="1" parent="1">
+          <mxGeometry x="530" y="650" width="540" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- FLOW ARROWS -->
+        <mxCell id="ea1" edge="1" parent="1" source="e_inp" target="e_cat" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#0D6E6E;" />
+        <mxCell id="ea2" edge="1" parent="1" source="e_cat" target="e_soc" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#F59E0B;" />
+        <mxCell id="ea3" edge="1" parent="1" source="e_soc" target="e_rf" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#D97706;" />
+        <mxCell id="ea4" edge="1" parent="1" source="e_rf" target="e_comorb" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#DC2626;" />
+        <mxCell id="ea5" edge="1" parent="1" source="e_comorb" target="e_tpl" style="edgeStyle=orthogonalEdgeStyle;strokeWidth=2;strokeColor=#2563EB;" />
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+</mxfile>

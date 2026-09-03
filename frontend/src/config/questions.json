@@ -1,0 +1,97 @@
+{
+  "categories": [
+    {
+      "id": "joint_pain",
+      "name_en": "Joint & Bone Pain",
+      "name_hi": "जोड़ों और हड्डियों का दर्द",
+      "icon": "Bone",
+      "description_en": "Knee, back, shoulder, neck, or arthritis pain",
+      "description_hi": "घुटने, कमर, कंधे, गर्दन या गठिया का दर्द"
+    },
+    {
+      "id": "pyrexia",
+      "name_en": "Fever & Infection",
+      "name_hi": "बुखार और संक्रमण",
+      "icon": "Thermometer",
+      "description_en": "High temperature, chills, body ache, weakness",
+      "description_hi": "तेज बुखार, ठंड लगना, बदन दर्द, कमजोरी"
+    },
+    {
+      "id": "gastrointestinal",
+      "name_en": "Digestion & Stomach",
+      "name_hi": "पेट और पाचन समस्या",
+      "icon": "Activity",
+      "description_en": "Acidity, gas, bloating, constipation, piles",
+      "description_hi": "एसिडिटी, गैस, कब्ज, पेट दर्द, बवासीर"
+    },
+    {
+      "id": "respiratory",
+      "name_en": "Cough & Breathing",
+      "name_hi": "खांसी और सांस की तकलीफ",
+      "icon": "Wind",
+      "description_en": "Chronic cough, asthma, allergy, breathlessness",
+      "description_hi": "पुरानी खांसी, दमा, एलर्जी, सांस फूलना"
+    },
+    {
+      "id": "dermatology",
+      "name_en": "Skin & Hair Issues",
+      "name_hi": "त्वचा और बालों की समस्या",
+      "icon": "Sparkles",
+      "description_en": "Rash, itching, eczema, psoriasis, hair fall",
+      "description_hi": "खुजली, दाद, एक्जिमा, सोरायसिस, बाल झड़ना"
+    },
+    {
+      "id": "general_wellness",
+      "name_en": "General Health & Fatigue",
+      "name_hi": "सामान्य कमजोरी व अन्य",
+      "icon": "Heart",
+      "description_en": "Chronic fatigue, sleep issues, stress, diabetes review",
+      "description_hi": "थकान, अनिद्रा, तनाव, शुगर/बीपी नियमित जांच"
+    }
+  ],
+  "socrates_templates": {
+    "joint_pain": [
+      {
+        "id": "JP-01",
+        "question_en": "Where is your pain located?",
+        "question_hi": "आपको दर्द कहाँ पर है?",
+        "options": [
+          { "text_en": "Both Knees", "text_hi": "दोनों घुटनों में" },
+          { "text_en": "Lower Back", "text_hi": "कमर के निचले हिस्से में" },
+          { "text_en": "Shoulders / Neck", "text_hi": "कंधे या गर्दन में" },
+          { "text_en": "Multiple Small Joints (Hands/Feet)", "text_hi": "हाथ-पैरों के छोटे जोड़ों में" }
+        ]
+      },
+      {
+        "id": "JP-02",
+        "question_en": "How long have you been suffering from this pain?",
+        "question_hi": "यह दर्द आपको कितने समय से है?",
+        "options": [
+          { "text_en": "Few days to 2 weeks", "text_hi": "कुछ दिनों से 2 हफ्ते तक" },
+          { "text_en": "1 to 6 months", "text_hi": "1 से 6 महीने से" },
+          { "text_en": "More than 1 year (Chronic)", "text_hi": "1 साल से भी ज्यादा समय से" }
+        ]
+      },
+      {
+        "id": "JP-03",
+        "question_en": "Do you experience severe morning stiffness?",
+        "question_hi": "क्या सुबह उठने पर जोड़ों में तेज जकड़न महसूस होती है?",
+        "options": [
+          { "text_en": "Yes, lasts more than 30 minutes", "text_hi": "हाँ, 30 मिनट से अधिक समय तक" },
+          { "text_en": "Mild stiffness, eases quickly with movement", "text_hi": "थोड़ी देर रहती है, चलने पर ठीक हो जाती है" },
+          { "text_en": "No morning stiffness", "text_hi": "सुबह कोई जकड़न नहीं होती" }
+        ]
+      },
+      {
+        "id": "JP-04",
+        "question_en": "What makes your pain worse?",
+        "question_hi": "किस गतिविधि से दर्द बढ़ जाता है?",
+        "options": [
+          { "text_en": "Climbing stairs or walking long distances", "text_hi": "सीढ़ियां चढ़ने या अधिक पैदल चलने से" },
+          { "text_en": "Cold weather or AC exposure", "text_hi": "ठंड या ठंडी हवा के संपर्क से" },
+          { "text_en": "Continuous sitting in one position", "text_hi": "लगातार एक जगह बैठे रहने से" }
+        ]
+      }
+    ]
+  }
+}
