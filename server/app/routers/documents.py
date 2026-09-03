@@ -1,12 +1,14 @@
 """
 Document and Prescription OCR Processing Router.
 Handles multimodal prescription uploads, Tesseract spatial verification,
-and Ayurvedic Pharmacopoeia entity extraction.
+FastAPI BackgroundTasks for sub-100ms response, and DPDP ephemeral storage.
 """
 
+import json
 import logging
+import uuid
 from typing import List, Optional
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, UploadFile, status
 
 from app.models.schemas import ProcessReportsResponse
 from app.services.report_pipeline import report_pipeline
@@ -20,19 +22,22 @@ router = APIRouter(prefix="/api/documents", tags=["Documents & OCR"])
     "/process-reports",
     response_model=ProcessReportsResponse,
     status_code=status.HTTP_200_OK,
-    summary="Process and verify multiple medical prescription images",
+    summary="Process and verify multiple medical prescription images with background queuing",
 )
 async def process_reports(
+    background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(..., description="Uploaded prescription/lab report image files"),
     session_id: Optional[str] = Form(None, description="Optional patient kiosk session identifier"),
     grouping_json: Optional[str] = Form(None, description="Optional JSON string specifying report page grouping"),
+    sync: bool = Form(False, description="If True, process synchronously; if False, process in background for fast UX"),
 ):
     """
     Submits prescription images through the Dual-Engine Vision & OCR Pipeline:
     1. Validates image integrity and MIME types.
-    2. Runs Gemini Multimodal Vision analysis to extract Ayurvedic formulations and lab values.
-    3. Executes independent Tesseract OCR spatial verification against original pixels.
-    4. Synthesizes a longitudinal patient clinical history for BAMS doctor review.
+    2. Writes files to an isolated ephemeral temporary directory.
+    3. If sync=True: executes Gemini extraction and Tesseract verification synchronously.
+    4. If sync=False (default for kiosk): queues processing via BackgroundTasks and returns immediately.
+    5. In all cases, raw images are auto-purged on completion (DPDP Act 2023 compliance).
     """
     if not files:
         raise HTTPException(
@@ -40,15 +45,48 @@ async def process_reports(
             detail="At least one prescription or report image must be provided.",
         )
 
+    patient_session_id = session_id or f"session_{uuid.uuid4().hex[:10]}"
+
     try:
-        response = await report_pipeline.process_all_reports(
+        grouping_spec = None
+        if grouping_json:
+            try:
+                grouping_spec = json.loads(grouping_json)
+            except Exception as exc:
+                logger.warning("Could not parse grouping JSON: %s", exc)
+
+        # 1. Save uploaded images to isolated ephemeral storage
+        temp_dir, image_metas = await report_pipeline.save_uploaded_files_ephemeral(
             files=files,
-            session_id=session_id,
-            grouping_json=grouping_json,
+            patient_session_id=patient_session_id,
+            grouping_spec=grouping_spec,
         )
-        return response
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+
+        if sync:
+            return report_pipeline.process_pipeline_and_cleanup(
+                temp_dir=temp_dir,
+                image_metas=image_metas,
+                patient_session_id=patient_session_id,
+            )
+
+        # 2. Fast UX: Dispatch to BackgroundTasks and return immediately in <100ms
+        background_tasks.add_task(
+            report_pipeline.process_pipeline_and_cleanup,
+            temp_dir=temp_dir,
+            image_metas=image_metas,
+            patient_session_id=patient_session_id,
+        )
+
+        return ProcessReportsResponse(
+            status="queued",
+            patient_session_id=patient_session_id,
+            reports_processed=0,
+            result_file=None,
+            message="Prescriptions received and saved to ephemeral storage. Extraction & OCR verification queued in background.",
+        )
+
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.error("Failed to process documents: %s", exc)
         raise HTTPException(
@@ -65,9 +103,10 @@ async def process_reports(
 )
 async def upload_session_document(
     session_id: str,
+    background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(..., description="Prescription image files"),
 ):
     """
     Uploads prescriptions directly linked to an active patient intake session.
     """
-    return await process_reports(files=files, session_id=session_id)
+    return await process_reports(files=files, session_id=session_id, background_tasks=background_tasks)
