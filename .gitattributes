@@ -1,0 +1,9 @@
+# Auto-normalize line endings across Windows, Mac, and Linux
+* text=auto eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.sql text eol=lf
+*.bat text eol=crlf
