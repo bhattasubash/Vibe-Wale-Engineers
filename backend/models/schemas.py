@@ -114,6 +114,7 @@ class PatientSessionOutput(BaseModel):
 class ProcessReportsResponse(BaseModel):
     status: str
     patient_session_id: str
-    reports_processed: int
-    result_file: str
+    reports_processed: Optional[int] = 0
+    result_file: Optional[str] = None
+    token_number: Optional[str] = None
     message: Optional[str] = None

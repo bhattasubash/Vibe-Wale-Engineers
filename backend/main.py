@@ -1,6 +1,8 @@
+import json
 import logging
+import uuid
 from typing import List, Optional
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
+from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -69,6 +71,7 @@ async def health_check():
     tags=["Reports"],
 )
 async def process_reports(
+    background_tasks: BackgroundTasks,
     files: List[UploadFile] = File(..., description="Multiple medical report image files (JPEG, PNG, WebP, TIFF)"),
     report_grouping: Optional[str] = Form(
         None,
@@ -77,18 +80,22 @@ async def process_reports(
             '{"report_001": ["page1.jpg", "page2.jpg"]}'
         ),
     ),
+    patient_session_id: Optional[str] = Form(
+        None,
+        description="Optional existing patient session ID (e.g. from Kiosk)",
+    ),
+    sync: bool = Form(
+        False,
+        description="If True, process synchronously; if False, process in background and return immediately.",
+    ),
 ):
     """
     Process multiple medical report images:
     1. Validates image types, integrity, and sizes
-    2. Saves original images to storage/uploads/
-    3. Groups images into individual reports
-    4. Performs multimodal clinical extraction using Gemini
-    5. Independently verifies extracted numbers against original images using Tesseract OCR
-    6. Persists individual report JSONs in storage/results/reports/
-    7. Synthesizes overall longitudinal patient history using Gemini
-    8. Persists overall patient session JSON in storage/results/
-    9. Returns processing confirmation with session ID and saved result path
+    2. Writes files to an isolated ephemeral temporary directory
+    3. If sync=True: executes Gemini multimodal extraction and Tesseract OCR verification synchronously
+    4. If sync=False (default for kiosk): dispatches processing pipeline via BackgroundTasks and returns immediately
+    5. In all cases, raw images and ephemeral storage are guaranteed to be auto-purged on completion
     """
     if not files:
         raise HTTPException(
@@ -96,12 +103,45 @@ async def process_reports(
             detail="At least one medical report image must be uploaded.",
         )
 
+    session_id = patient_session_id or f"session_{uuid.uuid4().hex[:10]}"
+
     try:
-        response = await report_service.process_all_reports(
+        grouping_spec = None
+        if report_grouping:
+            try:
+                grouping_spec = json.loads(report_grouping)
+            except Exception as exc:
+                logger.warning("Could not parse grouping JSON: %s", exc)
+
+        # Save files to ephemeral temp directory
+        temp_dir, image_metas = await report_service.save_uploaded_files_ephemeral(
             files=files,
-            grouping_json=report_grouping,
+            patient_session_id=session_id,
+            grouping_spec=grouping_spec,
         )
-        return response
+
+        if sync:
+            return report_service.process_pipeline_and_cleanup(
+                temp_dir=temp_dir,
+                image_metas=image_metas,
+                patient_session_id=session_id,
+            )
+
+        # Queue background processing and return immediately
+        background_tasks.add_task(
+            report_service.process_pipeline_and_cleanup,
+            temp_dir=temp_dir,
+            image_metas=image_metas,
+            patient_session_id=session_id,
+        )
+
+        return ProcessReportsResponse(
+            status="queued",
+            patient_session_id=session_id,
+            reports_processed=0,
+            result_file=None,
+            message="Report images received and saved to ephemeral storage. Extraction & OCR verification queued in background.",
+        )
     except HTTPException:
         raise
     except Exception as exc:

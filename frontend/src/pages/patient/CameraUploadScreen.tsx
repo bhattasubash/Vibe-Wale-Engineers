@@ -13,7 +13,7 @@ interface CapturedDocItem {
 
 export const CameraUploadScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { language, addUploadedDocument } = useSessionStore();
+  const { language, sessionId, addUploadedDocument } = useSessionStore();
 
   const [cameraActive, setCameraActive] = useState(false);
   const [detectionState, setDetectionState] = useState<'searching' | 'adjusting' | 'holding' | 'captured'>('searching');
@@ -212,6 +212,9 @@ export const CameraUploadScreen: React.FC = () => {
         capturedDocs.forEach((doc) => {
           formData.append('files', doc.file);
         });
+        if (sessionId) {
+          formData.append('patient_session_id', sessionId);
+        }
 
         await fetch('/api/process-reports', {
           method: 'POST',

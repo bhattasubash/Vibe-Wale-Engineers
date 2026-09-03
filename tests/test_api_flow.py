@@ -82,13 +82,12 @@ def test_process_reports_pipeline(tmp_path, monkeypatch):
 
             assert response.status_code == 200, response.text
             data = response.json()
-            assert data["status"] == "completed"
-            assert data["reports_processed"] == 1
+            assert data["status"] == "queued"
             assert "patient_session_id" in data
-            assert data["result_file"].endswith(".json")
 
-            # Verify saved files on disk
-            result_file = Path(data["result_file"])
+            # Starlette TestClient runs BackgroundTasks before returning.
+            # Verify saved session file on disk
+            result_file = Path(tmp_path) / "results" / f"patient_session_{data['patient_session_id']}.json"
             assert result_file.exists()
 
             with open(result_file, "r", encoding="utf-8") as f:
@@ -154,14 +153,16 @@ def test_process_reports_with_explicit_grouping(tmp_path, monkeypatch):
                 "report_lipid": ["pageC.jpg"],
             })
 
+            # Test synchronous mode via sync=true
             response = client.post(
                 "/api/process-reports",
                 files=files,
-                data={"report_grouping": grouping_json},
+                data={"report_grouping": grouping_json, "sync": "true"},
             )
 
             assert response.status_code == 200
             data = response.json()
+            assert data["status"] == "completed"
             assert data["reports_processed"] == 2
 
             # Check individual report files
@@ -219,3 +220,46 @@ def test_empty_files_rejected():
     response = client.post("/api/process-reports", files=[])
     # FastAPI returns 422 for missing required file field
     assert response.status_code in (400, 422)
+
+
+def test_ephemeral_image_cleanup(tmp_path, monkeypatch):
+    """Verifies that ephemeral image files and temporary directories are 100% removed after processing."""
+    from backend.services.report_service import report_service
+
+    captured_temp_dirs = []
+    original_save = report_service.save_uploaded_files_ephemeral
+
+    async def mock_save_ephemeral(*args, **kwargs):
+        temp_dir, metas = await original_save(*args, **kwargs)
+        captured_temp_dirs.append(temp_dir)
+        return temp_dir, metas
+
+    monkeypatch.setattr(report_service, "save_uploaded_files_ephemeral", mock_save_ephemeral)
+    monkeypatch.setattr("backend.config.settings.STORAGE_DIR", str(tmp_path))
+
+    mock_extraction = IndividualReportExtraction(
+        report_type="CBC",
+        summary="CBC report.",
+        findings=[],
+    )
+    mock_history = OverallPatientHistory(
+        past_medical_surgical_history="None",
+        drug_allergy_history="None",
+        personal_history="None",
+        review_of_systems="None",
+        prior_investigations_summary="None",
+    )
+
+    with patch("backend.services.gemini_service.gemini_service.extract_individual_report", return_value=mock_extraction):
+        with patch("backend.services.gemini_service.gemini_service.synthesize_patient_history", return_value=mock_history):
+            files = [
+                ("files", ("test_page.jpg", io.BytesIO(create_dummy_image_bytes()), "image/jpeg")),
+            ]
+
+            response = client.post("/api/process-reports", files=files)
+            assert response.status_code == 200
+            assert len(captured_temp_dirs) == 1
+            temp_dir = captured_temp_dirs[0]
+
+            # The temporary directory must NOT exist on disk anymore (ephemeral auto-purge guarantee)
+            assert not temp_dir.exists(), f"Ephemeral directory {temp_dir} was not cleaned up!"
