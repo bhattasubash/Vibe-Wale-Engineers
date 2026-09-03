@@ -49,12 +49,12 @@ export const IdentifyScreen: React.FC = () => {
         phone: regPhone,
         isReturning: false,
       });
-      navigate('/kiosk/consent');
+      navigate('/kiosk/department');
     }
   };
 
   const handleProceed = () => {
-    navigate('/kiosk/consent');
+    navigate('/kiosk/department');
   };
 
   return (

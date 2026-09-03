@@ -10,10 +10,12 @@ export const TokenScreen: React.FC = () => {
   const {
     sessionId,
     language,
+    treatmentMode,
     patient,
     chiefComplaint,
     complaintCategory,
     socrates,
+    generalVitals,
     redFlagTriggered,
     prakritiResult,
     uploadedDocuments,
@@ -23,8 +25,18 @@ export const TokenScreen: React.FC = () => {
   const { addPatientToQueue } = usePhysicianStore();
   const [countdown, setCountdown] = useState(25);
 
+  const isAyurveda = treatmentMode === 'ayurveda';
   const currentSessionId = sessionId || `SES-${Math.floor(1000 + Math.random() * 9000)}K`;
-  const tokenNumber = '#AIIA-042';
+  const tokenNumber = isAyurveda ? '#AIIA-042' : '#AIIA-G108';
+
+  const assignedDoctorName = isAyurveda
+    ? 'डॉ. अनन्या शर्मा (Dr. Ananya Sharma)'
+    : 'डॉ. राजेश वर्मा (Dr. Rajesh Verma)';
+  const assignedDegree = isAyurveda
+    ? 'BAMS, MD • कायचिकित्सा विभाग (Internal Medicine)'
+    : 'MBBS, MD (Medicine) • सामान्य चिकित्सा विभाग (General Medicine)';
+  const assignedRoom = isAyurveda ? 'Room #104' : 'Room #205';
+  const assignedBlock = isAyurveda ? 'Block A' : 'Block B';
 
   // Automatically sync patient intake into Doctor's OPD Workstation Queue
   useEffect(() => {
@@ -32,40 +44,44 @@ export const TokenScreen: React.FC = () => {
 
     addPatientToQueue({
       sessionId: currentSessionId,
-      patientName: patient.fullName ? `${patient.fullName}` : 'रामेश्वर दयाल शर्मा (Rameshwar Sharma)',
+      patientName: patient.fullName ? `${patient.fullName}` : (language === 'hi' ? 'रामेश्वर दयाल शर्मा (Rameshwar Sharma)' : 'Rameshwar Sharma'),
       age: typeof patient.age === 'number' ? patient.age : 62,
       gender: patient.gender || 'male',
       phone: patient.phone || '9876543210',
       abhaId: patient.abhaId || '91-4523-8901-2345',
       tokenNumber: tokenNumber,
-      chiefComplaint: chiefComplaint || 'दोनों घुटनों में दर्द, सूजन व कट-कट की आवाज (Sandhivata)',
-      complaintCategory: complaintCategory || 'musculoskeletal',
-      dominantPrakriti: prakritiResult?.dominantPrakriti || 'PITTA-KAPHA',
+      chiefComplaint: chiefComplaint || (isAyurveda ? 'दोनों घुटनों में दर्द, सूजन व कट-कट की आवाज (Sandhivata)' : 'शरीर में अत्यधिक कमजोरी, बुखार व सांस लेने में भारीपन'),
+      complaintCategory: complaintCategory || (isAyurveda ? 'musculoskeletal' : 'general-medicine'),
+      dominantPrakriti: isAyurveda ? (prakritiResult?.dominantPrakriti || 'PITTA-KAPHA') : 'सामान्य एलोपैथी (Allopathy)',
       vataScore: prakritiResult?.vataScore ?? 20,
       pittaScore: prakritiResult?.pittaScore ?? 53,
       kaphaScore: prakritiResult?.kaphaScore ?? 27,
       redFlagTriggered: redFlagTriggered,
       priority: redFlagTriggered ? 'critical' : 'normal',
-      assignedDoctor: 'डॉ. अनन्या शर्मा (Dr. Ananya Sharma)',
-      roomNumber: 'Room #104',
+      assignedDoctor: assignedDoctorName,
+      roomNumber: assignedRoom,
       createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       socrates: {
-        site: socrates.site || 'bilateral-knees',
+        site: socrates.site || (isAyurveda ? 'दोनों जानु सन्धि (Bilateral Knees)' : 'छाती व शरीर में भारीपन'),
         onset: socrates.onset || 'chronic-6-months',
         severity: typeof socrates.severity === 'number' ? `${socrates.severity}/10` : 'severe-8',
         timing: socrates.timing || 'cold-morning',
         familyHistory: socrates.familyHistory || 'family-arthritis',
       },
-      ocrText: ocrSnippet || 'Rx: Maharasnadi Kwath 20ml BD, Yogaraj Guggulu 2 Tab BD. Diagnosed: Sandhivata.',
-      extractedDrugs: ['Maharasnadi Kwath', 'Yogaraj Guggulu', 'Shallaki Capsule 1 BD'],
+      ocrText: ocrSnippet || 'Rx: Formulations and diagnostic lab reports extracted.',
+      extractedDrugs: isAyurveda
+        ? ['Maharasnadi Kwath 20ml BD', 'Yogaraj Guggulu 2 Tab BD', 'Shallaki Capsule 1 BD']
+        : ['Tab Paracetamol 650mg TDS', 'Tab Pantoprazole 40mg OD', 'Syp Azithromycin 500mg'],
       status: 'awaiting_review',
     });
   }, []);
 
-  const promptHindi =
-    'बधाई हो! आपका पंजीकरण और प्रकृति परीक्षण पूरा हो गया है। आपका टोकन नंबर ए-42 है। कृपया कमरा नंबर 104, डॉ. अनन्या शर्मा के पास जाएं।';
+  const promptHindi = isAyurveda
+    ? `बधाई हो! आपका पंजीकरण पूरा हो गया है। आपका टोकन नंबर ${tokenNumber} है। कृपया ${assignedRoom}, ${assignedDoctorName} के पास जाएं।`
+    : `बधाई हो! आपका सामान्य चिकित्सा पंजीकरण पूरा हो गया है। आपका टोकन नंबर ${tokenNumber} है। कृपया ${assignedRoom}, ${assignedDoctorName} के पास जाएं।`;
+
   const promptEnglish =
-    'Congratulations! Your registration and Prakriti intake are complete. Your token number is A-42. Please proceed to Room 104, Dr. Ananya Sharma.';
+    `Congratulations! Your intake is complete. Your token number is ${tokenNumber}. Please proceed to ${assignedRoom}, ${assignedDoctorName}.`;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -112,13 +128,13 @@ export const TokenScreen: React.FC = () => {
           <div
             className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[3px] border text-[11px] font-bold uppercase tracking-wider mb-1"
             style={{
-              backgroundColor: '#F0FDF4',
-              borderColor: 'rgba(21, 128, 61, 0.4)',
-              color: '#15803D',
+              backgroundColor: isAyurveda ? '#F0FDF4' : '#E8F1F8',
+              borderColor: isAyurveda ? 'rgba(21, 128, 61, 0.4)' : 'rgba(11, 95, 165, 0.3)',
+              color: isAyurveda ? '#15803D' : '#0B5FA5',
             }}
           >
-            <CheckCircle className="w-3.5 h-3.5 text-[#15803D]" />
-            <span>पंजीकरण सफल • CASE DISPATCHED TO DOCTOR</span>
+            <CheckCircle className="w-3.5 h-3.5" />
+            <span>पंजीकरण सफल • CASE DISPATCHED TO OPD DOCTOR</span>
           </div>
 
           <h1
@@ -130,7 +146,7 @@ export const TokenScreen: React.FC = () => {
           <p className="text-xs sm:text-sm text-[#495057] font-semibold">
             {language === 'hi'
               ? 'आपका केस विवरण डॉक्टर के कंप्यूटर पर भेज दिया गया है।'
-              : 'Your case summary has been sent directly to the physician.'}
+              : 'Your case summary has been sent directly to the physician workstation.'}
           </p>
         </div>
 
@@ -144,7 +160,7 @@ export const TokenScreen: React.FC = () => {
                 अखिल भारतीय आयुर्वेद संस्थान (AIIA), नई दिल्ली
               </span>
               <span className="text-xs sm:text-sm font-black text-[#0B5FA5]">
-                आयुष ओपीडी परामर्श पर्ची (OPD Token Slip)
+                {isAyurveda ? 'आयुष ओपीडी परामर्श पर्ची (Ayurveda OPD Token Slip)' : 'सामान्य चिकित्सा ओपीडी पर्ची (General Medicine Token Slip)'}
               </span>
             </div>
 
@@ -162,13 +178,13 @@ export const TokenScreen: React.FC = () => {
               </div>
               <div>
                 <span className="text-[9px] font-bold text-[#0B5FA5] uppercase tracking-wider block">
-                  आवंटित डॉक्टर (Assigned Doctor):
+                  आवंटित चिकित्सक (Assigned Physician):
                 </span>
                 <span className="text-sm sm:text-base font-black text-[#212529] block">
-                  डॉ. अनन्या शर्मा (Dr. Ananya Sharma)
+                  {assignedDoctorName}
                 </span>
                 <span className="text-[11px] text-[#495057] font-semibold">
-                  BAMS, MD • कायचिकित्सा विभाग (Internal Medicine)
+                  {assignedDegree}
                 </span>
               </div>
             </div>
@@ -178,8 +194,8 @@ export const TokenScreen: React.FC = () => {
                 <MapPin className="w-2.5 h-2.5 text-[#0B5FA5]" />
                 <span>कमरा नं.:</span>
               </div>
-              <span className="text-base font-black text-[#0B5FA5] block leading-none mt-0.5">Room #104</span>
-              <span className="text-[8px] text-[#6C757D] font-bold block">Block A</span>
+              <span className="text-base font-black text-[#0B5FA5] block leading-none mt-0.5">{assignedRoom}</span>
+              <span className="text-[8px] text-[#6C757D] font-bold block">{assignedBlock}</span>
             </div>
           </div>
 
@@ -196,9 +212,9 @@ export const TokenScreen: React.FC = () => {
               <span className="font-bold text-[#212529]">{patient.age || 62} वर्ष / {patient.gender === 'female' ? 'महिला' : 'पुरुष'}</span>
             </div>
             <div>
-              <span className="text-[9px] text-[#6C757D] block">प्रकृति निष्कर्ष:</span>
-              <span className="font-bold text-[#2F7D4F]">
-                {prakritiResult?.dominantPrakriti || 'PITTA-KAPHA'}
+              <span className="text-[9px] text-[#6C757D] block">चिकित्सा पद्धति:</span>
+              <span className={`font-bold ${isAyurveda ? 'text-[#2F7D4F]' : 'text-[#0B5FA5]'}`}>
+                {isAyurveda ? (prakritiResult?.dominantPrakriti || 'PITTA-KAPHA') : 'सामान्य चिकित्सा (Allopathy)'}
               </span>
             </div>
           </div>

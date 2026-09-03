@@ -139,11 +139,11 @@ export const ConsentScreen: React.FC = () => {
         <div className="shrink-0">
           <button
             type="button"
-            onClick={() => navigate('/kiosk/identify')}
+            onClick={() => navigate('/kiosk/department')}
             className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-[3px] border border-[#CED4DA] bg-white hover:border-[#0B5FA5] hover:text-[#0B5FA5] text-xs font-bold text-[#212529] transition-all cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>पहचान पृष्ठ पर वापस जाएं (Back)</span>
+            <span>विभाग चयन पर वापस जाएं (Back)</span>
           </button>
         </div>
 

@@ -25,6 +25,8 @@ export type LanguageCode =
   | 'brx' // Bodo
   | 'mni'; // Manipuri
 
+export type TreatmentMode = 'ayurveda' | 'allopathy';
+
 export interface PatientInfo {
   id?: string;
   fullName: string;
@@ -56,14 +58,23 @@ export interface SocratesResponses {
   associated?: string;
   timing?: string;
   exacerbating?: string;
-  severity?: number;
+  severity?: number | string;
   familyHistory?: string;
+}
+
+export interface GeneralVitals {
+  bloodPressureHistory?: string;
+  diabetesStatus?: string;
+  knownAllergies?: string;
+  pastSurgeries?: string;
+  lifestyleFactors?: string;
 }
 
 export interface SessionState {
   // Session Identifiers
   sessionId: string | null;
   language: LanguageCode;
+  treatmentMode: TreatmentMode;
   currentStep: string;
   consentGranted: boolean;
   consentTimestamp: string | null;
@@ -75,10 +86,11 @@ export interface SessionState {
   chiefComplaint: string;
   complaintCategory: string;
   socrates: SocratesResponses;
+  generalVitals: GeneralVitals;
   redFlagTriggered: boolean;
   redFlagReason: string | null;
 
-  // Prakriti & Pariksha
+  // Prakriti & Pariksha (Ayurveda specific)
   prakritiAnswers: Record<string, { optionIndex: number; doshaTag: 'vata' | 'pitta' | 'kapha' }>;
   prakritiResult: {
     vataScore: number;
@@ -102,12 +114,14 @@ export interface SessionState {
 
   // Actions
   setLanguage: (lang: LanguageCode) => void;
+  setTreatmentMode: (mode: TreatmentMode) => void;
   setSessionId: (id: string) => void;
   setCurrentStep: (step: string) => void;
   setConsentGranted: (granted: boolean) => void;
   setPatient: (patientData: Partial<PatientInfo>) => void;
   setChiefComplaint: (complaint: string, category?: string) => void;
   setSocratesResponse: (key: keyof SocratesResponses, value: any) => void;
+  setGeneralVitals: (vitals: Partial<GeneralVitals>) => void;
   setRedFlag: (triggered: boolean, reason?: string) => void;
   setPrakritiAnswer: (questionId: string, answer: { optionIndex: number; doshaTag: 'vata' | 'pitta' | 'kapha' }) => void;
   setPrakritiResult: (result: SessionState['prakritiResult']) => void;
@@ -130,6 +144,7 @@ const initialPatientState: PatientInfo = {
 export const useSessionStore = create<SessionState>((set) => ({
   sessionId: null,
   language: 'hi',
+  treatmentMode: 'ayurveda',
   currentStep: 'welcome',
   consentGranted: false,
   consentTimestamp: null,
@@ -137,6 +152,7 @@ export const useSessionStore = create<SessionState>((set) => ({
   chiefComplaint: '',
   complaintCategory: '',
   socrates: {},
+  generalVitals: {},
   redFlagTriggered: false,
   redFlagReason: null,
   prakritiAnswers: {},
@@ -145,6 +161,7 @@ export const useSessionStore = create<SessionState>((set) => ({
   assignedDoctor: null,
 
   setLanguage: (lang) => set({ language: lang }),
+  setTreatmentMode: (mode) => set({ treatmentMode: mode }),
   setSessionId: (id) => set({ sessionId: id }),
   setCurrentStep: (step) => set({ currentStep: step }),
   setConsentGranted: (granted) =>
@@ -158,6 +175,8 @@ export const useSessionStore = create<SessionState>((set) => ({
     set({ chiefComplaint: complaint, complaintCategory: category }),
   setSocratesResponse: (key, value) =>
     set((state) => ({ socrates: { ...state.socrates, [key]: value } })),
+  setGeneralVitals: (vitals) =>
+    set((state) => ({ generalVitals: { ...state.generalVitals, ...vitals } })),
   setRedFlag: (triggered, reason = null) =>
     set({ redFlagTriggered: triggered, redFlagReason: reason }),
   setPrakritiAnswer: (questionId, answer) =>
@@ -176,6 +195,7 @@ export const useSessionStore = create<SessionState>((set) => ({
     set({
       sessionId: null,
       language: 'hi',
+      treatmentMode: 'ayurveda',
       currentStep: 'welcome',
       consentGranted: false,
       consentTimestamp: null,
@@ -183,6 +203,7 @@ export const useSessionStore = create<SessionState>((set) => ({
       chiefComplaint: '',
       complaintCategory: '',
       socrates: {},
+      generalVitals: {},
       redFlagTriggered: false,
       redFlagReason: null,
       prakritiAnswers: {},

@@ -5,8 +5,8 @@ import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 import { speechEngine } from '@/lib/speech';
 
-export interface SocratesQuestion {
-  key: string;
+interface VitalsQuestion {
+  key: 'bloodPressureHistory' | 'diabetesStatus' | 'knownAllergies' | 'pastSurgeries';
   titleHindi: string;
   titleEnglish: string;
   options: Array<{
@@ -16,77 +16,67 @@ export interface SocratesQuestion {
   }>;
 }
 
-const SOCRATES_QUESTIONS: SocratesQuestion[] = [
+const GENERAL_VITALS_QUESTIONS: VitalsQuestion[] = [
   {
-    key: 'site',
-    titleHindi: 'दर्द या तकलीफ शरीर के किस हिस्से में सबसे ज्यादा महसूस हो रही है?',
-    titleEnglish: 'Where is the pain or discomfort located?',
+    key: 'bloodPressureHistory',
+    titleHindi: 'क्या आपको पहले से उच्च रक्तचाप (High Blood Pressure) की शिकायत है?',
+    titleEnglish: 'Do you have a known history of High Blood Pressure (Hypertension)?',
     options: [
-      { value: 'bilateral-knees', hindi: 'दोनों घुटने व जोड़ (Bilateral Knees)', english: 'Bilateral Knees & Joints' },
-      { value: 'epigastrium', hindi: 'पेट का ऊपरी हिस्सा / छाती (Epigastrium)', english: 'Upper Abdomen / Chest' },
-      { value: 'lower-back', hindi: 'कमर का निचला हिस्सा (Lumbar/Spine)', english: 'Lower Back & Spine' },
-      { value: 'general-body', hindi: 'पूरे शरीर में भारीपन व थकान (Generalized)', english: 'Whole Body / Fatigue' },
+      { value: 'hypertensive-meds', hindi: 'हाँ, BP की नियमित दवा चल रही है (Hypertensive on Meds)', english: 'Yes, taking regular BP medicine' },
+      { value: 'borderline-bp', hindi: 'कभी-कभार बढ़ जाता है (Borderline / Fluctuating BP)', english: 'Occasional high BP' },
+      { value: 'normal-bp', hindi: 'सामान्य रहता है (Normal Blood Pressure)', english: 'Normal Blood Pressure' },
+      { value: 'never-checked', hindi: 'हाल ही में जांच नहीं कराई (Never Checked Recently)', english: 'Not checked recently' },
     ],
   },
   {
-    key: 'onset',
-    titleHindi: 'यह तकलीफ कब से शुरू हुई है?',
-    titleEnglish: 'When did this problem start?',
+    key: 'diabetesStatus',
+    titleHindi: 'क्या आपको मधुमेह (शुगर / Diabetes) का रोग है?',
+    titleEnglish: 'Do you have a history of Diabetes / High Blood Sugar?',
     options: [
-      { value: 'acute-few-days', hindi: 'कुछ ही दिनों से (Recent / Acute)', english: 'Past few days (Acute)' },
-      { value: 'subacute-few-weeks', hindi: '2 से 4 सप्ताह से (Subacute)', english: '2 to 4 weeks' },
-      { value: 'chronic-6-months', hindi: '6 महीने या उससे अधिक (Chronic / पुराना)', english: '6+ months (Chronic)' },
-      { value: 'years-recurrent', hindi: 'सालों से बार-बार होती है (Recurrent)', english: 'Recurrent for years' },
+      { value: 'diabetic-meds', hindi: 'हाँ, शुगर की गोली या इंसुलिन लेते हैं (Diabetic)', english: 'Yes, taking sugar medication/insulin' },
+      { value: 'prediabetic', hindi: 'बॉर्डरलाइन शुगर है (Pre-diabetic / Borderline)', english: 'Borderline blood sugar' },
+      { value: 'non-diabetic', hindi: 'नहीं, शुगर की कोई समस्या नहीं है (Non-diabetic)', english: 'No, blood sugar is normal' },
+      { value: 'sugar-unknown', hindi: 'जांच नहीं हुई है (Not tested recently)', english: 'Not tested' },
     ],
   },
   {
-    key: 'severity',
-    titleHindi: 'तकलीफ की गंभीरता (दर्द का स्तर) 1 से 10 के पैमाने पर कितनी है?',
-    titleEnglish: 'How severe is the discomfort on a scale of 1 to 10?',
+    key: 'knownAllergies',
+    titleHindi: 'क्या आपको किसी एलोपैथिक दवा (पेनिसिलिन, दर्द निवारक आदि) से एलर्जी है?',
+    titleEnglish: 'Do you have any known allergies to medicines (Penicillin, Sulfa, Painkillers)?',
     options: [
-      { value: 'mild-3', hindi: 'हल्का दर्द (1 से 3) - काम में रुकावट नहीं', english: 'Mild (1-3) - Manageable' },
-      { value: 'moderate-6', hindi: 'मध्यम दर्द (4 से 6) - उठने-बैठने में कष्ट', english: 'Moderate (4-6) - Affects mobility' },
-      { value: 'severe-8', hindi: 'तेज दर्द (7 से 8) - बिना सहारे चलना मुश्किल', english: 'Severe (7-8) - Severe pain' },
-      { value: 'unbearable-10', hindi: 'असहनीय दर्द (9 से 10) - तत्काल राहत चाहिए', english: 'Unbearable (9-10) - Critical' },
+      { value: 'allergy-antibiotic', hindi: 'हाँ, एंटीबायोटिक / पेनिसिलिन से एलर्जी है', english: 'Yes, allergic to antibiotics / penicillin' },
+      { value: 'allergy-nsaid', hindi: 'हाँ, दर्द निवारक गोलियों (NSAIDs) से गैस/चकत्ते होते हैं', english: 'Yes, allergic to pain relief drugs' },
+      { value: 'allergy-none', hindi: 'नहीं, किसी दवा से कोई ज्ञात एलर्जी नहीं है (NKDA)', english: 'No known drug allergies (NKDA)' },
+      { value: 'allergy-dust-food', hindi: 'दवा से नहीं, केवल धूल/खाद्य पदार्थ से एलर्जी है', english: 'Only environmental / food allergy' },
     ],
   },
   {
-    key: 'timing',
-    titleHindi: 'यह तकलीफ किस समय या किस स्थिति में ज्यादा बढ़ जाती है?',
-    titleEnglish: 'When or in what situation does the problem worsen?',
+    key: 'pastSurgeries',
+    titleHindi: 'क्या पूर्व में आपका कोई बड़ा ऑपरेशन (Surgery) या अस्पताल में भर्ती हुआ है?',
+    titleEnglish: 'Any past surgeries, major procedures, or hospitalization?',
     options: [
-      { value: 'cold-morning', hindi: 'सुबह उठने पर व ठंड के मौसम में (Morning/Cold)', english: 'Morning stiffness / Cold' },
-      { value: 'post-meal', hindi: 'भोजन के तुरंत बाद या खाली पेट (Post-Meal)', english: 'After meals / Empty stomach' },
-      { value: 'physical-exertion', hindi: 'पैदल चलने व सीढ़ी चढ़ने पर (Exertion)', english: 'Walking / Climbing stairs' },
-      { value: 'night-rest', hindi: 'रात को सोते समय (At Night)', english: 'During sleep / Night' },
-    ],
-  },
-  {
-    key: 'familyHistory',
-    titleHindi: 'क्या परिवार में माता-पिता या भाई-बहन को भी ऐसी समस्या रही है?',
-    titleEnglish: 'Is there any family history of this health condition?',
-    options: [
-      { value: 'family-arthritis', hindi: 'हाँ, माता या पिता को जोड़ों/गठिया का दर्द रहा है', english: 'Yes, family history of arthritis' },
-      { value: 'family-digestive', hindi: 'हाँ, परिवार में पेट व पाचन की समस्या रही है', english: 'Yes, family history of digestive issues' },
-      { value: 'family-metabolic', hindi: 'हाँ, मधुमेह (शुगर) या उच्च रक्तचाप (BP)', english: 'Yes, diabetes or hypertension' },
-      { value: 'family-none', hindi: 'नहीं, परिवार में किसी को ऐसा रोग नहीं है', english: 'No, no such family history' },
+      { value: 'surgery-recent-year', hindi: 'हाँ, पिछले 1 वर्ष में सर्जरी हुई है (Recent Surgery)', english: 'Yes, surgery in the past year' },
+      { value: 'surgery-past', hindi: 'हाँ, कई वर्ष पूर्व पुराना ऑपरेशन हुआ था', english: 'Past surgical procedure years ago' },
+      { value: 'chronic-cardiac-renal', hindi: 'हृदय, गुर्दे या थायरॉयड का पुराना इलाज चल रहा है', english: 'Ongoing cardiac/renal/thyroid care' },
+      { value: 'no-surgery', hindi: 'नहीं, कभी कोई ऑपरेशन या भर्ती नहीं हुई है', english: 'No prior surgeries or hospitalization' },
     ],
   },
 ];
 
-export const SocratesScreen: React.FC = () => {
+export const GeneralVitalsScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { language, setSocratesResponse, chiefComplaint, treatmentMode } = useSessionStore();
+  const { language, generalVitals, setGeneralVitals, chiefComplaint } = useSessionStore();
 
-  const [currentTurn, setCurrentTurn] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentQ = GENERAL_VITALS_QUESTIONS[currentIndex];
 
-  const question = SOCRATES_QUESTIONS[currentTurn];
+  const existingVal = generalVitals[currentQ.key];
+  const [selectedOption, setSelectedOption] = useState<string | null>(existingVal || null);
 
-  const handleSelectOption = (optValue: string) => {
+  const handleSelectOption = (optVal: string) => {
     speechEngine.stop();
-    setSelectedOption(optValue);
-    setSocratesResponse(question.key as any, optValue);
+    setSelectedOption(optVal);
+    setGeneralVitals({ [currentQ.key]: optVal });
   };
 
   const handleSpeakOption = (e: React.MouseEvent, text: string) => {
@@ -95,27 +85,27 @@ export const SocratesScreen: React.FC = () => {
     speechEngine.speak(text, language);
   };
 
-  const handleNextTurn = () => {
+  const handleNext = () => {
     speechEngine.stop();
-    if (currentTurn < SOCRATES_QUESTIONS.length - 1) {
-      setCurrentTurn((prev) => prev + 1);
-      setSelectedOption(null);
+    if (currentIndex < GENERAL_VITALS_QUESTIONS.length - 1) {
+      const nextIdx = currentIndex + 1;
+      setCurrentIndex(nextIdx);
+      const nextVal = generalVitals[GENERAL_VITALS_QUESTIONS[nextIdx].key];
+      setSelectedOption(nextVal || null);
     } else {
-      if (treatmentMode === 'allopathy') {
-        navigate('/kiosk/vitals');
-      } else {
-        navigate('/kiosk/prakriti');
-      }
+      navigate('/kiosk/review');
     }
   };
 
-  const handlePrevTurn = () => {
+  const handlePrev = () => {
     speechEngine.stop();
-    if (currentTurn > 0) {
-      setCurrentTurn((prev) => prev - 1);
-      setSelectedOption(null);
+    if (currentIndex > 0) {
+      const prevIdx = currentIndex - 1;
+      setCurrentIndex(prevIdx);
+      const prevVal = generalVitals[GENERAL_VITALS_QUESTIONS[prevIdx].key];
+      setSelectedOption(prevVal || null);
     } else {
-      navigate('/kiosk/complaint');
+      navigate('/kiosk/socrates');
     }
   };
 
@@ -128,8 +118,8 @@ export const SocratesScreen: React.FC = () => {
         {/* Top Prompter */}
         <div className="shrink-0">
           <AudioSpeaker
-            hindiText={question.titleHindi}
-            englishText={question.titleEnglish}
+            hindiText={currentQ.titleHindi}
+            englishText={currentQ.titleEnglish}
             bilingual={language === 'hi'}
             autoPlay={true}
           />
@@ -147,11 +137,11 @@ export const SocratesScreen: React.FC = () => {
               }}
             >
               <Activity className="w-3.5 h-3.5" />
-              <span>SOCRATES नैदानिक प्रश्न {currentTurn + 1} / 5</span>
+              <span>सामान्य चिकित्सा इतिहास • प्रश्न {currentIndex + 1} / {GENERAL_VITALS_QUESTIONS.length}</span>
             </div>
 
             <span className="text-xs font-extrabold text-[#495057] truncate max-w-xs">
-              लक्षण: {chiefComplaint || 'जोड़ों का दर्द (संधिवात)'}
+              लक्षण: {chiefComplaint || 'सामान्य परामर्श'}
             </span>
           </div>
 
@@ -159,7 +149,7 @@ export const SocratesScreen: React.FC = () => {
             <div
               className="h-full transition-all duration-300"
               style={{
-                width: `${((currentTurn + 1) / 5) * 100}%`,
+                width: `${((currentIndex + 1) / GENERAL_VITALS_QUESTIONS.length) * 100}%`,
                 backgroundColor: '#0B5FA5',
               }}
             />
@@ -170,19 +160,19 @@ export const SocratesScreen: React.FC = () => {
         <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-4 sm:p-5 shrink-0">
           
           <div className="text-[10px] font-bold text-[#6C757D] uppercase tracking-wider mb-0.5">
-            लक्षण विस्तृत विश्लेषण (Adaptive Clinical Exploration)
+            सामान्य चिकित्सा व स्वास्थ्य इतिहास (General Medicine & Vitals)
           </div>
 
           <h2
             className="text-lg sm:text-2xl font-black mb-3 leading-tight"
             style={{ color: '#0B5FA5' }}
           >
-            {language === 'hi' ? question.titleHindi : question.titleEnglish}
+            {language === 'hi' ? currentQ.titleHindi : currentQ.titleEnglish}
           </h2>
 
-          {/* 4 SPACIOUS TOUCH OPTIONS WITH PER-OPTION AUDIO SPEAKER BUTTONS */}
+          {/* 4 TOUCH OPTIONS WITH DEDICATED SPEAKER ICONS */}
           <div className="space-y-2">
-            {question.options.map((opt, idx) => {
+            {currentQ.options.map((opt, idx) => {
               const isSelected = selectedOption === opt.value;
               const optionText = language === 'hi' ? opt.hindi : opt.english;
               return (
@@ -216,7 +206,7 @@ export const SocratesScreen: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0 ml-2">
-                    {/* Dedicated Per-Option Speaker Button */}
+                    {/* Per-Option Audio Speaker */}
                     <div
                       role="button"
                       tabIndex={0}
@@ -230,7 +220,7 @@ export const SocratesScreen: React.FC = () => {
                         borderColor: isSelected ? 'rgba(255, 255, 255, 0.4)' : '#CBD5E1',
                         color: isSelected ? '#FFFFFF' : '#0B5FA5',
                       }}
-                      title="इस विकल्प को आवाज़ में सुनें (Listen aloud)"
+                      title="इस विकल्प को आवाज़ में सुनें"
                     >
                       <Volume2 className="w-3.5 h-3.5" />
                     </div>
@@ -258,16 +248,16 @@ export const SocratesScreen: React.FC = () => {
         <div className="grid grid-cols-2 gap-3 w-full max-w-2xl shrink-0">
           <button
             type="button"
-            onClick={handlePrevTurn}
+            onClick={handlePrev}
             className="h-12 sm:h-14 px-4 rounded-[3px] border border-[#CED4DA] bg-white hover:bg-[#EAEDF0] font-black text-xs sm:text-sm text-[#495057] flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{currentTurn === 0 ? 'शिकायत पर वापस' : 'पिछला सवाल (Previous)'}</span>
+            <span>{currentIndex === 0 ? 'लक्षण पर वापस' : 'पिछला सवाल (Previous)'}</span>
           </button>
 
           <button
             type="button"
-            onClick={handleNextTurn}
+            onClick={handleNext}
             disabled={selectedOption === null}
             className="h-12 sm:h-14 px-6 rounded-[3px] border font-black text-sm sm:text-base text-white flex items-center justify-center gap-2 transition-transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
@@ -276,8 +266,8 @@ export const SocratesScreen: React.FC = () => {
             }}
           >
             <span>
-              {currentTurn === SOCRATES_QUESTIONS.length - 1
-                ? (treatmentMode === 'allopathy' ? 'सामान्य जांच शुरू करें • START VITALS' : 'प्रकृति परीक्षण शुरू करें • START PRAKRITI')
+              {currentIndex === GENERAL_VITALS_QUESTIONS.length - 1
+                ? 'समीक्षा देखें • REVIEW CASE'
                 : 'अगला सवाल • NEXT'}
             </span>
             <ArrowRight className="w-5 h-5 text-white" />
@@ -292,10 +282,10 @@ export const SocratesScreen: React.FC = () => {
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
-            <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
+            <span className="font-semibold text-[#495057]">General Medicine Consultation Wing</span>
           </div>
-          <div className="flex items-center gap-1 text-[11px] font-semibold text-[#6C757D]">
-            <span>SOCRATES Clinical Protocol • Standard OPD Triage</span>
+          <div className="text-[11px] font-semibold text-[#6C757D]">
+            <span>आधुनिक एलोपैथी व स्वास्थ्य इतिहास प्रोटोकॉल</span>
           </div>
         </div>
       </footer>

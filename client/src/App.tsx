@@ -6,10 +6,12 @@ import { KioskHeader } from '@/components/shared/KioskHeader';
 import { WelcomeScreen } from '@/pages/patient/WelcomeScreen';
 import { LanguageScreen } from '@/pages/patient/LanguageScreen';
 import { IdentifyScreen } from '@/pages/patient/IdentifyScreen';
+import { DepartmentScreen } from '@/pages/patient/DepartmentScreen';
 import { ConsentScreen } from '@/pages/patient/ConsentScreen';
 import { ComplaintScreen } from '@/pages/patient/ComplaintScreen';
 import { SocratesScreen } from '@/pages/patient/SocratesScreen';
 import { PrakritiScreen } from '@/pages/patient/PrakritiScreen';
+import { GeneralVitalsScreen } from '@/pages/patient/GeneralVitalsScreen';
 import { ReviewScreen } from '@/pages/patient/ReviewScreen';
 import { CameraUploadScreen } from '@/pages/patient/CameraUploadScreen';
 import { TokenScreen } from '@/pages/patient/TokenScreen';
@@ -43,6 +45,9 @@ export const App: React.FC = () => {
                   {/* S-03: Patient Identification & ABHA Scan */}
                   <Route path="kiosk/identify" element={<IdentifyScreen />} />
 
+                  {/* S-03B: Department & Treatment Path Selector (Ayurveda vs Allopathy) */}
+                  <Route path="kiosk/department" element={<DepartmentScreen />} />
+
                   {/* S-04: DPDP Act 2023 Audio Consent Capture */}
                   <Route path="kiosk/consent" element={<ConsentScreen />} />
 
@@ -52,8 +57,11 @@ export const App: React.FC = () => {
                   {/* S-07: 5-Turn Adaptive SOCRATES Clinical Follow-Up */}
                   <Route path="kiosk/socrates" element={<SocratesScreen />} />
 
-                  {/* S-08: 15-Trait Classical Charaka Samhita Prakriti Assessment */}
+                  {/* S-08A: 15-Trait Classical Charaka Samhita Prakriti Assessment (Ayurveda) */}
                   <Route path="kiosk/prakriti" element={<PrakritiScreen />} />
+
+                  {/* S-08B: General Medicine Vitals & Allergies Assessment (Allopathy) */}
+                  <Route path="kiosk/vitals" element={<GeneralVitalsScreen />} />
 
                   {/* S-09: Answer Summary Verification & 1-Tap Section Editing */}
                   <Route path="kiosk/review" element={<ReviewScreen />} />
