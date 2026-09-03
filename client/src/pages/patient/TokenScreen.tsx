@@ -3,12 +3,64 @@ import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Printer, ArrowRight, MapPin, User, ShieldCheck } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
+import { usePhysicianStore } from '@/stores/physicianStore';
 
 export const TokenScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { language, patient, chiefComplaint, prakritiResult, resetSession } = useSessionStore();
+  const {
+    sessionId,
+    language,
+    patient,
+    chiefComplaint,
+    complaintCategory,
+    socrates,
+    redFlagTriggered,
+    prakritiResult,
+    uploadedDocuments,
+    resetSession,
+  } = useSessionStore();
 
-  const [countdown, setCountdown] = useState(20);
+  const { addPatientToQueue } = usePhysicianStore();
+  const [countdown, setCountdown] = useState(25);
+
+  const currentSessionId = sessionId || `SES-${Math.floor(1000 + Math.random() * 9000)}K`;
+  const tokenNumber = '#AIIA-042';
+
+  // Automatically sync patient intake into Doctor's OPD Workstation Queue
+  useEffect(() => {
+    const ocrSnippet = uploadedDocuments.map((d) => d.extractedText).filter(Boolean).join(' | ');
+
+    addPatientToQueue({
+      sessionId: currentSessionId,
+      patientName: patient.fullName ? `${patient.fullName}` : 'रामेश्वर दयाल शर्मा (Rameshwar Sharma)',
+      age: typeof patient.age === 'number' ? patient.age : 62,
+      gender: patient.gender || 'male',
+      phone: patient.phone || '9876543210',
+      abhaId: patient.abhaId || '91-4523-8901-2345',
+      tokenNumber: tokenNumber,
+      chiefComplaint: chiefComplaint || 'दोनों घुटनों में दर्द, सूजन व कट-कट की आवाज (Sandhivata)',
+      complaintCategory: complaintCategory || 'musculoskeletal',
+      dominantPrakriti: prakritiResult?.dominantPrakriti || 'PITTA-KAPHA',
+      vataScore: prakritiResult?.vataScore ?? 20,
+      pittaScore: prakritiResult?.pittaScore ?? 53,
+      kaphaScore: prakritiResult?.kaphaScore ?? 27,
+      redFlagTriggered: redFlagTriggered,
+      priority: redFlagTriggered ? 'critical' : 'normal',
+      assignedDoctor: 'डॉ. अनन्या शर्मा (Dr. Ananya Sharma)',
+      roomNumber: 'Room #104',
+      createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      socrates: {
+        site: socrates.site || 'bilateral-knees',
+        onset: socrates.onset || 'chronic-6-months',
+        severity: typeof socrates.severity === 'number' ? `${socrates.severity}/10` : 'severe-8',
+        timing: socrates.timing || 'cold-morning',
+        familyHistory: socrates.familyHistory || 'family-arthritis',
+      },
+      ocrText: ocrSnippet || 'Rx: Maharasnadi Kwath 20ml BD, Yogaraj Guggulu 2 Tab BD. Diagnosed: Sandhivata.',
+      extractedDrugs: ['Maharasnadi Kwath', 'Yogaraj Guggulu', 'Shallaki Capsule 1 BD'],
+      status: 'awaiting_review',
+    });
+  }, []);
 
   const promptHindi =
     'बधाई हो! आपका पंजीकरण और प्रकृति परीक्षण पूरा हो गया है। आपका टोकन नंबर ए-42 है। कृपया कमरा नंबर 104, डॉ. अनन्या शर्मा के पास जाएं।';
@@ -82,7 +134,7 @@ export const TokenScreen: React.FC = () => {
           </p>
         </div>
 
-        {/* PRINTED TOKEN SLIP (Non-Scrollable Fitting) */}
+        {/* PRINTED TOKEN SLIP */}
         <div className="w-full max-w-2xl bg-white border-2 border-[#0B5FA5] rounded-[3px] p-4 sm:p-5 shadow-sm text-left shrink-0">
           
           {/* Slip Header */}
@@ -98,7 +150,7 @@ export const TokenScreen: React.FC = () => {
 
             <div className="text-right">
               <span className="text-[9px] font-bold text-[#6C757D] uppercase block">टोकन संख्या:</span>
-              <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B5FA5]">#AIIA-042</span>
+              <span className="text-2xl sm:text-3xl font-black font-mono text-[#0B5FA5]">{tokenNumber}</span>
             </div>
           </div>
 
@@ -141,7 +193,7 @@ export const TokenScreen: React.FC = () => {
             </div>
             <div>
               <span className="text-[9px] text-[#6C757D] block">आयु/लिंग:</span>
-              <span className="font-bold text-[#212529]">{patient.age || 62} वर्ष / पुरुष</span>
+              <span className="font-bold text-[#212529]">{patient.age || 62} वर्ष / {patient.gender === 'female' ? 'महिला' : 'पुरुष'}</span>
             </div>
             <div>
               <span className="text-[9px] text-[#6C757D] block">प्रकृति निष्कर्ष:</span>

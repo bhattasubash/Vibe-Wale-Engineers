@@ -50,6 +50,7 @@ interface PhysicianState {
   setFilterPriority: (priority: 'all' | 'critical' | 'normal') => void;
   setSearchQuery: (query: string) => void;
   reviewSession: (sessionId: string, status: 'accepted' | 'amended' | 'rejected', notes?: string) => void;
+  addPatientToQueue: (patient: DoctorQueuePatient) => void;
 }
 
 const INITIAL_MOCK_QUEUE: DoctorQueuePatient[] = [
@@ -145,41 +146,86 @@ const INITIAL_MOCK_QUEUE: DoctorQueuePatient[] = [
   },
 ];
 
-export const usePhysicianStore = create<PhysicianState>((set, get) => ({
-  isAuthenticated: true,
-  doctorId: 'DOC-AIIA-104',
-  doctorName: 'डॉ. अनन्या शर्मा (Dr. Ananya Sharma)',
-  department: 'कायचिकित्सा विभाग (Internal Medicine)',
-  roomNumber: 'Room #104 (Block A)',
-  queue: INITIAL_MOCK_QUEUE,
-  activePatient: INITIAL_MOCK_QUEUE[1],
-  filterPriority: 'all',
-  searchQuery: '',
+const loadPersistedQueue = (): DoctorQueuePatient[] => {
+  try {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('ayush_doctor_queue');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Could not parse persisted queue from localStorage:', err);
+  }
+  return INITIAL_MOCK_QUEUE;
+};
 
-  loginDoctor: (doctorId, doctorName, room) =>
-    set({ isAuthenticated: true, doctorId, doctorName, roomNumber: room }),
+const savePersistedQueue = (queue: DoctorQueuePatient[]) => {
+  try {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ayush_doctor_queue', JSON.stringify(queue));
+    }
+  } catch (err) {
+    console.warn('Could not save queue to localStorage:', err);
+  }
+};
 
-  logoutDoctor: () => set({ isAuthenticated: false }),
+export const usePhysicianStore = create<PhysicianState>((set, get) => {
+  const initialQueue = loadPersistedQueue();
 
-  setActivePatient: (sessionId) => {
-    const patient = get().queue.find((p) => p.sessionId === sessionId) || null;
-    set({ activePatient: patient });
-  },
+  return {
+    isAuthenticated: true,
+    doctorId: 'DOC-AIIA-104',
+    doctorName: 'डॉ. अनन्या शर्मा (Dr. Ananya Sharma)',
+    department: 'कायचिकित्सा विभाग (Internal Medicine)',
+    roomNumber: 'Room #104 (Block A)',
+    queue: initialQueue,
+    activePatient: initialQueue[0] || null,
+    filterPriority: 'all',
+    searchQuery: '',
 
-  setFilterPriority: (priority) => set({ filterPriority: priority }),
+    loginDoctor: (doctorId, doctorName, room) =>
+      set({ isAuthenticated: true, doctorId, doctorName, roomNumber: room }),
 
-  setSearchQuery: (query) => set({ searchQuery: query }),
+    logoutDoctor: () => set({ isAuthenticated: false }),
 
-  reviewSession: (sessionId, status, notes) =>
-    set((state) => ({
-      queue: state.queue.map((p) =>
-        p.sessionId === sessionId
-          ? { ...p, status, doctorNotes: notes }
-          : p
-      ),
-      activePatient:
-        state.activePatient?.sessionId === sessionId
-          ? { ...state.activePatient, status, doctorNotes: notes }
-          : state.activePatient,
-    })),
-}));
+    setActivePatient: (sessionId) => {
+      const patient = get().queue.find((p) => p.sessionId === sessionId) || null;
+      set({ activePatient: patient });
+    },
+
+    setFilterPriority: (priority) => set({ filterPriority: priority }),
+
+    setSearchQuery: (query) => set({ searchQuery: query }),
+
+    reviewSession: (sessionId, status, notes) =>
+      set((state) => {
+        const updatedQueue = state.queue.map((p) =>
+          p.sessionId === sessionId ? { ...p, status, doctorNotes: notes } : p
+        );
+        savePersistedQueue(updatedQueue);
+        return {
+          queue: updatedQueue,
+          activePatient:
+            state.activePatient?.sessionId === sessionId
+              ? { ...state.activePatient, status, doctorNotes: notes }
+              : state.activePatient,
+        };
+      }),
+
+    addPatientToQueue: (newPatient) =>
+      set((state) => {
+        // Prevent duplicates
+        const filtered = state.queue.filter((p) => p.sessionId !== newPatient.sessionId);
+        const updatedQueue = [newPatient, ...filtered];
+        savePersistedQueue(updatedQueue);
+        return {
+          queue: updatedQueue,
+          activePatient: newPatient,
+        };
+      }),
+  };
+});
