@@ -12,15 +12,19 @@ export const DoctorApp: React.FC = () => {
           {/* Doctor Portal Login */}
           <Route path="/" element={<DoctorLoginScreen />} />
           <Route path="/login" element={<DoctorLoginScreen />} />
+          <Route path="/doctor" element={<DoctorLoginScreen />} />
+          <Route path="/doctor/login" element={<DoctorLoginScreen />} />
 
           {/* Real-Time Prioritized Patient Queue */}
           <Route path="/queue" element={<DoctorQueueScreen />} />
+          <Route path="/doctor/queue" element={<DoctorQueueScreen />} />
 
           {/* Clinical Case Sheet Review */}
           <Route path="/session/:sessionId" element={<DoctorSessionReview />} />
+          <Route path="/doctor/session/:sessionId" element={<DoctorSessionReview />} />
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/queue" replace />} />
         </Routes>
       </div>
     </HashRouter>
