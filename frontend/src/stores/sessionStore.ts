@@ -48,6 +48,30 @@ export interface DoctorAssignment {
   slotTime: string;
 }
 
+export interface DynamicQuestionOption {
+  hindi: string;
+  english: string;
+  value: string;
+}
+
+export interface DynamicQuestion {
+  id: string;
+  key: string;
+  category: string;
+  titleHindi: string;
+  titleEnglish: string;
+  options: DynamicQuestionOption[];
+}
+
+export interface ActiveQuestionSet {
+  id: string;
+  title: string;
+  matched: boolean;
+  source: 'question_set' | 'gemini_general' | 'fallback';
+  reasoning?: string;
+  questions: DynamicQuestion[];
+}
+
 export interface SocratesResponses {
   site?: string;
   onset?: string;
@@ -56,9 +80,11 @@ export interface SocratesResponses {
   associated?: string;
   timing?: string;
   exacerbating?: string;
-  severity?: number;
+  severity?: number | string;
   familyHistory?: string;
+  [key: string]: any;
 }
+
 
 export interface SessionState {
   // Session Identifiers
@@ -74,6 +100,7 @@ export interface SessionState {
   // Clinical Workflow
   chiefComplaint: string;
   complaintCategory: string;
+  activeQuestionSet: ActiveQuestionSet | null;
   socrates: SocratesResponses;
   redFlagTriggered: boolean;
   redFlagReason: string | null;
@@ -107,6 +134,7 @@ export interface SessionState {
   setConsentGranted: (granted: boolean) => void;
   setPatient: (patientData: Partial<PatientInfo>) => void;
   setChiefComplaint: (complaint: string, category?: string) => void;
+  setActiveQuestionSet: (set: ActiveQuestionSet | null) => void;
   setSocratesResponse: (key: keyof SocratesResponses, value: any) => void;
   setRedFlag: (triggered: boolean, reason?: string) => void;
   setPrakritiAnswer: (questionId: string, answer: { optionIndex: number; doshaTag: 'vata' | 'pitta' | 'kapha' }) => void;
@@ -136,6 +164,7 @@ export const useSessionStore = create<SessionState>((set) => ({
   patient: initialPatientState,
   chiefComplaint: '',
   complaintCategory: '',
+  activeQuestionSet: null,
   socrates: {},
   redFlagTriggered: false,
   redFlagReason: null,
@@ -156,7 +185,9 @@ export const useSessionStore = create<SessionState>((set) => ({
     set((state) => ({ patient: { ...state.patient, ...patientData } })),
   setChiefComplaint: (complaint, category = '') =>
     set({ chiefComplaint: complaint, complaintCategory: category }),
+  setActiveQuestionSet: (qSet) => set({ activeQuestionSet: qSet }),
   setSocratesResponse: (key, value) =>
+
     set((state) => ({ socrates: { ...state.socrates, [key]: value } })),
   setRedFlag: (triggered, reason) =>
     set({ redFlagTriggered: triggered, redFlagReason: reason ?? null }),
@@ -182,6 +213,7 @@ export const useSessionStore = create<SessionState>((set) => ({
       patient: initialPatientState,
       chiefComplaint: '',
       complaintCategory: '',
+      activeQuestionSet: null,
       socrates: {},
       redFlagTriggered: false,
       redFlagReason: null,

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import uuid
 from datetime import datetime
 
@@ -9,8 +9,14 @@ from backend.kiosk.models.schemas import (
     ChiefComplaintRequest,
     SessionSyncBatchRequest,
     SessionSyncBatchResponse,
+    TranscribeAudioRequest,
+    TranscribeAudioResponse,
+    InferComplaintRequest,
+    InferComplaintResponse,
 )
 from backend.kiosk.services.red_flags import evaluate_red_flags
+from backend.services.whisprflow_service import whisprflow_service
+from backend.services.complaint_inference_service import complaint_inference_service
 
 router = APIRouter(prefix="/api/sessions", tags=["Kiosk Sessions"])
 
@@ -69,6 +75,104 @@ async def submit_complaint(session_id: str, payload: ChiefComplaintRequest):
         "recorded_complaint": payload.complaint_text,
         "red_flag": red_flag_eval.model_dump(),
     }
+
+
+@router.post("/transcribe", response_model=TranscribeAudioResponse)
+async def transcribe_audio(payload: TranscribeAudioRequest):
+    """
+    Transcribes microphone audio using Wispr Flow API.
+    """
+    res = await whisprflow_service.transcribe_audio_base64(
+        audio_base64=payload.audio_base64,
+        properties=payload.properties,
+    )
+    return TranscribeAudioResponse(
+        success=res["success"],
+        text=res["text"],
+        error=res.get("error"),
+        source=res.get("source", "whisprflow"),
+    )
+
+
+@router.post("/infer-complaint", response_model=InferComplaintResponse)
+async def infer_complaint(payload: InferComplaintRequest):
+    """
+    Analyzes chief complaint using Gemini AI:
+    - Matches complaint against available question sets in backend/question_sets/
+    - If matched: returns that question set to be pushed to the kiosk frontend
+    - If unmatched: uses Gemini to ask structured general health questions
+    - Evaluates red-flag emergency symptoms
+    """
+    session_id = payload.session_id or f"SES-{uuid.uuid4().hex[:8].upper()}"
+    if session_id not in SESSION_DB:
+        SESSION_DB[session_id] = {
+            "session_id": session_id,
+            "status": "in_progress",
+            "created_at": datetime.now(),
+        }
+
+    # Evaluate red flag
+    red_flag_eval = evaluate_red_flags(payload.complaint_text)
+
+    # Gemini Inference
+    inference_result = complaint_inference_service.infer_complaint(
+        complaint_text=payload.complaint_text,
+        language=payload.language or "hi",
+    )
+
+    SESSION_DB[session_id]["chief_complaint"] = payload.complaint_text
+    SESSION_DB[session_id]["complaint_category"] = (
+        inference_result.matched_set_id if inference_result.matched else "general"
+    )
+    SESSION_DB[session_id]["red_flag_triggered"] = red_flag_eval.triggered
+    SESSION_DB[session_id]["red_flag_details"] = (
+        red_flag_eval.model_dump() if red_flag_eval.triggered else None
+    )
+    SESSION_DB[session_id]["active_questions"] = [
+        q.model_dump() for q in inference_result.questions
+    ]
+
+    return InferComplaintResponse(
+        session_id=session_id,
+        complaint_text=payload.complaint_text,
+        matched=inference_result.matched,
+        matched_set_id=inference_result.matched_set_id,
+        matched_set_title=inference_result.matched_set_title,
+        source=inference_result.source,
+        reasoning=inference_result.reasoning,
+        questions=[q.model_dump() for q in inference_result.questions],
+        red_flag=red_flag_eval.model_dump(),
+    )
+
+
+@router.post("/transcribe-and-infer", response_model=InferComplaintResponse)
+async def transcribe_and_infer(
+    payload: TranscribeAudioRequest,
+    session_id: Optional[str] = None,
+    language: Optional[str] = "hi",
+):
+    """
+    Convenience endpoint: transcribes audio with Wispr Flow, then immediately infers with Gemini.
+    """
+    transcribe_res = await whisprflow_service.transcribe_audio_base64(
+        audio_base64=payload.audio_base64,
+        properties=payload.properties,
+    )
+    complaint_text = transcribe_res.get("text", "").strip()
+    if not complaint_text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=transcribe_res.get("error") or "Failed to transcribe audio from voice input.",
+        )
+
+    return await infer_complaint(
+        InferComplaintRequest(
+            session_id=session_id,
+            complaint_text=complaint_text,
+            language=language,
+        )
+    )
+
 
 
 @router.post("/sync-batch", response_model=SessionSyncBatchResponse, status_code=status.HTTP_200_OK)

@@ -1,0 +1,62 @@
+{
+  "id": "respiratory_cough",
+  "title": "Cough & Respiratory Trouble (Kasa-Shwasa)",
+  "titleHindi": "खांसी और सांस की तकलीफ (कास-श्वास)",
+  "description": "Chronic cough, dry cough, phlegm/sputum, breathlessness, wheezing, seasonal allergy, asthma or throat irritation.",
+  "keywords": [
+    "cough",
+    "phlegm",
+    "sputum",
+    "asthma",
+    "breathlessness",
+    "kasa",
+    "shwasa",
+    "bronchitis",
+    "wheezing",
+    "खांसी",
+    "बलगम",
+    "सांस फूलना",
+    "दमा",
+    "गले में खराश"
+  ],
+  "questions": [
+    {
+      "id": "rc-01",
+      "key": "character",
+      "category": "खांसी का प्रकार (Cough Nature)",
+      "titleHindi": "आपकी खांसी सूखी है या बलगम (कफ) आता है?",
+      "titleEnglish": "Is your cough dry or producing phlegm / sputum?",
+      "options": [
+        { "hindi": "सूखी खांसी • गले में लगातार खुजली या खराश", "english": "Dry cough • throat tickle/irritation", "value": "dry_cough" },
+        { "hindi": "सफेद / गाढ़ा बलगम निकलता है", "english": "Wet cough with white/thick phlegm", "value": "wet_white_phlegm" },
+        { "hindi": "पीला या हरा बलगम निकलता है", "english": "Yellow or greenish phlegm", "value": "wet_colored_phlegm" },
+        { "hindi": "सांस लेते समय सीने से सीटी जैसी आवाज आती है", "english": "Wheezing sound while breathing", "value": "wheezing" }
+      ]
+    },
+    {
+      "id": "rc-02",
+      "key": "onset",
+      "category": "अवधि (Duration)",
+      "titleHindi": "यह खांसी या सांस की तकलीफ कब से है?",
+      "titleEnglish": "How long have you had this cough or breathing issue?",
+      "options": [
+        { "hindi": "1 हफ्ते से कम (हाल ही में शुरू हुई)", "english": "Under 1 week (Acute)", "value": "acute_1_week" },
+        { "hindi": "2 से 4 हफ्ते से चल रही है", "english": "2 to 4 weeks (Persistent)", "value": "subacute_4_weeks" },
+        { "hindi": "1 महीने से ज्यादा (पुरानी खांसी)", "english": "Over 1 month (Chronic)", "value": "chronic_month" }
+      ]
+    },
+    {
+      "id": "rc-03",
+      "key": "triggers",
+      "category": "बढ़ने का कारण (Triggers)",
+      "titleHindi": "खांसी किस स्थिति या संपर्क से तेज हो जाती है?",
+      "titleEnglish": "What triggers or worsens the cough?",
+      "options": [
+        { "hindi": "धूल, धुआं या प्रदूषण के संपर्क में आने से", "english": "Dust, smoke, or air pollution", "value": "dust_smoke" },
+        { "hindi": "ठंडा पानी, आइसक्रीम या ठंडे मौसम में", "english": "Cold drinks, AC or chilly weather", "value": "cold_exposure" },
+        { "hindi": "रात को सोने पर या सुबह जल्दी", "english": "At night while sleeping or early morning", "value": "night_morning" },
+        { "hindi": "चलने-फिरने या सीढ़ियां चढ़ने पर सांस फूलने से", "english": "Exertion / climbing stairs", "value": "exertion" }
+      ]
+    }
+  ]
+}

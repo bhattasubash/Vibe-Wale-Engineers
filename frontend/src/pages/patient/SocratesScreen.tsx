@@ -83,12 +83,18 @@ const SOCRATES_QUESTIONS: SocratesQuestion[] = [
 
 export const SocratesScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { language, setSocratesResponse, chiefComplaint } = useSessionStore();
+  const { language, setSocratesResponse, chiefComplaint, activeQuestionSet } = useSessionStore();
 
   const [currentTurn, setCurrentTurn] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  const question = SOCRATES_QUESTIONS[currentTurn];
+  const questionsList =
+    activeQuestionSet?.questions && activeQuestionSet.questions.length > 0
+      ? activeQuestionSet.questions
+      : SOCRATES_QUESTIONS;
+
+  const totalQuestions = questionsList.length;
+  const question = questionsList[Math.min(currentTurn, totalQuestions - 1)];
 
   const handleSelectOption = (optValue: string) => {
     setSelectedOption(optValue);
@@ -96,7 +102,7 @@ export const SocratesScreen: React.FC = () => {
   };
 
   const handleNextTurn = () => {
-    if (currentTurn < SOCRATES_QUESTIONS.length - 1) {
+    if (currentTurn < totalQuestions - 1) {
       setCurrentTurn((prev) => prev + 1);
       setSelectedOption(null);
     } else {
@@ -119,7 +125,7 @@ export const SocratesScreen: React.FC = () => {
       {/* Non-Scrollable Centered Main Container */}
       <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-2 flex-1 flex flex-col justify-evenly items-center">
         
-        {/* Top Prompter */}
+        {/* Top Prompter - Read-aloud TTS only */}
         <div className="shrink-0">
           <AudioSpeaker
             hindiText={question.titleHindi}
@@ -140,7 +146,13 @@ export const SocratesScreen: React.FC = () => {
                 color: '#0B5FA5',
               }}
             >
-              <span>SOCRATES विश्लेषण • चरण {currentTurn + 1} / 5</span>
+              <span>
+                {activeQuestionSet?.matched
+                  ? `${activeQuestionSet.title} • चरण ${currentTurn + 1} / ${totalQuestions}`
+                  : activeQuestionSet?.source === 'gemini_general'
+                  ? `सामान्य स्वास्थ्य विवरण • चरण ${currentTurn + 1} / ${totalQuestions}`
+                  : `विश्लेषण • चरण ${currentTurn + 1} / ${totalQuestions}`}
+              </span>
             </div>
 
             <span className="text-xs font-extrabold text-[#E07B1A]">
@@ -152,12 +164,13 @@ export const SocratesScreen: React.FC = () => {
             <div
               className="h-full transition-all duration-300"
               style={{
-                width: `${((currentTurn + 1) / 5) * 100}%`,
+                width: `${((currentTurn + 1) / totalQuestions) * 100}%`,
                 backgroundColor: '#0B5FA5',
               }}
             />
           </div>
         </div>
+
 
         {/* Current Question Container */}
         <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-4 sm:p-5 shrink-0">

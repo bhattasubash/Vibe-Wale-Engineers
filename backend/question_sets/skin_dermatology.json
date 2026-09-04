@@ -1,0 +1,62 @@
+{
+  "id": "skin_dermatology",
+  "title": "Skin & Allergy (Kushtha/Twak Vikara)",
+  "titleHindi": "त्वचा में खुजली, दाने व एलर्जी (त्वक विकार)",
+  "description": "Skin itching, rashes, red patches, eczema, fungal infection, dry skin, hives or allergy.",
+  "keywords": [
+    "skin",
+    "itching",
+    "rash",
+    "eczema",
+    "allergy",
+    "kushtha",
+    "patches",
+    "fungal",
+    "खुजली",
+    "दाद",
+    "चकत्ते",
+    "त्वचा",
+    "फोड़े-फुंसी",
+    "एलर्जी"
+  ],
+  "questions": [
+    {
+      "id": "sd-01",
+      "key": "site",
+      "category": "स्थान व फैलाव (Location & Spread)",
+      "titleHindi": "त्वचा की समस्या शरीर के किस भाग पर सबसे अधिक है?",
+      "titleEnglish": "Where is the skin condition mostly located on your body?",
+      "options": [
+        { "hindi": "हाथ, पैर या जोड़ों की सिलवटों में", "english": "Hands, feet, or joint folds", "value": "hands_feet_folds" },
+        { "hindi": "चेहरे या गर्दन पर", "english": "Face or neck", "value": "face_neck" },
+        { "hindi": "पीठ या पेट पर", "english": "Back or abdomen", "value": "back_abdomen" },
+        { "hindi": "पूरे शरीर में कहीं भी चकत्ते / खुजली", "english": "Generalized across entire body", "value": "generalized" }
+      ]
+    },
+    {
+      "id": "sd-02",
+      "key": "character",
+      "category": "लक्षण का स्वरूप (Appearance & Nature)",
+      "titleHindi": "त्वचा पर किस तरह के लक्षण दिखाई दे रहे हैं?",
+      "titleEnglish": "How does the skin irritation present itself?",
+      "options": [
+        { "hindi": "तेज खुजली के साथ लाल चकत्ते", "english": "Severe itching with red patches", "value": "itch_red_patches" },
+        { "hindi": "रूखी, पपड़ीदार त्वचा (Dry & Peeling)", "english": "Dry, scaly, or peeling skin", "value": "dry_scaly" },
+        { "hindi": "पानी या पस वाले छोटे दाने", "english": "Small blisters with oozing fluid", "value": "blisters_oozing" }
+      ]
+    },
+    {
+      "id": "sd-03",
+      "key": "timing",
+      "category": "बढ़ने का समय (Timing)",
+      "titleHindi": "खुजली या जलन किस समय सबसे तेज होती है?",
+      "titleEnglish": "When is the itching or irritation most severe?",
+      "options": [
+        { "hindi": "रात को बिस्तर में जाने पर या गर्म वातावरण में", "english": "At night in bed or warm environment", "value": "night_warmth" },
+        { "hindi": "पसीना आने पर या धूप में निकलने पर", "english": "With sweating or sun exposure", "value": "sweat_sun" },
+        { "hindi": "साबुन, पानी या रासायनिक संपर्क के बाद", "english": "After contact with soap/water/chemicals", "value": "soap_chemical" },
+        { "hindi": "लगातार दिन-रात बनी रहती है", "english": "Continuous day and night", "value": "continuous" }
+      ]
+    }
+  ]
+}

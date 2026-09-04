@@ -1,0 +1,74 @@
+{
+  "id": "digestive_acidity",
+  "title": "Digestion & Acidity (Amlapitta)",
+  "titleHindi": "पाचन, गैस व एसिडिटी की समस्या (अम्लपित्त)",
+  "description": "Acidity, gas, sour belching, heartburn, stomach burning, bloating, constipation, piles, indigestion or abdominal discomfort.",
+  "keywords": [
+    "acidity",
+    "gas",
+    "indigestion",
+    "heartburn",
+    "bloating",
+    "constipation",
+    "amlapitta",
+    "stomach pain",
+    "गैस",
+    "एसिडिटी",
+    "खट्टी डकार",
+    "पेट में जलन",
+    "कब्ज",
+    "बदहजमी"
+  ],
+  "questions": [
+    {
+      "id": "da-01",
+      "key": "site",
+      "category": "लक्षण का प्रकार (Symptom Type)",
+      "titleHindi": "पेट में मुख्य रूप से क्या समस्या महसूस होती है?",
+      "titleEnglish": "What is the primary digestive issue you are experiencing?",
+      "options": [
+        { "hindi": "छाती और गले में जलन व खट्टी डकार", "english": "Heartburn, sour belching & acid reflux", "value": "heartburn_reflux" },
+        { "hindi": "पेट में भारीपन और तेज गैस", "english": "Bloating, abdominal fullness & flatulence", "value": "gas_bloating" },
+        { "hindi": "पेट में मरोड़ या दर्द", "english": "Stomach cramps or abdominal pain", "value": "cramps_pain" },
+        { "hindi": "कब्ज या शौच साफ न होना", "english": "Severe constipation / irregular bowel", "value": "constipation" }
+      ]
+    },
+    {
+      "id": "da-02",
+      "key": "onset",
+      "category": "अवधि (Duration)",
+      "titleHindi": "यह पाचन समस्या आपको कितने दिनों से हो रही है?",
+      "titleEnglish": "How long have you had this digestive trouble?",
+      "options": [
+        { "hindi": "पिछले कुछ दिनों से (Recent)", "english": "Last few days", "value": "days" },
+        { "hindi": "1 महीने से कम समय से", "english": "Less than 1 month", "value": "weeks" },
+        { "hindi": "कई महीनों या सालों से पुरानी समस्या है", "english": "Chronic for months/years", "value": "chronic" }
+      ]
+    },
+    {
+      "id": "da-03",
+      "key": "timing",
+      "category": "समय व प्रभाव (Timing & Relation to Meals)",
+      "titleHindi": "यह परेशानी खाने से पहले या खाने के बाद कब अधिक होती है?",
+      "titleEnglish": "When is the discomfort most noticeable relative to meals?",
+      "options": [
+        { "hindi": "खाना खाने के तुरंत बाद (1-2 घंटे में)", "english": "Immediately after meals (1-2 hours)", "value": "post_meal" },
+        { "hindi": "खाली पेट रहने पर या सुबह उठते ही", "english": "On empty stomach or early morning", "value": "empty_stomach" },
+        { "hindi": "मसालेदार / तला-भुना खाने के बाद", "english": "After spicy / oily foods", "value": "spicy_food" },
+        { "hindi": "रात को सोते समय", "english": "At night while lying down", "value": "night_lying" }
+      ]
+    },
+    {
+      "id": "da-04",
+      "key": "severity",
+      "category": "भूख और खान-पान (Appetite & Routine)",
+      "titleHindi": "आपकी भूख और खान-पान की क्या स्थिति है?",
+      "titleEnglish": "How is your appetite and daily eating routine?",
+      "options": [
+        { "hindi": "भूख सामान्य है लेकिन खाने के बाद भारीपन होता है", "english": "Normal appetite but post-meal heaviness", "value": "normal_heavy" },
+        { "hindi": "बिल्कुल भूख नहीं लगती / खाने का मन नहीं करता", "english": "Poor appetite / food aversion", "value": "poor_appetite" },
+        { "hindi": "खाना समय पर नहीं खा पाते (अनियमित दिनचर्या)", "english": "Irregular eating habits / erratic schedule", "value": "irregular_routine" }
+      ]
+    }
+  ]
+}

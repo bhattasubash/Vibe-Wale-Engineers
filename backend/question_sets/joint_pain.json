@@ -1,0 +1,86 @@
+{
+  "id": "joint_pain",
+  "title": "Joint & Bone Pain",
+  "titleHindi": "जोड़ों और हड्डियों का दर्द (संधिवात)",
+  "description": "Knee, back, spine, neck, shoulder, arthritis pain, joint swelling, stiffness, or musculoskeletal discomfort.",
+  "keywords": [
+    "knee pain",
+    "back pain",
+    "joint pain",
+    "arthritis",
+    "sandhivata",
+    "stiffness",
+    "spine",
+    "घुटने",
+    "कमर दर्द",
+    "जोड़ों का दर्द",
+    "संधिवात",
+    "जकड़न"
+  ],
+  "questions": [
+    {
+      "id": "jp-01",
+      "key": "site",
+      "category": "स्थान (Location)",
+      "titleHindi": "यह दर्द या समस्या शरीर के किस हिस्से में सबसे ज्यादा महसूस होती है?",
+      "titleEnglish": "Where exactly is this pain located in your body?",
+      "options": [
+        { "hindi": "दोनों घुटने / पैर", "english": "Both Knees / Legs", "value": "bilateral_knees" },
+        { "hindi": "कमर / रीढ़ की हड्डी", "english": "Lower Back / Spine", "value": "lower_back" },
+        { "hindi": "गर्दन / कंधे / सिर", "english": "Neck / Shoulders / Head", "value": "neck_shoulders" },
+        { "hindi": "हाथ-पैरों के छोटे जोड़", "english": "Small Joints (Hands/Feet)", "value": "small_joints" }
+      ]
+    },
+    {
+      "id": "jp-02",
+      "key": "onset",
+      "category": "अवधि (Duration)",
+      "titleHindi": "आपको यह जोड़ों का दर्द कितने समय से परेशान कर रहा है?",
+      "titleEnglish": "How long have you been suffering from this joint trouble?",
+      "options": [
+        { "hindi": "हाल ही में (पिछले 1-2 हफ्तों से)", "english": "Recent (Last 1-2 weeks)", "value": "acute_2_weeks" },
+        { "hindi": "1 से 3 महीने से", "english": "1 to 3 months", "value": "subacute_3_months" },
+        { "hindi": "6 महीने से अधिक समय से (पुराना)", "english": "More than 6 months (Chronic)", "value": "chronic_6_months" },
+        { "hindi": "कई सालों से बार-बार होता है", "english": "Recurrent for years", "value": "recurrent_years" }
+      ]
+    },
+    {
+      "id": "jp-03",
+      "key": "severity",
+      "category": "तीव्रता (Severity)",
+      "titleHindi": "दर्द की तीव्रता कितनी है और क्या चलने-फिरने में कठिनाई होती है?",
+      "titleEnglish": "How severe is your pain and does it limit your movement?",
+      "options": [
+        { "hindi": "हल्का दर्द • रोज़मर्रा का काम हो जाता है", "english": "Mild • Manageable daily tasks", "value": "mild" },
+        { "hindi": "मध्यम दर्द • सीढ़ी चढ़ने या झुकने में परेशानी", "english": "Moderate • Trouble with stairs/bending", "value": "moderate" },
+        { "hindi": "तेज दर्द • बिना सहारे चलना मुश्किल", "english": "Severe • Difficult to walk without support", "value": "severe" },
+        { "hindi": "अत्यधिक दर्द • बिस्तर से उठना भी कठिन", "english": "Very Severe • Bedridden / Extreme distress", "value": "extreme" }
+      ]
+    },
+    {
+      "id": "jp-04",
+      "key": "timing",
+      "category": "घटने-बढ़ने का कारण (Triggers)",
+      "titleHindi": "यह दर्द किस समय या मौसम में ज्यादा बढ़ जाता है?",
+      "titleEnglish": "When or under what conditions does this pain worsen?",
+      "options": [
+        { "hindi": "सुबह उठने पर और ठंड के मौसम में", "english": "Morning stiffness & cold weather", "value": "cold_morning" },
+        { "hindi": "अधिक चलने-फिरने या मेहनत करने के बाद", "english": "After walking or physical exertion", "value": "exertion" },
+        { "hindi": "लगातार एक जगह बैठे रहने पर", "english": "After prolonged sitting", "value": "prolonged_sitting" },
+        { "hindi": "रात को सोते समय या करवट लेने पर", "english": "During night time / turning in bed", "value": "night" }
+      ]
+    },
+    {
+      "id": "jp-05",
+      "key": "familyHistory",
+      "category": "पारिवारिक इतिहास (Family History)",
+      "titleHindi": "क्या परिवार में माता-पिता को गठिया या जोड़ों की पुरानी बीमारी रही है?",
+      "titleEnglish": "Does anyone in your family have a history of arthritis or joint disorders?",
+      "options": [
+        { "hindi": "हाँ, माता या पिता को गठिया / जोड़ों का दर्द था", "english": "Yes, family history of arthritis", "value": "family_yes" },
+        { "hindi": "नहीं, परिवार में ऐसी कोई बीमारी नहीं है", "english": "No history of joint disease in family", "value": "family_no" },
+        { "hindi": "मुझे इस बारे में निश्चित जानकारी नहीं है", "english": "Not sure / Unknown", "value": "family_unknown" }
+      ]
+    }
+  ]
+}

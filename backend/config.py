@@ -12,11 +12,21 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE: int = 15 * 1024 * 1024  # 15 MB
     STORAGE_DIR: str = "storage"
 
+    WISPRFLOW_API_KEY: str = ""
+    WISPRFLOW_API_URL: str = "https://platform-api.wisprflow.ai/api/v1/dash/api"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore"
     )
+
+    @property
+    def question_sets_dir(self) -> Path:
+        p = Path(__file__).resolve().parent / "question_sets"
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+
 
     @property
     def uploads_dir(self) -> Path:

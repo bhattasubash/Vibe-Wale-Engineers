@@ -72,6 +72,52 @@ class ChiefComplaintRequest(BaseModel):
     category: Optional[str] = "general"
 
 
+# --- VOICE TRANSCRIPTION & INFERENCE SCHEMAS ---
+class TranscribeAudioRequest(BaseModel):
+    audio_base64: str = Field(..., description="Base64-encoded 16kHz WAV audio data")
+    properties: Optional[Dict[str, Any]] = None
+
+
+class TranscribeAudioResponse(BaseModel):
+    success: bool
+    text: str
+    error: Optional[str] = None
+    source: str
+
+
+class DynamicQuestionOptionSchema(BaseModel):
+    hindi: str
+    english: str
+    value: str
+
+
+class DynamicQuestionItemSchema(BaseModel):
+    id: str
+    key: str
+    category: str
+    titleHindi: str
+    titleEnglish: str
+    options: List[DynamicQuestionOptionSchema]
+
+
+class InferComplaintRequest(BaseModel):
+    session_id: Optional[str] = None
+    complaint_text: str = Field(..., min_length=1)
+    language: Optional[str] = "hi"
+
+
+class InferComplaintResponse(BaseModel):
+    session_id: Optional[str] = None
+    complaint_text: str
+    matched: bool
+    matched_set_id: Optional[str] = None
+    matched_set_title: str
+    source: str
+    reasoning: Optional[str] = None
+    questions: List[DynamicQuestionItemSchema]
+    red_flag: Optional[Dict[str, Any]] = None
+
+
 class SocratesTurnRequest(BaseModel):
     turn_index: int = Field(..., ge=1, le=5)
     key: str

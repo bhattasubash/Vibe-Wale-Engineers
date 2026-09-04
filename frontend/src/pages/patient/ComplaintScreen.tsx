@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, MicOff, ArrowLeft, ArrowRight, AlertTriangle, Check, RotateCcw, Activity } from 'lucide-react';
+import { Mic, MicOff, ArrowLeft, ArrowRight, AlertTriangle, Check, RotateCcw, Activity, Loader2, Sparkles } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
+import { audioRecorder } from '@/lib/audioRecorder';
 
 interface SymptomPreset {
   id: string;
@@ -61,11 +62,14 @@ const COMMON_SYMPTOMS: SymptomPreset[] = [
 
 export const ComplaintScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { language, setChiefComplaint, setRedFlag } = useSessionStore();
+  const { sessionId, language, setChiefComplaint, setRedFlag, setActiveQuestionSet } = useSessionStore();
 
   const [inputText, setInputText] = useState('');
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [isInferring, setIsInferring] = useState(false);
+  const [statusNotice, setStatusNotice] = useState<string | null>(null);
   const [showRedFlagModal, setShowRedFlagModal] = useState(false);
 
   const promptHindi =
@@ -83,14 +87,9 @@ export const ComplaintScreen: React.FC = () => {
     }
   };
 
-  const handleToggleRecord = () => {
-    if (isRecording) {
-      setIsRecording(false);
-      return;
-    }
-
+  const startBrowserSpeechFallback = () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert('Voice recognition not supported. Please select from the symptoms below.');
+      alert('Voice recognition not supported. Please type or select from the symptoms below.');
       return;
     }
 
@@ -101,6 +100,7 @@ export const ComplaintScreen: React.FC = () => {
     recognition.interimResults = false;
 
     setIsRecording(true);
+    setStatusNotice(language === 'hi' ? 'बोलिए... सुन रहे हैं' : 'Listening... Speak now');
 
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
@@ -108,11 +108,74 @@ export const ComplaintScreen: React.FC = () => {
       setSelectedPreset(null);
       setIsRecording(false);
       checkRedFlags(transcript);
+      setStatusNotice(language === 'hi' ? 'आवाज़ रिकॉर्ड हो गई' : 'Speech captured');
     };
 
-    recognition.onerror = () => setIsRecording(false);
-    recognition.onend = () => setIsRecording(false);
+    recognition.onerror = () => {
+      setIsRecording(false);
+      setStatusNotice(null);
+    };
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
     recognition.start();
+  };
+
+  const handleToggleRecord = async () => {
+    if (isRecording) {
+      // User tapped to STOP recording -> process with Wispr Flow
+      setIsRecording(false);
+      setIsTranscribing(true);
+      setStatusNotice(language === 'hi' ? 'Wispr Flow द्वारा आवाज़ पहचानी जा रही है...' : 'Wispr Flow is transcribing audio...');
+
+      try {
+        const audioResult = await audioRecorder.stop();
+
+        // Send base64 audio to backend Wispr Flow endpoint
+        const response = await fetch('/api/sessions/transcribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            audio_base64: audioResult.base64,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.text) {
+            setInputText(data.text);
+            setSelectedPreset(null);
+            checkRedFlags(data.text);
+            setStatusNotice(language === 'hi' ? 'Wispr Flow द्वारा रिकॉर्डिंग सफल' : 'Wispr Flow transcription complete');
+            setIsTranscribing(false);
+            return;
+          } else {
+            console.warn('[Wispr Flow] Notice:', data.error);
+            // Fallback to browser speech if Wispr Flow returned error
+            setStatusNotice(language === 'hi' ? 'Wispr Flow उपलब्ध नहीं है; ब्राउज़र आवाज़ पहचान का उपयोग किया जा रहा है' : 'Wispr Flow key not set; using browser speech');
+            startBrowserSpeechFallback();
+          }
+        } else {
+          startBrowserSpeechFallback();
+        }
+      } catch (err) {
+        console.warn('Wispr Flow audio processing error, falling back:', err);
+        startBrowserSpeechFallback();
+      } finally {
+        setIsTranscribing(false);
+      }
+      return;
+    }
+
+    // User tapped to START recording
+    try {
+      await audioRecorder.start();
+      setIsRecording(true);
+      setStatusNotice(language === 'hi' ? 'माइक सक्रिय है... अपनी परेशानी बोलें (Wispr Flow Listening)' : 'Wispr Flow listening... Speak your symptoms');
+    } catch (err) {
+      console.warn('Microphone access for AudioRecorder failed, trying browser speech:', err);
+      startBrowserSpeechFallback();
+    }
   };
 
   const handleSelectPreset = (preset: SymptomPreset) => {
@@ -126,11 +189,60 @@ export const ComplaintScreen: React.FC = () => {
     }
   };
 
-  const handleProceed = () => {
-    if (inputText.trim()) {
+  const handleProceed = async () => {
+    if (!inputText.trim()) return;
+
+    setIsInferring(true);
+    setStatusNotice(language === 'hi' ? 'Gemini AI द्वारा लक्षणों का विश्लेषण और प्रश्नावली चयन...' : 'Gemini AI is analyzing complaint & matching question set...');
+
+    try {
+      const response = await fetch('/api/sessions/infer-complaint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          complaint_text: inputText.trim(),
+          language: language,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Push selected questions to frontend session store
+        setActiveQuestionSet({
+          id: data.matched_set_id || 'general',
+          title: data.matched_set_title,
+          matched: data.matched,
+          source: data.source,
+          reasoning: data.reasoning,
+          questions: data.questions || [],
+        });
+
+        const activePreset = COMMON_SYMPTOMS.find((s) => s.id === selectedPreset);
+        setChiefComplaint(inputText.trim(), data.matched_set_id || (activePreset ? activePreset.category : 'general'));
+
+        if (data.red_flag && data.red_flag.triggered) {
+          setRedFlag(true, data.red_flag.reason || 'Emergency Red Flag Detected');
+          setShowRedFlagModal(true);
+          return;
+        }
+
+        // Navigate to dynamic question screen
+        navigate('/kiosk/socrates');
+      } else {
+        // Fallback navigation if server returned error
+        const activePreset = COMMON_SYMPTOMS.find((s) => s.id === selectedPreset);
+        setChiefComplaint(inputText.trim(), activePreset ? activePreset.category : 'general');
+        navigate('/kiosk/socrates');
+      }
+    } catch (err) {
+      console.warn('Inference API call failed, proceeding to default questionnaire:', err);
       const activePreset = COMMON_SYMPTOMS.find((s) => s.id === selectedPreset);
-      setChiefComplaint(inputText, activePreset ? activePreset.category : 'general');
+      setChiefComplaint(inputText.trim(), activePreset ? activePreset.category : 'general');
       navigate('/kiosk/socrates');
+    } finally {
+      setIsInferring(false);
     }
   };
 
@@ -180,54 +292,81 @@ export const ComplaintScreen: React.FC = () => {
         </div>
 
         {/* VOICE INPUT PULSING MIC + TRANSCRIPT FIELD */}
-        <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-3 sm:p-4 flex items-center gap-3 shrink-0">
+        <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-3 sm:p-4 flex flex-col gap-2 shrink-0">
           
-          <button
-            type="button"
-            onClick={handleToggleRecord}
-            className={`w-14 h-14 rounded-full flex items-center justify-center text-white shrink-0 cursor-pointer transition-transform active:scale-95 border-2 ${
-              isRecording
-                ? 'bg-[#DC2626] border-red-700 animate-pulse'
-                : 'bg-[#0B5FA5] border-[#084B83] hover:bg-[#084B83]'
-            }`}
-          >
-            {isRecording ? <MicOff className="w-6 h-6 text-white" /> : <Mic className="w-6 h-6 text-white" />}
-          </button>
-
-          <div className="flex-1">
-            <div className="text-[10px] font-extrabold uppercase tracking-wider text-[#495057] mb-0.5 flex items-center justify-between">
-              <span>{isRecording ? 'सुन रहे हैं... बोलिए (Listening...)' : 'आपका विवरण (Recorded Symptoms):'}</span>
-              {inputText && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setInputText('');
-                    setSelectedPreset(null);
-                  }}
-                  className="text-[#DC2626] hover:underline flex items-center gap-0.5 cursor-pointer font-bold text-[10px]"
-                >
-                  <RotateCcw className="w-2.5 h-2.5" />
-                  <span>हटाएं (Clear)</span>
-                </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleToggleRecord}
+              disabled={isTranscribing || isInferring}
+              title="Wispr Flow Voice Input"
+              className={`w-14 h-14 rounded-full flex items-center justify-center text-white shrink-0 cursor-pointer transition-transform active:scale-95 border-2 ${
+                isRecording
+                  ? 'bg-[#DC2626] border-red-700 animate-pulse'
+                  : isTranscribing
+                  ? 'bg-[#F59E0B] border-[#D97706]'
+                  : 'bg-[#0B5FA5] border-[#084B83] hover:bg-[#084B83]'
+              }`}
+            >
+              {isTranscribing ? (
+                <Loader2 className="w-6 h-6 text-white animate-spin" />
+              ) : isRecording ? (
+                <MicOff className="w-6 h-6 text-white" />
+              ) : (
+                <Mic className="w-6 h-6 text-white" />
               )}
+            </button>
+
+            <div className="flex-1">
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-[#495057] mb-0.5 flex items-center justify-between">
+                <span>
+                  {isRecording
+                    ? 'सुन रहे हैं... बोलिए (Wispr Flow Listening...)'
+                    : isTranscribing
+                    ? 'Wispr Flow आवाज़ पहचान रहा है (Transcribing...)'
+                    : 'आपका विवरण (Recorded Symptoms):'}
+                </span>
+                {inputText && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInputText('');
+                      setSelectedPreset(null);
+                      setStatusNotice(null);
+                    }}
+                    className="text-[#DC2626] hover:underline flex items-center gap-0.5 cursor-pointer font-bold text-[10px]"
+                  >
+                    <RotateCcw className="w-2.5 h-2.5" />
+                    <span>हटाएं (Clear)</span>
+                  </button>
+                )}
+              </div>
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => {
+                  setInputText(e.target.value);
+                  checkRedFlags(e.target.value);
+                }}
+                placeholder={
+                  language === 'hi'
+                    ? 'माइक दबाकर बोलें या यहाँ लिखें...'
+                    : 'Tap mic to speak (Wispr Flow) or type symptoms here...'
+                }
+                className="w-full p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[3px] text-xs sm:text-sm font-bold text-[#212529] focus:outline-none focus:border-[#0B5FA5]"
+              />
             </div>
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => {
-                setInputText(e.target.value);
-                checkRedFlags(e.target.value);
-              }}
-              placeholder={
-                language === 'hi'
-                  ? 'माइक दबाकर बोलें या यहाँ लिखें...'
-                  : 'Tap mic or type symptoms here...'
-              }
-              className="w-full p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[3px] text-xs sm:text-sm font-bold text-[#212529] focus:outline-none focus:border-[#0B5FA5]"
-            />
           </div>
 
+          {statusNotice && (
+            <div className="text-[11px] text-[#0B5FA5] font-semibold bg-[#E8F1F8] px-2.5 py-1 rounded-[2px] flex items-center gap-1.5 border border-[#B8D5ED]">
+              <Sparkles className="w-3.5 h-3.5 shrink-0 text-[#0B5FA5]" />
+              <span className="truncate">{statusNotice}</span>
+            </div>
+          )}
+
         </div>
+
 
         {/* SPATIOUS 6 COMMON SYMPTOMS TOUCH GRID */}
         <div className="w-full max-w-2xl shrink-0">
@@ -295,12 +434,21 @@ export const ComplaintScreen: React.FC = () => {
           <button
             type="button"
             onClick={handleProceed}
-            disabled={!inputText.trim()}
+            disabled={!inputText.trim() || isInferring || isTranscribing}
             className="w-full py-3.5 px-6 rounded-[3px] border border-[#084B83] text-sm sm:text-base font-black text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-transform active:scale-[0.98]"
             style={{ backgroundColor: '#0B5FA5' }}
           >
-            <span>विस्तार से बताएं • PROCEED TO SOCRATES QUESTIONS</span>
-            <ArrowRight className="w-5 h-5 text-white" />
+            {isInferring ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin text-white" />
+                <span>लक्षणों का AI विश्लेषण जारी है • ANALYZING...</span>
+              </>
+            ) : (
+              <>
+                <span>विस्तार से बताएं • PROCEED TO QUESTIONS</span>
+                <ArrowRight className="w-5 h-5 text-white" />
+              </>
+            )}
           </button>
         </div>
 
