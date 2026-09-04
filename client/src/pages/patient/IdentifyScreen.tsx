@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { QrCode, UserPlus, ArrowLeft, ArrowRight, CheckCircle2, ShieldCheck, User, RefreshCw, Smartphone } from 'lucide-react';
+import { QrCode, UserPlus, ArrowLeft, ArrowRight, CheckCircle2, ShieldCheck, User, Smartphone } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 
@@ -9,7 +9,6 @@ export const IdentifyScreen: React.FC = () => {
   const { language, setPatient, patient } = useSessionStore();
 
   const [activeTab, setActiveTab] = useState<'abha' | 'register'>('abha');
-  const [isWaitingScan, setIsWaitingScan] = useState(true);
   const [scannedSuccess, setScannedSuccess] = useState(false);
 
   // Manual Register Form State

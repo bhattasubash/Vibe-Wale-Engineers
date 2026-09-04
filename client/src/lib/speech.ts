@@ -14,7 +14,6 @@
 
 class SpeechEngine {
   private synth: SpeechSynthesis | null = null;
-  private currentUtterance: SpeechSynthesisUtterance | null = null;
   private currentAudio: HTMLAudioElement | null = null;
   private voices: SpeechSynthesisVoice[] = [];
 
@@ -139,7 +138,7 @@ class SpeechEngine {
   /**
    * Speak single utterance: If Hindi -> uses Female Hindi Audio stream; If English -> uses English voice.
    */
-  public speak(text: string, lang: 'hi' | 'en' = 'hi', onEnd?: () => void) {
+  public speak(text: string, lang: string = 'hi', onEnd?: () => void) {
     this.stop();
 
     if (lang === 'hi') {

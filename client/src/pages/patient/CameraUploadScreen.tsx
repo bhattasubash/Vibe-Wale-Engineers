@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, CheckCircle2, ArrowLeft, ArrowRight, FileText } from 'lucide-react';
+import { Camera, CheckCircle2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 import { API_BASE_URL } from '@/lib/config';
@@ -271,7 +271,7 @@ export const CameraUploadScreen: React.FC = () => {
             style={{ backgroundColor: '#0B5FA5' }}
           >
             <Camera className="w-3.5 h-3.5" />
-            <span>फ़ोटो खींचें • MANUAL SNAP</span>
+            <span>{isUploading ? 'अपलोड हो रहा है (Uploading)...' : 'फ़ोटो खींचें • MANUAL SNAP'}</span>
           </button>
         </div>
 

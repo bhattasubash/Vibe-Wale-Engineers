@@ -9,7 +9,6 @@ import {
   Scale,
   Activity,
   ShieldAlert,
-  User,
   Printer,
   Stethoscope,
   Eye,
@@ -17,9 +16,7 @@ import {
   ZoomOut,
   RotateCw,
   X,
-  ExternalLink,
   Check,
-  AlertCircle,
 } from 'lucide-react';
 import { usePhysicianStore, DocumentItem } from '@/stores/physicianStore';
 import { API_BASE_URL } from '@/lib/config';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, ArrowLeft, ArrowRight, Edit3, Activity, Scale, Stethoscope, Camera, FileText } from 'lucide-react';
+import { CheckCircle2, ArrowLeft, ArrowRight, Edit3, Activity, Scale, Stethoscope, Camera } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 

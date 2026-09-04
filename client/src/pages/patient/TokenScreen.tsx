@@ -15,7 +15,6 @@ export const TokenScreen: React.FC = () => {
     chiefComplaint,
     complaintCategory,
     socrates,
-    generalVitals,
     redFlagTriggered,
     prakritiResult,
     uploadedDocuments,

@@ -121,7 +121,7 @@ export interface SessionState {
   setChiefComplaint: (complaint: string, category?: string) => void;
   setSocratesResponse: (key: keyof SocratesResponses, value: any) => void;
   setGeneralVitals: (vitals: Partial<GeneralVitals>) => void;
-  setRedFlag: (triggered: boolean, reason?: string) => void;
+  setRedFlag: (triggered: boolean, reason?: string | null) => void;
   setPrakritiAnswer: (questionId: string, answer: { optionIndex: number; doshaTag: 'vata' | 'pitta' | 'kapha' }) => void;
   setPrakritiResult: (result: SessionState['prakritiResult']) => void;
   addUploadedDocument: (doc: SessionState['uploadedDocuments'][0]) => void;

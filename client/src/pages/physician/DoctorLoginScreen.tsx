@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, UserCheck, Lock, ArrowRight, Stethoscope, AlertCircle } from 'lucide-react';
+import { ShieldCheck, UserCheck, ArrowRight, Stethoscope, AlertCircle } from 'lucide-react';
 import { usePhysicianStore } from '@/stores/physicianStore';
 import { API_BASE_URL } from '@/lib/config';
 
@@ -9,7 +9,7 @@ export const DoctorLoginScreen: React.FC = () => {
   const { loginDoctor } = usePhysicianStore();
 
   const [doctorId, setDoctorId] = useState('DOC-AIIA-104');
-  const [doctorName, setDoctorName] = useState('डॉ. अनन्या शर्मा (Dr. Ananya Sharma)');
+  const [doctorName] = useState('डॉ. अनन्या शर्मा (Dr. Ananya Sharma)');
   const [department, setDepartment] = useState('कायचिकित्सा विभाग (Internal Medicine)');
   const [roomNumber, setRoomNumber] = useState('Room #104 (Block A)');
   const [pin, setPin] = useState('1234');
@@ -150,10 +150,11 @@ export const DoctorLoginScreen: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full mt-2 py-3.5 px-6 rounded-[3px] border border-[#084B83] text-sm font-black text-white flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
+              disabled={isSubmitting}
+              className="w-full mt-2 py-3.5 px-6 rounded-[3px] border border-[#084B83] text-sm font-black text-white flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98] disabled:opacity-50"
               style={{ backgroundColor: '#0B5FA5' }}
             >
-              <span>ओपीडी कतार में प्रवेश करें • ACCESS PATIENT QUEUE</span>
+              <span>{isSubmitting ? 'प्रवेश सत्यापित हो रहा है...' : 'ओपीडी कतार में प्रवेश करें • ACCESS PATIENT QUEUE'}</span>
               <ArrowRight className="w-4 h-4 text-white" />
             </button>
 
