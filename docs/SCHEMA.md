@@ -1,5 +1,10 @@
 # Database Schema
 
+> **IMPORTANT**: This document is a documentation overview and architecture design specification containing Markdown text and diagrams. 
+> To set up your Supabase database in the **Supabase SQL Editor**, do **NOT** copy this markdown file directly.
+> Instead, open and copy the pure, 100% executable SQL file:
+> **[`supabase/schema.sql`](file:///c:/Users/SUBASH/Desktop/SIH/supabase/schema.sql)**
+
 This document outlines the PostgreSQL schema for the AYUSH-Care / MediKiosk Supabase backend. All tables, columns, types, constraints, and foreign keys are included.
 
 ## Tables
