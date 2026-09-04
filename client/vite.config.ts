@@ -5,7 +5,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
-  base: '/Vibe-Wale-Engineers/', // Explicit GitHub Pages repository path
+  base: process.env.VITE_BASE_PATH || (process.env.GITHUB_PAGES === 'true' ? '/Vibe-Wale-Engineers/' : '/'),
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

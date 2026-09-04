@@ -1,0 +1,1 @@
+feat(deploy): configure dynamic base path and SPA rewrites for Vercel and Cloudflare Pages
