@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, ArrowLeft, ArrowRight, XCircle } from 'lucide-react';
+import { ShieldCheck, ArrowLeft, ArrowRight, XCircle, Lock } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 

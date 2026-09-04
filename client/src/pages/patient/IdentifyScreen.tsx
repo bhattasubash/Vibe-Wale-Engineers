@@ -24,7 +24,6 @@ export const IdentifyScreen: React.FC = () => {
 
   // Simulated ABDM Scan & Share Webhook Listener
   const handleSimulatePhoneScanned = () => {
-    setIsWaitingScan(false);
     setScannedSuccess(true);
     setPatient({
       fullName: 'रामेश्वर दयाल शर्मा (Rameshwar Sharma)',

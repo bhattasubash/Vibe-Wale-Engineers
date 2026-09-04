@@ -14,6 +14,7 @@
 
 class SpeechEngine {
   private synth: SpeechSynthesis | null = null;
+  private currentUtterance: SpeechSynthesisUtterance | null = null;
   private currentAudio: HTMLAudioElement | null = null;
   private voices: SpeechSynthesisVoice[] = [];
 
