@@ -1,1 +1,0 @@
-fix(vercel): remove root vercel.json to prevent cd client collision

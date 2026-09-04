@@ -76,12 +76,33 @@ const SOCRATES_QUESTIONS: SocratesQuestion[] = [
 
 export const SocratesScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { language, setSocratesResponse, chiefComplaint, treatmentMode } = useSessionStore();
+  const {
+    language,
+    setSocratesResponse,
+    chiefComplaint,
+    treatmentMode,
+    activeQuestionSet,
+  } = useSessionStore();
 
   const [currentTurn, setCurrentTurn] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  const question = SOCRATES_QUESTIONS[currentTurn];
+  const questionsList =
+    activeQuestionSet?.questions && activeQuestionSet.questions.length > 0
+      ? activeQuestionSet.questions.map((q) => ({
+          key: q.key,
+          titleHindi: q.titleHindi,
+          titleEnglish: q.titleEnglish,
+          options: q.options.map((opt) => ({
+            value: opt.value,
+            hindi: opt.hindi,
+            english: opt.english,
+          })),
+        }))
+      : SOCRATES_QUESTIONS;
+
+  const totalQuestions = questionsList.length;
+  const question = questionsList[Math.min(currentTurn, totalQuestions - 1)];
 
   const handleSelectOption = (optValue: string) => {
     speechEngine.stop();
@@ -97,7 +118,7 @@ export const SocratesScreen: React.FC = () => {
 
   const handleNextTurn = () => {
     speechEngine.stop();
-    if (currentTurn < SOCRATES_QUESTIONS.length - 1) {
+    if (currentTurn < totalQuestions - 1) {
       setCurrentTurn((prev) => prev + 1);
       setSelectedOption(null);
     } else {
@@ -147,7 +168,11 @@ export const SocratesScreen: React.FC = () => {
               }}
             >
               <Activity className="w-3.5 h-3.5" />
-              <span>SOCRATES नैदानिक प्रश्न {currentTurn + 1} / 5</span>
+              <span>
+                {activeQuestionSet?.title
+                  ? `${activeQuestionSet.title} • प्रश्न ${currentTurn + 1} / ${totalQuestions}`
+                  : `SOCRATES नैदानिक प्रश्न ${currentTurn + 1} / ${totalQuestions}`}
+              </span>
             </div>
 
             <span className="text-xs font-extrabold text-[#495057] truncate max-w-xs">
@@ -159,7 +184,7 @@ export const SocratesScreen: React.FC = () => {
             <div
               className="h-full transition-all duration-300"
               style={{
-                width: `${((currentTurn + 1) / 5) * 100}%`,
+                width: `${((currentTurn + 1) / totalQuestions) * 100}%`,
                 backgroundColor: '#0B5FA5',
               }}
             />

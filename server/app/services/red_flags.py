@@ -24,9 +24,11 @@ RED_FLAG_RULES: List[RedFlagRule] = [
         severity="critical",
         trigger_keywords=[
             "सीने में दर्द",
+            "सीने में तेज दर्द",
             "chest pain",
             "सीने में भारीपन",
             "छाती में दर्द",
+            "छाती में तेज दर्द",
             "left arm pain",
             "हार्ट",
             "heart pain",

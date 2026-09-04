@@ -1,0 +1,83 @@
+{
+  "id": "respiratory_cough",
+  "title": "Respiratory & Cough (Kasa-Shwasa)",
+  "titleHindi": "खांसी, सांस व श्वसन विकार (कास-श्वास)",
+  "description": "Dry or productive cough, throat irritation, phlegm, shortness of breath, wheezing, seasonal allergies or chest congestion.",
+  "keywords": [
+    "cough",
+    "phlegm",
+    "breathlessness",
+    "asthma",
+    "kasa",
+    "shwasa",
+    "wheezing",
+    "chest congestion",
+    "throat pain",
+    "mucus",
+    "खांसी",
+    "बलगम",
+    "सांस फूलना",
+    "दमा",
+    "कास",
+    "श्वास",
+    "सांस",
+    "गले में खराश",
+    "छाती में जकड़न",
+    "जुकाम",
+    "कफ"
+  ],
+  "questions": [
+    {
+      "id": "rc-01",
+      "key": "character",
+      "category": "खांसी का प्रकार (Cough Character)",
+      "titleHindi": "आपको किस प्रकार की खांसी या सांस की तकलीफ हो रही है?",
+      "titleEnglish": "What kind of cough or breathing discomfort do you have?",
+      "options": [
+        { "hindi": "सूखी खांसी, गले में ठसका या खुजली (Dry Cough)", "english": "Dry, hacking cough with throat tickle", "value": "dry_hacking" },
+        { "hindi": "बलगम वाली खांसी, छाती में जकड़न (Wet Cough)", "english": "Wet cough with thick phlegm / chest congestion", "value": "productive_mucus" },
+        { "hindi": "सांस फूलना व सीटी जैसी आवाज आना (दमा/Wheezing)", "english": "Shortness of breath with wheezing sound", "value": "breathless_wheeze" },
+        { "hindi": "गले में दर्द, खराश व निगलने में कष्ट (Sore Throat)", "english": "Sore throat, hoarseness & difficulty swallowing", "value": "throat_irritation" }
+      ]
+    },
+    {
+      "id": "rc-02",
+      "key": "onset",
+      "category": "अवधि (Duration)",
+      "titleHindi": "आपको यह खांसी या सांस की तकलीफ कितने समय से है?",
+      "titleEnglish": "How long have you been coughing or having breathing trouble?",
+      "options": [
+        { "hindi": "कुछ ही दिनों से (1 से 5 दिन)", "english": "Past few days (1 to 5 days)", "value": "acute_few_days" },
+        { "hindi": "1 से 3 सप्ताह से", "english": "1 to 3 weeks", "value": "subacute_weeks" },
+        { "hindi": "3 सप्ताह से अधिक या महीनों से (पुरानी खांसी)", "english": "More than 3 weeks (Chronic / Persistent)", "value": "chronic_months" },
+        { "hindi": "मौसम बदलते ही या ठंड में बार-बार होती है", "english": "Seasonal / recurrent with weather changes", "value": "seasonal_recurrent" }
+      ]
+    },
+    {
+      "id": "rc-03",
+      "key": "triggers",
+      "category": "परेशानी का समय व कारक (Timing & Triggers)",
+      "titleHindi": "यह खांसी या सांस फूलना किस समय सबसे ज्यादा बढ़ता है?",
+      "titleEnglish": "When or under what conditions does this cough worsen?",
+      "options": [
+        { "hindi": "रात को सोते समय या सुबह उठते ही", "english": "During sleep at night or early morning", "value": "night_early_morning" },
+        { "hindi": "धूल, धुएं या तेज गंध के संपर्क में आने पर", "english": "With exposure to dust, smoke or strong odors", "value": "dust_smoke_pollution" },
+        { "hindi": "ठंडा पानी, आइसक्रीम या ठंडी हवा से", "english": "After cold drinks, refrigerated food or cold air", "value": "cold_food_drinks" },
+        { "hindi": "पूरे दिन लगातार बनी रहती है", "english": "Continuous throughout the whole day", "value": "continuous_all_day" }
+      ]
+    },
+    {
+      "id": "rc-04",
+      "key": "associated",
+      "category": "अन्य लक्षण (Associated Symptoms)",
+      "titleHindi": "खांसी के साथ क्या कोई अन्य लक्षण भी हैं?",
+      "titleEnglish": "Do you have any other symptoms along with the cough?",
+      "options": [
+        { "hindi": "हल्का या तेज बुखार व शरीर में दर्द", "english": "Fever with chills and body ache", "value": "fever_bodyache" },
+        { "hindi": "छाती में भारीपन या पसलियों में दर्द", "english": "Tightness or heaviness in chest", "value": "chest_tightness" },
+        { "hindi": "भूख न लगना या कमजोरी व वजन घटना", "english": "Poor appetite, fatigue or weakness", "value": "loss_of_appetite_weight" },
+        { "hindi": "केवल खांसी है, कोई अन्य लक्षण नहीं", "english": "Only cough, no other symptoms", "value": "no_other_symptoms" }
+      ]
+    }
+  ]
+}

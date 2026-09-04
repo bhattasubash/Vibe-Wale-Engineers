@@ -69,6 +69,29 @@ export interface GeneralVitals {
   lifestyleFactors?: string;
 }
 
+export interface DynamicQuestionOption {
+  hindi: string;
+  english: string;
+  value: string;
+}
+
+export interface DynamicSocratesQuestion {
+  id: string;
+  key: string;
+  category: string;
+  titleHindi: string;
+  titleEnglish: string;
+  options: DynamicQuestionOption[];
+}
+
+export interface ActiveQuestionSet {
+  id?: string;
+  title: string;
+  source: 'question_set' | 'gemini_general' | 'fallback' | 'static';
+  questions: DynamicSocratesQuestion[];
+}
+
+
 export interface SessionState {
   // Session Identifiers
   sessionId: string | null;
@@ -111,6 +134,10 @@ export interface SessionState {
   // Final Routing
   assignedDoctor: DoctorAssignment | null;
 
+  // Dynamic Adaptive Socratic Questions
+  activeQuestionSet: ActiveQuestionSet | null;
+  dynamicQuestions: DynamicSocratesQuestion[];
+
   // Actions
   setLanguage: (lang: LanguageCode) => void;
   setTreatmentMode: (mode: TreatmentMode) => void;
@@ -122,6 +149,13 @@ export interface SessionState {
   setSocratesResponse: (key: keyof SocratesResponses, value: any) => void;
   setGeneralVitals: (vitals: Partial<GeneralVitals>) => void;
   setRedFlag: (triggered: boolean, reason?: string | null) => void;
+  setActiveQuestionSet: (set: ActiveQuestionSet | null) => void;
+  setDynamicQuestions: (
+    questions: DynamicSocratesQuestion[],
+    setId?: string,
+    setTitle?: string,
+    source?: 'question_set' | 'gemini_general' | 'fallback' | 'static'
+  ) => void;
   setPrakritiAnswer: (questionId: string, answer: { optionIndex: number; doshaTag: 'vata' | 'pitta' | 'kapha' }) => void;
   setPrakritiResult: (result: SessionState['prakritiResult']) => void;
   addUploadedDocument: (doc: SessionState['uploadedDocuments'][0]) => void;
@@ -157,6 +191,8 @@ export const useSessionStore = create<SessionState>((set) => ({
   prakritiResult: null,
   uploadedDocuments: [],
   assignedDoctor: null,
+  activeQuestionSet: null,
+  dynamicQuestions: [],
 
   setLanguage: (lang) => set({ language: lang }),
   setTreatmentMode: (mode) => set({ treatmentMode: mode }),
@@ -177,6 +213,22 @@ export const useSessionStore = create<SessionState>((set) => ({
     set((state) => ({ generalVitals: { ...state.generalVitals, ...vitals } })),
   setRedFlag: (triggered, reason = null) =>
     set({ redFlagTriggered: triggered, redFlagReason: reason }),
+  setActiveQuestionSet: (setVal) => set({ activeQuestionSet: setVal }),
+  setDynamicQuestions: (
+    questions,
+    setId,
+    setTitle = 'Adaptive Assessment',
+    source = 'question_set'
+  ) =>
+    set({
+      dynamicQuestions: questions,
+      activeQuestionSet: {
+        id: setId,
+        title: setTitle,
+        source,
+        questions,
+      },
+    }),
   setPrakritiAnswer: (questionId, answer) =>
     set((state) => ({
       prakritiAnswers: { ...state.prakritiAnswers, [questionId]: answer },
@@ -208,5 +260,7 @@ export const useSessionStore = create<SessionState>((set) => ({
       prakritiResult: null,
       uploadedDocuments: [],
       assignedDoctor: null,
+      activeQuestionSet: null,
+      dynamicQuestions: [],
     }),
 }));

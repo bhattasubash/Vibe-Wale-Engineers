@@ -79,6 +79,53 @@ class SocratesTurnRequest(BaseModel):
     selected_value: str
 
 
+# --- VOICE TRANSCRIPTION & ADAPTIVE SOCRATES SCHEMAS ---
+class TranscribeAudioRequest(BaseModel):
+    audio_base64: str = Field(..., description="Base64-encoded 16kHz mono WAV audio")
+    properties: Optional[Dict[str, Any]] = None
+
+
+class TranscribeAudioResponse(BaseModel):
+    success: bool
+    text: str
+    error: Optional[str] = None
+    source: str = "whisprflow"
+
+
+class DynamicQuestionOptionSchema(BaseModel):
+    hindi: str
+    english: str
+    value: str
+
+
+class DynamicQuestionSchema(BaseModel):
+    id: str
+    key: str
+    category: str
+    titleHindi: str
+    titleEnglish: str
+    options: List[DynamicQuestionOptionSchema]
+
+
+class InferComplaintRequest(BaseModel):
+    complaint_text: str = Field(..., min_length=2)
+    session_id: Optional[str] = None
+    language: Optional[str] = "hi"
+
+
+class InferComplaintResponse(BaseModel):
+    session_id: str
+    complaint_text: str
+    matched: bool
+    matched_set_id: Optional[str] = None
+    matched_set_title: str
+    source: str
+    reasoning: Optional[str] = None
+    questions: List[DynamicQuestionSchema]
+    red_flag: Optional[Dict[str, Any]] = None
+
+
+
 # --- BATCH OFFLINE SYNC SCHEMA ---
 class OfflineSessionItem(BaseModel):
     sessionId: str
