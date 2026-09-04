@@ -22,11 +22,13 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { usePhysicianStore, DocumentItem } from '@/stores/physicianStore';
+import { API_BASE_URL } from '@/lib/config';
+import { CLINICAL_PRESETS } from '@/config/clinicalPresets';
 
 export const DoctorSessionReview: React.FC = () => {
   const navigate = useNavigate();
   const { sessionId } = useParams<{ sessionId: string }>();
-  const { queue, activePatient, reviewSession, doctorName, roomNumber } = usePhysicianStore();
+  const { queue, activePatient, reviewSession, doctorName, roomNumber, authToken } = usePhysicianStore();
 
   const patient = activePatient || queue.find((p) => p.sessionId === sessionId) || queue[1] || queue[0];
   const [doctorNotes, setDoctorNotes] = useState(
@@ -52,6 +54,25 @@ export const DoctorSessionReview: React.FC = () => {
 
   const handleAction = (status: 'accepted' | 'amended' | 'rejected') => {
     reviewSession(patient.sessionId, status, doctorNotes);
+
+    // If authenticated with backend, dispatch verified EMR status
+    if (authToken) {
+      fetch(`${API_BASE_URL}/api/physician/session/${patient.sessionId}/review`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          status,
+          doctor_notes: doctorNotes,
+          doctor_id: doctorName,
+        }),
+      }).catch(() => {
+        // Offline resilience
+      });
+    }
+
     setToastMessage(
       status === 'accepted'
         ? 'केस सारांश सफलतापूर्वक स्वीकार किया गया (Case Accepted & Saved to EMR)'
@@ -180,11 +201,38 @@ export const DoctorSessionReview: React.FC = () => {
         </div>
       </header>
 
+      {/* Mobile/Tablet Quick-Jump Navigation (<1024px) */}
+      <div className="lg:hidden bg-[#E8F1F8] border-b border-[#CED4DA] px-4 py-2 flex items-center justify-around text-xs font-bold text-[#0B5FA5]">
+        <button
+          type="button"
+          onClick={() => document.getElementById('section-history')?.scrollIntoView({ behavior: 'smooth' })}
+          className="hover:underline cursor-pointer"
+        >
+          1. विवरण व लक्षण
+        </button>
+        <span className="text-[#CED4DA]">|</span>
+        <button
+          type="button"
+          onClick={() => document.getElementById('section-documents')?.scrollIntoView({ behavior: 'smooth' })}
+          className="hover:underline cursor-pointer"
+        >
+          2. पर्चे व रिपोर्ट
+        </button>
+        <span className="text-[#CED4DA]">|</span>
+        <button
+          type="button"
+          onClick={() => document.getElementById('section-rx')?.scrollIntoView({ behavior: 'smooth' })}
+          className="hover:underline cursor-pointer"
+        >
+          3. प्रकृति व परामर्श
+        </button>
+      </div>
+
       {/* Main 2-Column Clinical Review Interface */}
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 pb-24 lg:pb-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4">
         
         {/* LEFT COLUMN (7 Cols): Demographics, SOCRATES Timeline, Documents & Lab Findings */}
-        <div className="lg:col-span-7 space-y-4">
+        <div id="section-history" className="lg:col-span-7 space-y-4">
           
           {/* 1. PATIENT HEADER CARD (Rogi Vivarana) */}
           <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
@@ -277,7 +325,7 @@ export const DoctorSessionReview: React.FC = () => {
           </div>
 
           {/* 3. CAPTURED DOCUMENT SCANS & LIGHTBOX VIEWER GALLERY */}
-          <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
+          <div id="section-documents" className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
             <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-[#CED4DA] pb-1.5">
               <div className="flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-[#0B5FA5]" />
@@ -432,7 +480,7 @@ export const DoctorSessionReview: React.FC = () => {
         </div>
 
         {/* RIGHT COLUMN (5 Cols): Classical Tridosha Prakriti Analysis & Doctor Action Bar */}
-        <div className="lg:col-span-5 space-y-4">
+        <div id="section-rx" className="lg:col-span-5 space-y-4">
           
           {/* 6. CHARAKA SAMHITA PRAKRITI ANALYSIS (Vimanasthana 8) */}
           <div className="bg-white border-2 border-[#2F7D4F] p-4 rounded-[3px] shadow-xs">
@@ -523,27 +571,16 @@ export const DoctorSessionReview: React.FC = () => {
 
             {/* Fast Clinical Preset Insertion Buttons */}
             <div className="flex flex-wrap gap-1 mt-2">
-              <button
-                type="button"
-                onClick={() => setDoctorNotes((prev) => prev + ' जानु बस्ति (Janu Basti) 7 दिन हेतु अनुशंसित।')}
-                className="px-2 py-1 bg-[#E8F1F8] border border-[#0B5FA5]/30 text-[10px] font-bold text-[#0B5FA5] rounded-[2px] hover:bg-[#0B5FA5] hover:text-white cursor-pointer"
-              >
-                + जानु बस्ति
-              </button>
-              <button
-                type="button"
-                onClick={() => setDoctorNotes((prev) => prev + ' पथ्य: वातवर्धक आहार (उड़द, गोभी, ठंडा पानी) का त्याग करें।')}
-                className="px-2 py-1 bg-[#E8F1F8] border border-[#0B5FA5]/30 text-[10px] font-bold text-[#0B5FA5] rounded-[2px] hover:bg-[#0B5FA5] hover:text-white cursor-pointer"
-              >
-                + पथ्य-अपथ्य निर्देश
-              </button>
-              <button
-                type="button"
-                onClick={() => setDoctorNotes((prev) => prev + ' 15 दिन पश्चात पुनर्परीक्षण (Follow-up after 15 days).')}
-                className="px-2 py-1 bg-[#E8F1F8] border border-[#0B5FA5]/30 text-[10px] font-bold text-[#0B5FA5] rounded-[2px] hover:bg-[#0B5FA5] hover:text-white cursor-pointer"
-              >
-                + 15 दिन फॉलो-अप
-              </button>
+              {CLINICAL_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => setDoctorNotes((prev) => prev + preset.insertionText)}
+                  className="px-2 py-1 bg-[#E8F1F8] border border-[#0B5FA5]/30 text-[10px] font-bold text-[#0B5FA5] rounded-[2px] hover:bg-[#0B5FA5] hover:text-white cursor-pointer transition-colors"
+                >
+                  {preset.label}
+                </button>
+              ))}
             </div>
 
             {/* 3 ACTIONS BAR: Reject, Amend, Accept */}
@@ -701,11 +738,43 @@ export const DoctorSessionReview: React.FC = () => {
 
       {/* TOAST FEEDBACK NOTIFICATION */}
       {showToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#212529] text-white px-4 py-3 rounded-[3px] border border-[#CED4DA] shadow-xl text-xs font-black flex items-center gap-2 animate-bounce">
-          <CheckCircle className="w-4 h-4 text-[#2F7D4F]" />
+        <div className="fixed bottom-16 lg:bottom-6 right-6 z-50 bg-[#212529] text-white px-4 py-3 rounded-[3px] border border-[#CED4DA] shadow-xl text-xs font-black flex items-center gap-2 animate-bounce">
+          <CheckCircle className="w-4 h-4 text-[#186036]" />
           <span>{toastMessage}</span>
         </div>
       )}
+
+      {/* MOBILE & TABLET STICKY BOTTOM ACTION BAR (<1024px) */}
+      <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white/95 backdrop-blur-xs border-t border-[#CED4DA] p-2.5 shadow-lg z-30">
+        <div className="max-w-md mx-auto grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            onClick={() => handleAction('rejected')}
+            className="py-2.5 px-2 bg-white border border-[#DC2626] hover:bg-[#FEF2F2] text-[#DC2626] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+          >
+            <XCircle className="w-3.5 h-3.5" />
+            <span>पुनः परीक्षण</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleAction('amended')}
+            className="py-2.5 px-2 bg-white border border-[#0B5FA5] hover:bg-[#E8F1F8] text-[#0B5FA5] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+            <span>संशोधन</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleAction('accepted')}
+            className="py-2.5 px-2 bg-[#186036] border border-[#114526] hover:bg-[#15522e] text-white text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98 shadow-xs"
+          >
+            <CheckCircle className="w-3.5 h-3.5" />
+            <span>स्वीकार करें</span>
+          </button>
+        </div>
+      </div>
 
       {/* Persistent Single-Line Clean Footer */}
       <footer className="w-full bg-white border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">

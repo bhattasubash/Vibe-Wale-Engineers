@@ -7,6 +7,7 @@ FastAPI BackgroundTasks for sub-100ms response, and DPDP ephemeral storage.
 import json
 import logging
 import uuid
+import re
 from typing import List, Optional
 from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, UploadFile, status
 
@@ -16,6 +17,14 @@ from app.services.report_pipeline import report_pipeline
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/documents", tags=["Documents & OCR"])
+
+
+def sanitize_session_identifier(raw_id: Optional[str]) -> str:
+    """Enforces alphanumeric, underscore, and hyphen allowlist against path traversal."""
+    if not raw_id:
+        return f"session_{uuid.uuid4().hex[:10]}"
+    cleaned = re.sub(r"[^a-zA-Z0-9_-]", "", raw_id)[:64]
+    return cleaned if cleaned else f"session_{uuid.uuid4().hex[:10]}"
 
 
 @router.post(
@@ -45,7 +54,7 @@ async def process_reports(
             detail="At least one prescription or report image must be provided.",
         )
 
-    patient_session_id = session_id or f"session_{uuid.uuid4().hex[:10]}"
+    patient_session_id = sanitize_session_identifier(session_id)
 
     try:
         grouping_spec = None
@@ -55,6 +64,7 @@ async def process_reports(
             except Exception as exc:
                 logger.warning("Could not parse grouping JSON: %s", exc)
 
+        temp_dir = None
         # 1. Save uploaded images to isolated ephemeral storage
         temp_dir, image_metas = await report_pipeline.save_uploaded_files_ephemeral(
             files=files,
@@ -88,10 +98,14 @@ async def process_reports(
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("Failed to process documents: %s", exc)
+        if 'temp_dir' in locals() and temp_dir and hasattr(temp_dir, 'exists') and temp_dir.exists():
+            import shutil
+            shutil.rmtree(temp_dir, ignore_errors=True)
+        error_ref = f"ERR-DOC-{uuid.uuid4().hex[:8].upper()}"
+        logger.exception("Internal error in process_reports [Ref: %s]: %s", error_ref, exc)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Document processing failed: {str(exc)}",
+            detail=f"An internal error occurred while processing documents. Incident Reference: {error_ref}",
         )
 
 

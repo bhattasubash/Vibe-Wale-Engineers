@@ -4,6 +4,7 @@
  */
 
 import { offlineDb, OfflineSessionRecord } from './offlineDb';
+import { API_BASE_URL } from './config';
 
 class SyncManager {
   private isSyncing = false;
@@ -70,7 +71,7 @@ class SyncManager {
       }
 
       // Send batch to backend
-      const response = await fetch('/api/sessions/sync-batch', {
+      const response = await fetch(`${API_BASE_URL}/api/sessions/sync-batch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessions: pendingSessions }),

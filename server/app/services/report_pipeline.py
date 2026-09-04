@@ -7,8 +7,10 @@ Tesseract spatial pixel verification, and DPDP Act 2023 auto-purge.
 import json
 import logging
 import os
+import re
 import shutil
 import tempfile
+import time
 import uuid
 from collections import defaultdict
 from pathlib import Path
@@ -53,6 +55,26 @@ class ReportPipelineService:
 
         self.reports_dir.mkdir(parents=True, exist_ok=True)
         self.results_dir.mkdir(parents=True, exist_ok=True)
+        self.purge_stale_ephemeral_dirs()
+
+    def purge_stale_ephemeral_dirs(self, max_age_seconds: int = 900) -> None:
+        """
+        Sweeps the system temp directory and purges any abandoned ayush_ocr_ directories
+        older than max_age_seconds (default 15 minutes) to guarantee DPDP compliance.
+        """
+        try:
+            temp_root = Path(tempfile.gettempdir())
+            now = time.time()
+            for item in temp_root.glob("ayush_ocr_*"):
+                if item.is_dir():
+                    try:
+                        if (now - item.stat().st_mtime) > max_age_seconds:
+                            shutil.rmtree(item, ignore_errors=True)
+                            logger.info("Purged stale ephemeral directory: %s", item)
+                    except Exception:
+                        pass
+        except Exception as exc:
+            logger.warning("Could not execute stale ephemeral sweep: %s", exc)
 
     async def save_uploaded_files_ephemeral(
         self,
@@ -64,36 +86,43 @@ class ReportPipelineService:
         Saves uploaded prescription images to an isolated ephemeral temporary directory.
         Returns (temp_dir_path, list_of_saved_metas).
         """
-        temp_dir = Path(tempfile.mkdtemp(prefix=f"ayush_ocr_{patient_session_id}_"))
+        clean_session_id = re.sub(r"[^a-zA-Z0-9_-]", "", patient_session_id)[:64] or f"session_{uuid.uuid4().hex[:10]}"
+        temp_dir = Path(tempfile.mkdtemp(prefix=f"ayush_ocr_{clean_session_id[:16]}_"))
         saved_metas = []
 
-        for idx, file in enumerate(files):
-            content, sanitized_name = await validate_and_read_image(file)
-            ext = Path(sanitized_name).suffix.lower()
+        try:
+            for idx, file in enumerate(files):
+                content, sanitized_name = await validate_and_read_image(file)
+                ext = Path(sanitized_name).suffix.lower()
 
-            rep_id = "report_1"
-            page_num = idx + 1
-            if grouping_spec and str(idx) in grouping_spec:
-                rep_id = grouping_spec[str(idx)].get("report_id", rep_id)
-                page_num = grouping_spec[str(idx)].get("page_number", page_num)
+                rep_id = "report_1"
+                page_num = idx + 1
+                if grouping_spec and str(idx) in grouping_spec:
+                    rep_id = grouping_spec[str(idx)].get("report_id", rep_id)
+                    page_num = grouping_spec[str(idx)].get("page_number", page_num)
 
-            stored_name = f"{patient_session_id}_{rep_id}_p{page_num}_{uuid.uuid4().hex[:6]}{ext}"
-            file_path = temp_dir / stored_name
+                stored_name = f"{patient_session_id}_{rep_id}_p{page_num}_{uuid.uuid4().hex[:6]}{ext}"
+                file_path = temp_dir / stored_name
 
-            with open(file_path, "wb") as f_out:
-                f_out.write(content)
+                with open(file_path, "wb") as f_out:
+                    f_out.write(content)
 
-            saved_metas.append(
-                SavedImageMeta(
-                    file_path=file_path,
-                    original_filename=file.filename or sanitized_name,
-                    stored_filename=stored_name,
-                    report_id=rep_id,
-                    page_number=page_num,
+                saved_metas.append(
+                    SavedImageMeta(
+                        file_path=file_path,
+                        original_filename=file.filename or sanitized_name,
+                        stored_filename=stored_name,
+                        report_id=rep_id,
+                        page_number=page_num,
+                    )
                 )
-            )
 
-        return temp_dir, saved_metas
+            return temp_dir, saved_metas
+        except Exception as err:
+            # Immediate purge if read or write fails midway
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            logger.error("Aborted ephemeral write; cleaned temp_dir: %s", err)
+            raise
 
     def group_images_by_report(
         self, metas: List[SavedImageMeta]
@@ -165,8 +194,14 @@ class ReportPipelineService:
                     value_verification=verifications,
                 )
 
-                # D. Save Report JSON
-                report_file_path = self.reports_dir / f"{patient_session_id}_{rep_id}.json"
+                # D. Save Report JSON with strict path containment check
+                clean_session_id = re.sub(r"[^a-zA-Z0-9_-]", "", patient_session_id)[:64] or f"session_{uuid.uuid4().hex[:10]}"
+                clean_rep_id = re.sub(r"[^a-zA-Z0-9_-]", "", rep_id)[:32] or "report_1"
+
+                report_file_path = (self.reports_dir / f"{clean_session_id}_{clean_rep_id}.json").resolve()
+                if not str(report_file_path).startswith(str(self.reports_dir.resolve())):
+                    raise ValueError("Security Violation: Path traversal attempt in report_file_path")
+
                 with open(report_file_path, "w", encoding="utf-8") as f_rep:
                     json.dump(individual_output.model_dump(), f_rep, indent=2, ensure_ascii=False)
 
@@ -187,13 +222,16 @@ class ReportPipelineService:
             )
 
             patient_session_output = PatientSessionOutput(
-                patient_session_id=patient_session_id,
+                patient_session_id=clean_session_id,
                 overall_summary=overall_history,
                 reports=report_references,
                 uncertain_information=[],
             )
 
-            session_file_path = self.results_dir / f"session_{patient_session_id}.json"
+            session_file_path = (self.results_dir / f"session_{clean_session_id}.json").resolve()
+            if not str(session_file_path).startswith(str(self.results_dir.resolve())):
+                raise ValueError("Security Violation: Path traversal attempt in session_file_path")
+
             with open(session_file_path, "w", encoding="utf-8") as f_sess:
                 json.dump(patient_session_output.model_dump(), f_sess, indent=2, ensure_ascii=False)
 

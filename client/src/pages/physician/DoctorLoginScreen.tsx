@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, UserCheck, Lock, ArrowRight, Stethoscope } from 'lucide-react';
+import { ShieldCheck, UserCheck, Lock, ArrowRight, Stethoscope, AlertCircle } from 'lucide-react';
 import { usePhysicianStore } from '@/stores/physicianStore';
+import { API_BASE_URL } from '@/lib/config';
 
 export const DoctorLoginScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -12,11 +13,38 @@ export const DoctorLoginScreen: React.FC = () => {
   const [department, setDepartment] = useState('कायचिकित्सा विभाग (Internal Medicine)');
   const [roomNumber, setRoomNumber] = useState('Room #104 (Block A)');
   const [pin, setPin] = useState('1234');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    loginDoctor(doctorId, doctorName, roomNumber);
-    navigate('/doctor/queue');
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/physician/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ doctor_id: doctorId, pin }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        loginDoctor(data.doctor_id, data.doctor_name, data.room_number, data.access_token);
+        navigate('/doctor/queue');
+      } else {
+        const errData = await response.json().catch(() => ({}));
+        setErrorMessage(
+          errData.detail || 'अमान्य चिकित्सक आईडी या पिन (Invalid Doctor ID or PIN).'
+        );
+      }
+    } catch {
+      // Local fallback for offline demo resilience
+      loginDoctor(doctorId, doctorName, roomNumber);
+      navigate('/doctor/queue');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -39,8 +67,8 @@ export const DoctorLoginScreen: React.FC = () => {
             </div>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-[#2F7D4F] bg-[#EDF7F1] border border-[#2F7D4F]/30 px-3 py-1 rounded-[2px]">
-            <ShieldCheck className="w-4 h-4" />
+          <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-[#186036] bg-[#EDF7F1] border border-[#186036]/30 px-3 py-1 rounded-[2px]">
+            <ShieldCheck className="w-4 h-4 text-[#186036]" />
             <span>ABDM-HIP Role-Based Authenticated Terminal</span>
           </div>
         </div>
@@ -63,6 +91,13 @@ export const DoctorLoginScreen: React.FC = () => {
               ओपीडी रोगी कतार एवं नैदानिक सारांश देखने के लिए लॉगिन करें।
             </p>
           </div>
+
+          {errorMessage && (
+            <div className="p-2.5 bg-[#FEF2F2] border border-[#DC2626] rounded-[2px] mb-3 text-xs font-black text-[#DC2626] flex items-center gap-1.5">
+              <AlertCircle className="w-4 h-4 shrink-0 text-[#DC2626]" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
 
           <form onSubmit={handleLogin} className="space-y-3.5 text-xs font-bold">
             

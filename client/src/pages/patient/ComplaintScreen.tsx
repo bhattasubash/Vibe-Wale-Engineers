@@ -91,10 +91,52 @@ export const ComplaintScreen: React.FC = () => {
 
   const checkRedFlags = (text: string) => {
     const lower = text.toLowerCase();
-    const criticalTerms = ['सीने में दर्द', 'chest pain', 'सांस फूलना', 'खून', 'blood', 'बेहोशी', 'stroke', 'हार्ट', 'heart'];
-    const match = criticalTerms.some((term) => lower.includes(term));
-    if (match) {
-      setRedFlag(true, 'Critical Emergency Symptom Detected in Chief Complaint');
+    const criticalTerms = [
+      'सीने में दर्द',
+      'chest pain',
+      'सीने में भारीपन',
+      'सांस फूलना',
+      'shortness of breath',
+      'खून',
+      'blood',
+      'बेहोशी',
+      'stroke',
+      'हार्ट',
+      'heart pain',
+      'लकवा',
+    ];
+
+    const negationWords = [
+      'no',
+      'not',
+      'never',
+      'denies',
+      'denied',
+      'without',
+      'नहीं',
+      'ना',
+      'बिना',
+      'कोई नहीं',
+    ];
+
+    const matchedTerm = criticalTerms.find((term) => {
+      const idx = lower.indexOf(term);
+      if (idx === -1) return false;
+
+      // Extract surrounding window
+      const start = Math.max(0, idx - 30);
+      const end = Math.min(lower.length, idx + term.length + 20);
+      const preWords = lower.slice(start, idx).trim().split(/\s+/);
+      const postWords = lower.slice(idx + term.length, end).trim().split(/\s+/);
+
+      const isNegatedPre = preWords.slice(-3).some((w) => negationWords.includes(w));
+      const isNegatedPost = postWords.slice(0, 3).some((w) => negationWords.includes(w));
+
+      return !isNegatedPre && !isNegatedPost;
+    });
+
+    if (matchedTerm) {
+      setRedFlag(true, `Emergency symptom detected: ${matchedTerm}`);
       setShowRedFlagModal(true);
     }
   };

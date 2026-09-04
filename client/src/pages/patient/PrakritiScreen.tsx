@@ -130,11 +130,11 @@ export const PrakritiScreen: React.FC = () => {
               className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[3px] border text-[11px] font-bold uppercase tracking-wider"
               style={{
                 backgroundColor: '#EDF7F1',
-                borderColor: 'rgba(47, 125, 79, 0.4)',
-                color: '#2F7D4F',
+                borderColor: 'rgba(24, 96, 54, 0.4)',
+                color: '#186036',
               }}
             >
-              <Scale className="w-3.5 h-3.5 text-[#2F7D4F]" />
+              <Scale className="w-3.5 h-3.5 text-[#186036]" />
               <span>चरक संहिता प्रकृति परीक्षण • प्रश्न {currentIndex + 1} / 15</span>
             </div>
 

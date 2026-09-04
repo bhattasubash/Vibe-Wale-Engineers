@@ -1,8 +1,18 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Dict, Any
 from datetime import datetime
 
-from app.models.schemas import DoctorQueueItem, DoctorReviewRequest
+from app.models.schemas import (
+    DoctorQueueItem,
+    DoctorReviewRequest,
+    DoctorLoginRequest,
+    DoctorLoginResponse,
+)
+from app.services.auth import (
+    authenticate_physician,
+    create_access_token,
+    require_physician_auth,
+)
 
 router = APIRouter(prefix="/api/physician", tags=["Physician Dashboard"])
 
@@ -56,11 +66,43 @@ QUEUE_DB: List[Dict[str, Any]] = [
 ]
 
 
-@router.get("/queue", response_model=List[DoctorQueueItem])
-async def get_doctor_queue(doctor_id: str = "DOC-AIIA-104"):
+@router.post("/login", response_model=DoctorLoginResponse, status_code=status.HTTP_200_OK)
+async def login_physician(payload: DoctorLoginRequest):
     """
-    Returns prioritized patient queue for the doctor's workstation.
-    Critical Red-Flag emergency cases are automatically sorted to the top.
+    Authenticates a hospital physician via Doctor ID and secure PIN.
+    Returns a signed HMAC-SHA256 JWT access token with physician role.
+    """
+    doctor = authenticate_physician(payload.doctor_id, payload.pin)
+    if not doctor:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Doctor ID or Security PIN.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = create_access_token({
+        "sub": doctor["doctor_id"],
+        "name": doctor["doctor_name"],
+        "role": doctor["role"],
+        "dept": doctor["department"],
+    })
+
+    return DoctorLoginResponse(
+        access_token=token,
+        token_type="bearer",
+        doctor_id=doctor["doctor_id"],
+        doctor_name=doctor["doctor_name"],
+        department=doctor["department"],
+        room_number=doctor["room_number"],
+        role=doctor["role"],
+    )
+
+
+@router.get("/queue", response_model=List[DoctorQueueItem])
+async def get_doctor_queue(current_physician: Dict[str, Any] = Depends(require_physician_auth)):
+    """
+    Returns prioritized patient queue for the authenticated doctor's workstation.
+    Guarded by JWT Bearer authentication.
     """
     sorted_queue = sorted(
         QUEUE_DB,
@@ -70,20 +112,25 @@ async def get_doctor_queue(doctor_id: str = "DOC-AIIA-104"):
 
 
 @router.patch("/session/{session_id}/review", status_code=status.HTTP_200_OK)
-async def review_patient_session(session_id: str, payload: DoctorReviewRequest):
+async def review_patient_session(
+    session_id: str,
+    payload: DoctorReviewRequest,
+    current_physician: Dict[str, Any] = Depends(require_physician_auth),
+):
     """
     Doctor marks session as accepted, amended, or rejected with prescription notes.
+    Protected: guarantees only authenticated physicians can modify clinical case status.
     """
     for item in QUEUE_DB:
         if item["session_id"] == session_id:
             item["status"] = payload.status
-            item["reviewed_by"] = payload.doctor_id
+            item["reviewed_by"] = current_physician.get("sub", payload.doctor_id)
             item["reviewed_at"] = datetime.now().isoformat()
             item["doctor_notes"] = payload.doctor_notes
             return {
                 "session_id": session_id,
                 "review_status": payload.status,
-                "message": f"Session marked as {payload.status} by {payload.doctor_id}",
+                "message": f"Session marked as {payload.status} by {current_physician.get('sub')}",
             }
 
     raise HTTPException(
@@ -93,9 +140,10 @@ async def review_patient_session(session_id: str, payload: DoctorReviewRequest):
 
 
 @router.get("/stats")
-async def get_dashboard_stats():
+async def get_dashboard_stats(current_physician: Dict[str, Any] = Depends(require_physician_auth)):
     """
     Returns live OPD statistics for physician dashboard header.
+    Protected: requires valid physician session token.
     """
     total = len(QUEUE_DB)
     red_flags = sum(1 for item in QUEUE_DB if item["red_flag_triggered"])

@@ -39,6 +39,8 @@ jobs:
           node node_modules/esbuild/install.js
 
       - name: Build Vite Client Application
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || secrets.VITE_API_BASE_URL || '' }}
         run: |
           cd client
           node node_modules/vite/bin/vite.js build

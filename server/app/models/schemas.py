@@ -222,3 +222,19 @@ class ProcessReportsResponse(BaseModel):
     reports_processed: int
     result_file: Optional[str] = None
     message: str
+
+
+# --- PHYSICIAN AUTH SCHEMAS ---
+class DoctorLoginRequest(BaseModel):
+    doctor_id: str = Field(..., min_length=3, max_length=50)
+    pin: str = Field(..., min_length=4, max_length=20)
+
+
+class DoctorLoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    doctor_id: str
+    doctor_name: str
+    department: str
+    room_number: str
+    role: str

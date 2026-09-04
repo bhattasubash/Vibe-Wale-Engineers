@@ -34,7 +34,6 @@ export const IdentifyScreen: React.FC = () => {
       phone: '9876543210',
       abhaId: '91-4523-8901-2345',
       abhaAddress: 'rameshwar.sharma@abdm',
-      aadhaarLastFour: '8912',
       isReturning: true,
       lastVisitDate: '14 अगस्त 2026 (OPD #104)',
     });

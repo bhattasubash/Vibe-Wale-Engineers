@@ -66,6 +66,7 @@ export interface DoctorQueuePatient {
 
 interface PhysicianState {
   isAuthenticated: boolean;
+  authToken: string | null;
   doctorId: string;
   doctorName: string;
   department: string;
@@ -76,7 +77,7 @@ interface PhysicianState {
   searchQuery: string;
 
   // Actions
-  loginDoctor: (doctorId: string, doctorName: string, room: string) => void;
+  loginDoctor: (doctorId: string, doctorName: string, room: string, token?: string) => void;
   logoutDoctor: () => void;
   setActivePatient: (sessionId: string) => void;
   setFilterPriority: (priority: 'all' | 'critical' | 'normal') => void;
@@ -412,6 +413,7 @@ export const usePhysicianStore = create<PhysicianState>((set, get) => {
 
   return {
     isAuthenticated: true,
+    authToken: null,
     doctorId: 'DOC-AIIA-104',
     doctorName: 'डॉ. अनन्या शर्मा (Dr. Ananya Sharma)',
     department: 'कायचिकित्सा विभाग (Internal Medicine)',
@@ -421,10 +423,16 @@ export const usePhysicianStore = create<PhysicianState>((set, get) => {
     filterPriority: 'all',
     searchQuery: '',
 
-    loginDoctor: (doctorId, doctorName, room) =>
-      set({ isAuthenticated: true, doctorId, doctorName, roomNumber: room }),
+    loginDoctor: (doctorId, doctorName, room, token) =>
+      set({
+        isAuthenticated: true,
+        authToken: token || null,
+        doctorId,
+        doctorName,
+        roomNumber: room,
+      }),
 
-    logoutDoctor: () => set({ isAuthenticated: false }),
+    logoutDoctor: () => set({ isAuthenticated: false, authToken: null }),
 
     setActivePatient: (sessionId) => {
       const patient = get().queue.find((p) => p.sessionId === sessionId) || null;

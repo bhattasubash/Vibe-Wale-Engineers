@@ -10,9 +10,9 @@ export const ConsentScreen: React.FC = () => {
   const [showDeclineModal, setShowDeclineModal] = useState(false);
 
   const promptHindi =
-    'डिजिटल व्यक्तिगत डेटा संरक्षण अधिनियम 2023। हम आपसे आपके स्वास्थ्य और प्रकृति के बारे में प्रश्न पूछेंगे। यह जानकारी केवल आपके डॉक्टर को दी जाएगी। यदि आप सहमत हैं, तो नीचे दिए गए नीले बटन को दबाएं।';
+    'नमस्ते। हम आपसे आपके स्वास्थ्य के बारे में कुछ सरल प्रश्न पूछेंगे। यह जानकारी केवल आपके डॉक्टर को दी जाएगी। आगे बढ़ने के लिए "सहमत हैं" बटन दबाएं।';
   const promptEnglish =
-    'Digital Personal Data Protection Act 2023 Consent. We will collect symptoms and Prakriti details for your treating doctor. Tap Agree to continue.';
+    'Welcome. We will ask simple questions about your health for your treating physician. Please tap I Agree to proceed.';
 
   const handleAgree = () => {
     setConsentGranted(true);
@@ -54,59 +54,68 @@ export const ConsentScreen: React.FC = () => {
             style={{ color: '#0B5FA5' }}
           >
             {language === 'hi'
-              ? 'स्वास्थ्य विवरण एवं प्रकृति परीक्षण सहमति'
-              : 'Patient Intake & DPDP Consent Notice'}
+              ? 'स्वास्थ्य विवरण एवं परीक्षण सहमति'
+              : 'Patient Care & DPDP Consent'}
           </h1>
           <p className="text-xs sm:text-sm text-[#495057] font-semibold">
             {language === 'hi'
-              ? `रोगी: ${patient.fullName || 'नागरिक'} • डॉक्टर परामर्श पूर्व विवरण संग्रह`
-              : `Patient: ${patient.fullName || 'Citizen'} • Pre-consultation case intake`}
+              ? `रोगी: ${patient.fullName || 'नागरिक'} • डॉक्टर परामर्श पूर्व विवरण`
+              : `Patient: ${patient.fullName || 'Citizen'} • Pre-consultation intake`}
           </p>
         </div>
 
         {/* Spacious 3-Point DPDP Card */}
-        <div className="w-full bg-white border border-[#CED4DA] rounded-[3px] p-4 sm:p-5 space-y-3 text-xs sm:text-sm text-[#212529] shrink-0">
+        <div className="w-full bg-white border border-[#CED4DA] rounded-[3px] p-5 space-y-3.5 text-sm sm:text-base text-[#212529] shrink-0 shadow-xs">
           
           <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-[#E8F1F8] text-[#0B5FA5] flex items-center justify-center font-black shrink-0 text-xs">
+            <div className="w-6 h-6 rounded-full bg-[#E8F1F8] text-[#0B5FA5] flex items-center justify-center font-black shrink-0 text-xs mt-0.5">
               1
             </div>
-            <p className="font-semibold leading-relaxed">
-              {language === 'hi'
-                ? 'हम आपसे आपके मुख्य स्वास्थ्य लक्षण (Chief Complaints), बीमारी का इतिहास और 15 शारीरिक प्रकृति प्रश्न पूछेंगे।'
-                : 'We will record your health symptoms, medical history, and 15 classical Ayurvedic constitution traits.'}
+            <p className="font-medium leading-normal">
+              {language === 'hi' ? (
+                <>
+                  <strong className="text-[#0B5FA5]">लक्षण एवं स्वास्थ्य विवरण:</strong> हम आपकी बीमारी, पुराने पर्चे और प्रकृति के संबंध में प्रश्न पूछेंगे।
+                </>
+              ) : (
+                <>
+                  <strong className="text-[#0B5FA5]">Symptoms & History:</strong> We will ask simple questions about your symptoms, prior prescriptions, and body constitution.
+                </>
+              )}
             </p>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-[#E8F1F8] text-[#0B5FA5] flex items-center justify-center font-black shrink-0 text-xs">
+            <div className="w-6 h-6 rounded-full bg-[#E8F1F8] text-[#0B5FA5] flex items-center justify-center font-black shrink-0 text-xs mt-0.5">
               2
             </div>
-            <p className="font-semibold leading-relaxed">
-              {language === 'hi'
-                ? 'यह विवरण 100% सुरक्षित एवं गोपनीय है और केवल आपके परामर्श कक्ष के अधिकृत BAMS डॉक्टर के कंप्यूटर पर पहुंचेगा।'
-                : 'All information is strictly confidential and transmitted directly to your assigned BAMS physician’s EMR.'}
+            <p className="font-medium leading-normal">
+              {language === 'hi' ? (
+                <>
+                  <strong className="text-[#0B5FA5]">सीधा डॉक्टर को:</strong> यह विवरण 100% गोपनीय है और केवल आपके अधिकृत चिकित्सक के ईएमआर पोर्टल पर पहुंचेगा।
+                </>
+              ) : (
+                <>
+                  <strong className="text-[#0B5FA5]">Direct to Physician:</strong> All information is confidential and transmitted exclusively to your treating physician’s workstation.
+                </>
+              )}
             </p>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-[#E8F1F8] text-[#0B5FA5] flex items-center justify-center font-black shrink-0 text-xs">
+            <div className="w-6 h-6 rounded-full bg-[#E8F1F8] text-[#0B5FA5] flex items-center justify-center font-black shrink-0 text-xs mt-0.5">
               3
             </div>
-            <p className="font-semibold leading-relaxed">
-              {language === 'hi'
-                ? 'पर्ची जारी होते ही कियोस्क टर्मिनल से आपका अस्थायी विवरण स्वतः मिटा दिया जाएगा।'
-                : 'Your ephemeral session data is automatically purged from this terminal upon token generation.'}
+            <p className="font-medium leading-normal">
+              {language === 'hi' ? (
+                <>
+                  <strong className="text-[#0B5FA5]">पूर्ण गोपनीयता:</strong> टोकन पर्ची जारी होते ही इस कियोस्क टर्मिनल से आपका डेटा स्वतः मिटा दिया जाएगा।
+                </>
+              ) : (
+                <>
+                  <strong className="text-[#0B5FA5]">Ephemeral Privacy:</strong> Your temporary session data is automatically purged from this kiosk upon token issuance.
+                </>
+              )}
             </p>
-          </div>
-
-          <div className="p-2.5 bg-[#FFF4EB] border border-[#E07B1A]/40 rounded-[2px] flex items-center gap-2 text-xs font-bold text-[#E07B1A]">
-            <Mic className="w-4 h-4 shrink-0" />
-            <span>
-              {language === 'hi'
-                ? 'आवाज़ निर्देश: बोलते समय अपनी चुनी हुई भाषा में स्पष्ट रूप से बोलें।'
-                : 'Voice Note: Please speak clearly in your selected language for accurate transcription.'}
-            </span>
           </div>
 
         </div>

@@ -73,9 +73,10 @@ async def validate_and_read_image(file: UploadFile) -> Tuple[bytes, str]:
         with Image.open(image_stream) as img:
             img.verify()
     except Exception as exc:
+        logger.warning("Unreadable image upload '%s': %s", filename, exc)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Corrupted or unreadable image file '{filename}': {str(exc)}",
+            detail=f"Corrupted or unsupported image file '{filename}'. Please upload a valid JPEG, PNG, or WebP photo.",
         )
 
     return content, filename

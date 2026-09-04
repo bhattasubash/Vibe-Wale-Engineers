@@ -1,11 +1,14 @@
 from fastapi import APIRouter, HTTPException, status
 from typing import Dict, Any
+import hashlib
 import uuid
 from datetime import datetime
 
 from app.models.schemas import PatientCreate, PatientResponse
 
 router = APIRouter(prefix="/api/patients", tags=["Patients"])
+
+AADHAAR_SALT = "aiia_aadhaar_salt_2026_"
 
 # In-Memory Store / Redis Bridge for demo and kiosk operation
 PATIENT_DB: Dict[str, Dict[str, Any]] = {
@@ -17,7 +20,7 @@ PATIENT_DB: Dict[str, Dict[str, Any]] = {
         "phone": "9876543210",
         "abha_id": "91-4523-8901-2345",
         "abha_address": "rameshwar.sharma@abdm",
-        "aadhaar_last_four": "8912",
+        "aadhaar_last_four": hashlib.sha256((AADHAAR_SALT + "8912").encode()).hexdigest()[:12],
         "created_at": datetime.now(),
         "is_returning": True,
         "last_visit_date": "14 अगस्त 2026 (OPD #104)",
@@ -29,8 +32,15 @@ PATIENT_DB: Dict[str, Dict[str, Any]] = {
 async def register_patient(payload: PatientCreate):
     """
     Registers a new patient walk-in intake.
+    Hashes and salts any Aadhaar fragment to prevent plaintext storage (DPDP Act compliance).
     """
     patient_id = f"pat-{uuid.uuid4().hex[:8]}"
+    aadhaar_token = (
+        hashlib.sha256((AADHAAR_SALT + payload.aadhaar_last_four).encode()).hexdigest()[:12]
+        if payload.aadhaar_last_four
+        else None
+    )
+
     record = {
         "id": patient_id,
         "full_name": payload.full_name,
@@ -39,7 +49,7 @@ async def register_patient(payload: PatientCreate):
         "phone": payload.phone,
         "abha_id": payload.abha_id,
         "abha_address": payload.abha_address,
-        "aadhaar_last_four": payload.aadhaar_last_four,
+        "aadhaar_last_four": aadhaar_token,
         "created_at": datetime.now(),
         "is_returning": False,
         "last_visit_date": None,

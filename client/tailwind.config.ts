@@ -14,7 +14,7 @@ const config: Config = {
           blueLight: '#E8F1F8',    // Soft Blue Tint
           saffron: '#E07B1A',      // National Tricolor Accent (Used sparingly)
           saffronLight: '#FFF4EB',
-          ayushGreen: '#2F7D4F',   // AYUSH / Ayurveda Muted Green (Exclusively for Prakriti)
+          ayushGreen: '#186036',   // AYUSH Muted Dark Green (WCAG AA & AAA >6.3:1 contrast)
           ayushGreenLight: '#EDF7F1',
           canvas: '#EAEDF0',       // Neutral Pale Grey Canvas
           surface: '#FFFFFF',      // Pure White Surface

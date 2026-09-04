@@ -35,7 +35,6 @@ export interface PatientInfo {
   phone?: string;
   abhaId?: string;
   abhaAddress?: string;
-  aadhaarLastFour?: string;
   isReturning?: boolean;
   lastVisitDate?: string;
 }
@@ -137,7 +136,6 @@ const initialPatientState: PatientInfo = {
   phone: '',
   abhaId: '',
   abhaAddress: '',
-  aadhaarLastFour: '',
   isReturning: false,
 };
 

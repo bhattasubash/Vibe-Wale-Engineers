@@ -103,9 +103,43 @@ class RedFlagEvaluation(BaseModel):
     matched_keyword: Optional[str] = None
 
 
+NEGATION_PATTERNS_EN = [
+    "no", "not", "denies", "denied", "without", "never", "negative for", "ruled out", "free of"
+]
+NEGATION_PATTERNS_HI = ["नहीं", "ना", "बिना", "मुक्त"]
+
+
+def is_negated(text: str, keyword: str) -> bool:
+    """
+    Checks if a matched emergency keyword is negated in Hindi or English context.
+    Prevents false alarms on statements like 'no chest pain' or 'सीने में दर्द नहीं है'.
+    """
+    idx = text.find(keyword)
+    if idx == -1:
+        return False
+
+    start = max(0, idx - 35)
+    end = min(len(text), idx + len(keyword) + 25)
+
+    pre_words = text[start:idx].strip().split()
+    post_words = text[idx + len(keyword):end].strip().split()
+
+    # English negation (e.g. 'no chest pain', 'denies shortness of breath')
+    if any(neg in pre_words[-3:] for neg in NEGATION_PATTERNS_EN):
+        return True
+
+    # Hindi negation (e.g. 'सीने में दर्द नहीं है', 'खून नहीं आ रहा')
+    if any(neg in post_words[:3] for neg in NEGATION_PATTERNS_HI):
+        return True
+    if any(neg in pre_words[-3:] for neg in NEGATION_PATTERNS_HI):
+        return True
+
+    return False
+
+
 def evaluate_red_flags(text: str) -> RedFlagEvaluation:
     """
-    Scans patient input string against critical emergency rules.
+    Scans patient input string against critical emergency rules with clinical negation filtering.
     """
     if not text or not text.strip():
         return RedFlagEvaluation(triggered=False)
@@ -115,6 +149,10 @@ def evaluate_red_flags(text: str) -> RedFlagEvaluation:
     for rule in RED_FLAG_RULES:
         for keyword in rule.trigger_keywords:
             if keyword in text_lower:
+                # If negated by patient, do not trigger false emergency
+                if is_negated(text_lower, keyword):
+                    continue
+
                 return RedFlagEvaluation(
                     triggered=True,
                     severity=rule.severity,
