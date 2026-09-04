@@ -25,13 +25,14 @@ app = FastAPI(
 # CORS configuration: strict explicit origins from env var (disallows wildcard with credentials)
 cors_env = os.getenv(
     "CORS_ORIGINS",
-    "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,https://bhattasubash.github.io"
+    "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,https://bhattasubash.github.io,https://vibe-wale-engineers.vercel.app"
 )
 allowed_origins = [origin.strip() for origin in cors_env.split(",") if origin.strip()]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Session-ID", "Accept"],
