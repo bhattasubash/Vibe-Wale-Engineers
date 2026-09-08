@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, ArrowLeft, Check, ChevronRight } from 'lucide-react';
+import { Globe, ArrowLeft, ArrowRight, Check, ChevronRight } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
+import { speechEngine } from '@/lib/speech';
 import { useSessionStore, LanguageCode } from '@/stores/sessionStore';
 
 interface LanguageOption {
@@ -41,36 +42,45 @@ const OTHER_18_LANGUAGES: LanguageOption[] = [
 
 export const LanguageScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { setLanguage } = useSessionStore();
-  const [selectedLang, setSelectedLang] = useState<LanguageCode | null>(null);
+  const { language, setLanguage } = useSessionStore();
+  const [selectedLang, setSelectedLang] = useState<LanguageCode>(language || 'hi');
   const [showAllLanguages, setShowAllLanguages] = useState(false);
 
   const handleSelectLanguage = (langCode: LanguageCode) => {
     setSelectedLang(langCode);
     setLanguage(langCode);
     
-    // Immediate acoustic confirmation in chosen language
-    if (langCode === 'hi') {
-      speechEngine.speak('आपने हिन्दी चुनी है।', 'hi');
-    } else if (langCode === 'en') {
-      speechEngine.speak('You have selected English.', 'en');
-    } else if (langCode === 'pa') {
-      speechEngine.speak('ਤੁਸੀਂ ਪੰਜਾਬੀ ਚੁਣੀ ਹੈ।', 'pa');
+    // Safe acoustic confirmation in chosen language
+    try {
+      if (langCode === 'hi') {
+        speechEngine.speak('आपने हिन्दी चुनी है। आगे बढ़ें पर स्पर्श करें।', 'hi');
+      } else if (langCode === 'en') {
+        speechEngine.speak('You have selected English. Tap Proceed to continue.', 'en');
+      } else if (langCode === 'pa') {
+        speechEngine.speak('ਤੁਸੀਂ ਪੰਜਾਬੀ ਚੁਣੀ ਹੈ। ਅੱਗੇ ਵਧੋ ਤੇ ਕਲਿੱਕ ਕਰੋ।', 'pa');
+      } else if (langCode === 'ur') {
+        speechEngine.speak('آپ نے اردو منتخب کی ہے۔ آگے بڑھیں پر کلک کریں۔', 'ur');
+      }
+    } catch (err) {
+      console.warn('Speech confirmation error:', err);
     }
+  };
 
-    setTimeout(() => {
-      navigate('/kiosk/identify');
-    }, 450);
+  const handleProceed = () => {
+    if (selectedLang) {
+      setLanguage(selectedLang);
+    }
+    navigate('/kiosk/identify');
   };
 
   const promptHindi = 'कृपया अपनी पसंदीदा भाषा चुनें। स्क्रीन पर दी गई किसी भी भाषा पर स्पर्श करें।';
   const promptEnglish = 'Please choose your preferred language for consultation.';
 
   return (
-    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-hidden">
+    <div className="flex flex-col min-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-y-auto">
       
-      {/* Non-Scrollable Centered Main Container */}
-      <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-2 flex-1 flex flex-col justify-evenly items-center">
+      {/* Centered Main Container */}
+      <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-4 flex-1 flex flex-col justify-center items-center gap-3 sm:gap-4">
         
         {/* Top Prompter */}
         <div className="shrink-0">
@@ -213,6 +223,26 @@ export const LanguageScreen: React.FC = () => {
             </button>
           </div>
         )}
+
+        {/* Primary CTA Proceed Button */}
+        <div className="w-full max-w-md shrink-0">
+          <button
+            type="button"
+            onClick={handleProceed}
+            className="w-full py-3.5 px-6 rounded-[3px] border border-[#114526] bg-[#186036] hover:bg-[#14522d] text-white text-sm sm:text-base font-black flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98] shadow-xs"
+          >
+            <span>
+              {selectedLang === 'en'
+                ? 'आगे बढ़ें • Proceed to Identification'
+                : selectedLang === 'pa'
+                ? 'ਅੱਗੇ ਵਧੋ • Proceed'
+                : selectedLang === 'ur'
+                ? 'آگے بڑھیں • Proceed'
+                : 'आगे बढ़ें • Proceed'}
+            </span>
+            <ArrowRight className="w-5 h-5 text-white" />
+          </button>
+        </div>
 
         {/* Back Button */}
         <div className="shrink-0">
