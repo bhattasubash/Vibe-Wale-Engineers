@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Activity, Check, Volume2 } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
+import { VoiceAnswerButton } from '@/components/ui/VoiceAnswerButton';
 import { useSessionStore } from '@/stores/sessionStore';
 import { speechEngine } from '@/lib/speech';
 
@@ -110,6 +111,41 @@ export const SocratesScreen: React.FC = () => {
     setSocratesResponse(question.key as any, optValue);
   };
 
+  const handleVoiceAnswer = (transcript: string) => {
+    const lower = transcript.toLowerCase();
+    const currentQ = questionsList[currentTurn];
+    if (!currentQ) return;
+
+    let matchedVal: string | null = null;
+    currentQ.options.forEach((opt, idx) => {
+      const optHindi = opt.hindi.toLowerCase();
+      const optEng = opt.english.toLowerCase();
+      if (
+        lower.includes(optHindi) ||
+        lower.includes(optEng) ||
+        (idx === 0 && (lower.includes('पहला') || lower.includes('first') || lower.includes('1') || lower.includes('one'))) ||
+        (idx === 1 && (lower.includes('दूसरा') || lower.includes('second') || lower.includes('2') || lower.includes('two'))) ||
+        (idx === 2 && (lower.includes('तीसरा') || lower.includes('third') || lower.includes('3') || lower.includes('three'))) ||
+        (idx === 3 && (lower.includes('चौथा') || lower.includes('fourth') || lower.includes('4') || lower.includes('four')))
+      ) {
+        matchedVal = opt.value;
+      }
+    });
+
+    if (matchedVal) {
+      handleSelectOption(matchedVal);
+    } else {
+      for (const opt of currentQ.options) {
+        const words = (opt.hindi + ' ' + opt.english).toLowerCase().split(/\s+/);
+        if (words.some((w) => w.length > 3 && lower.includes(w))) {
+          handleSelectOption(opt.value);
+          return;
+        }
+      }
+      if (currentQ.options[0]) handleSelectOption(currentQ.options[0].value);
+    }
+  };
+
   const handleSpeakOption = (e: React.MouseEvent, text: string) => {
     e.stopPropagation();
     speechEngine.stop();
@@ -198,12 +234,19 @@ export const SocratesScreen: React.FC = () => {
             लक्षण विस्तृत विश्लेषण (Adaptive Clinical Exploration)
           </div>
 
-          <h2
-            className="text-lg sm:text-2xl font-black mb-3 leading-tight"
-            style={{ color: '#0B5FA5' }}
-          >
-            {language === 'hi' ? question.titleHindi : question.titleEnglish}
-          </h2>
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <h2
+              className="text-lg sm:text-2xl font-black leading-tight flex-1"
+              style={{ color: '#0B5FA5' }}
+            >
+              {language === 'hi' ? question.titleHindi : question.titleEnglish}
+            </h2>
+            <VoiceAnswerButton
+              language={language}
+              onTranscript={handleVoiceAnswer}
+              size="sm"
+            />
+          </div>
 
           {/* 4 SPACIOUS TOUCH OPTIONS WITH PER-OPTION AUDIO SPEAKER BUTTONS */}
           <div className="space-y-2">

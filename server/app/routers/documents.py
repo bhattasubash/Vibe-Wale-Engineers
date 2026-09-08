@@ -6,6 +6,7 @@ FastAPI BackgroundTasks for sub-100ms response, and DPDP ephemeral storage.
 
 import json
 import logging
+import os
 import uuid
 import re
 from typing import List, Optional
@@ -227,3 +228,157 @@ async def upload_session_document(
     Uploads prescriptions directly linked to an active patient intake session.
     """
     return await process_reports(files=files, session_id=session_id, background_tasks=background_tasks)
+
+
+from pydantic import BaseModel, Field
+from datetime import datetime, timezone
+
+
+class VoiceHistoryRequest(BaseModel):
+    spoken_text: str = Field(..., min_length=2, description="Patient's spoken narration of past medical history")
+    language: Optional[str] = "hi"
+
+
+@router.post(
+    "/{session_id}/voice-history",
+    status_code=status.HTTP_200_OK,
+    summary="Record and structure spoken medical history for patients without physical documents"
+)
+async def record_voice_history(session_id: str, payload: VoiceHistoryRequest):
+    """
+    Processes spoken clinical history for patients who do not possess physical papers.
+    Uses Gemini 3.5 Flash to extract medications, past surgeries, chronic conditions, and allergies,
+    and structures them into the exact same EMR timeline as scanned documents.
+    """
+    patient_session_id = sanitize_session_identifier(session_id)
+    text = payload.spoken_text.strip()
+    lang = payload.language or "hi"
+
+    # 1. Attempt Gemini 3.5 Extraction
+    extracted_data = None
+    try:
+        from app.services.gemini_vision import gemini_vision, clean_json_markdown
+        from google.genai import types
+
+        client = gemini_vision._get_client()
+        if client:
+            system_instruction = (
+                "You are an expert hospital clinical registrar. The patient does not have physical documents "
+                "and is narrating their medical history verbally in Hindi or English. "
+                "Extract all clinical details and return a strictly valid JSON object with these keys:\n"
+                "- summary: A professional 2-3 sentence clinical overview for physician EMR\n"
+                "- diagnoses: list of strings (e.g. Type 2 Diabetes, Essential Hypertension)\n"
+                "- medications: list of objects with {drug_name, dosage, frequency, anupana}\n"
+                "- past_surgeries: list of strings with procedure and approximate year if mentioned\n"
+                "- allergies: list of strings (known drug allergies)\n"
+                "- chronic_conditions: list of strings\n"
+            )
+            config = types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                response_mime_type="application/json",
+                temperature=0.1,
+            )
+            response = client.models.generate_content(
+                model=os.getenv("LLM_MODEL", "gemini-3.5-flash"),
+                contents=[f"Patient Verbal History ({lang}):\n{text}"],
+                config=config,
+            )
+            raw = clean_json_markdown(response.text or "{}")
+            extracted_data = json.loads(raw)
+    except Exception as exc:
+        logger.warning("Gemini voice history extraction failed or offline (%s). Using rule-based extractor.", exc)
+
+    # 2. Local Fallback Extractor if Gemini is offline
+    if not extracted_data:
+        lower_t = text.lower()
+        diagnoses = []
+        medications = []
+        surgeries = []
+        allergies = []
+
+        # Common clinical keywords in Hindi / English
+        if any(w in lower_t for w in ["sugar", "शुगर", "मधुमेह", "diabetes"]):
+            diagnoses.append("Type 2 Diabetes Mellitus")
+        if any(w in lower_t for w in ["bp", "बीपी", "रक्तचाप", "hypertension", "high pressure"]):
+            diagnoses.append("Essential Hypertension")
+        if any(w in lower_t for w in ["घुटने", "joint", "जोड़ों", "गठिया", "arthritis"]):
+            diagnoses.append("Sandhivata (Osteoarthritis)")
+        if any(w in lower_t for w in ["दमा", "asthma", "सांस"]):
+            diagnoses.append("Bronchial Asthma")
+
+        if any(w in lower_t for w in ["metformin", "मेटफॉर्मिन"]):
+            medications.append({"drug_name": "Metformin", "dosage": "500mg", "frequency": "BD", "anupana": "Water"})
+        if any(w in lower_t for w in ["amlodipine", "एमलोडिपिन"]):
+            medications.append({"drug_name": "Amlodipine", "dosage": "5mg", "frequency": "OD", "anupana": "Water"})
+        if any(w in lower_t for w in ["paracetamol", "पैरासिटामोल"]):
+            medications.append({"drug_name": "Paracetamol", "dosage": "650mg", "frequency": "SOS", "anupana": "Water"})
+        if any(w in lower_t for w in ["क्वाथ", "kwath", "गूगल", "guggulu"]):
+            medications.append({"drug_name": "Maharasnadi Kwath", "dosage": "20ml", "frequency": "BD", "anupana": "Koshna Jala"})
+
+        if any(w in lower_t for w in ["operation", "सर्जरी", "ऑपरेशन", "appendix", "अपेंडिक्स", "gallbladder", "पित्त"]):
+            surgeries.append("Past Abdominal Surgery / Procedure reported")
+        if any(w in lower_t for w in ["allergy", "एलर्जी", "penicillin", "पेनिसिलिन"]):
+            allergies.append("Suspected Drug Allergy reported")
+
+        extracted_data = {
+            "summary": f"Patient self-reported history: {text}",
+            "diagnoses": diagnoses,
+            "medications": medications,
+            "past_surgeries": surgeries,
+            "allergies": allergies,
+            "chronic_conditions": diagnoses,
+        }
+
+    # 3. Create synthetic OCR/Document record
+    now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    report_id = f"VOICE-{uuid.uuid4().hex[:6].upper()}"
+
+    formatted_meds = []
+    for m in extracted_data.get("medications", []):
+        formatted_meds.append({
+            "drugName": m.get("drug_name") or m.get("drugName") or "Medication",
+            "dosage": m.get("dosage") or "As directed",
+            "frequency": m.get("frequency") or "1-0-1 (BD)",
+            "anupana": m.get("anupana") or "Warm Water",
+            "source": "Patient Spoken History",
+        })
+
+    report_record = {
+        "report_id": report_id,
+        "report_type": "Spoken Patient History (मौखिक इतिहास)",
+        "medical_specialty": "General & AYUSH Clinical History",
+        "report_date": now_iso,
+        "facility_name": "Kiosk Spoken Self-Report",
+        "summary": extracted_data.get("summary") or text,
+        "diagnoses": extracted_data.get("diagnoses", []),
+        "medications": formatted_meds,
+        "findings": [],
+        "observations": extracted_data.get("past_surgeries", []) + extracted_data.get("allergies", []),
+        "impression": "Verbal medical intake recorded on kiosk hardware.",
+        "uncertain_information": [],
+    }
+
+    # 4. Persist to DB and update queue entry
+    db.save_ocr_result(patient_session_id, report_record)
+    saved_reports = db.get_ocr_results(patient_session_id)
+    db.update_queue_ocr(patient_session_id, saved_reports)
+
+    # 5. Also record into session general_vitals if allergies/surgeries found
+    existing_vitals = db.get_vitals(patient_session_id) or {}
+    if extracted_data.get("past_surgeries"):
+        existing_vitals["pastSurgeries"] = ", ".join(extracted_data["past_surgeries"])
+    if extracted_data.get("allergies"):
+        existing_vitals["knownAllergies"] = ", ".join(extracted_data["allergies"])
+    if existing_vitals:
+        db.save_vitals(patient_session_id, existing_vitals)
+
+    logger.info("Successfully recorded voice medical history for session %s: %d meds, %d diagnoses",
+                patient_session_id, len(formatted_meds), len(extracted_data.get("diagnoses", [])))
+
+    return {
+        "status": "success",
+        "session_id": patient_session_id,
+        "report_id": report_id,
+        "extracted_data": extracted_data,
+        "message": "Spoken history successfully processed and saved to patient record."
+    }

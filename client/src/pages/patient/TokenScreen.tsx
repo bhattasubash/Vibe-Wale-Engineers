@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, Printer, ArrowRight, MapPin, User, ShieldCheck } from 'lucide-react';
+import { CheckCircle, Printer, ArrowRight, MapPin, User, ShieldCheck, FileCode, Send, Loader2, X, Copy, Check } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 import { usePhysicianStore } from '@/stores/physicianStore';
@@ -27,9 +27,52 @@ export const TokenScreen: React.FC = () => {
   const { addPatientToQueue } = usePhysicianStore();
   const [countdown, setCountdown] = useState(25);
 
+  const [showFhirModal, setShowFhirModal] = useState(false);
+  const [fhirBundle, setFhirBundle] = useState<any>(null);
+  const [loadingFhir, setLoadingFhir] = useState(false);
+  const [hisPushing, setHisPushing] = useState(false);
+  const [hisPushResult, setHisPushResult] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
+
   const isAyurveda = treatmentMode === 'ayurveda';
   const currentSessionId = sessionId || getOrCreateSessionId();
   const tokenNumber = isAyurveda ? '#AIIA-042' : '#AIIA-G108';
+
+  const handleOpenFhirModal = async () => {
+    setShowFhirModal(true);
+    setLoadingFhir(true);
+    setHisPushResult(null);
+    try {
+      const activeSessionId = sessionId || getOrCreateSessionId();
+      const res = await fetch(`${API_BASE_URL}/api/sessions/${activeSessionId}/fhir-bundle`);
+      if (res.ok) {
+        const data = await res.json();
+        setFhirBundle(data);
+      }
+    } catch (err) {
+      console.warn('Could not load FHIR bundle:', err);
+    } finally {
+      setLoadingFhir(false);
+    }
+  };
+
+  const handlePushHis = async () => {
+    setHisPushing(true);
+    try {
+      const activeSessionId = sessionId || getOrCreateSessionId();
+      const res = await fetch(`${API_BASE_URL}/api/sessions/${activeSessionId}/push-his`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHisPushResult(data);
+      }
+    } catch (err) {
+      console.warn('Could not push to HIS:', err);
+    } finally {
+      setHisPushing(false);
+    }
+  };
 
   const assignedDoctorName = isAyurveda
     ? 'डॉ. अनन्या शर्मा (Dr. Ananya Sharma)'
@@ -73,7 +116,7 @@ export const TokenScreen: React.FC = () => {
       roomNumber: assignedRoom,
       createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       treatmentMode: treatmentMode,
-      generalVitals: generalVitals,
+      generalVitals: generalVitals as any,
       socrates: {
         site: socrates.site || '',
         onset: socrates.onset || '',
@@ -249,7 +292,15 @@ export const TokenScreen: React.FC = () => {
 
           <div className="flex items-center justify-between text-[10px] text-[#6C757D]">
             <span>दिनांक: {new Date().toLocaleDateString('hi-IN')} • समय: {new Date().toLocaleTimeString()}</span>
-            <span className="font-mono text-[#0B5FA5] font-bold">ABDM-FHIR-R4-COMPLIANT</span>
+            <button
+              type="button"
+              onClick={handleOpenFhirModal}
+              className="font-mono text-[#0B5FA5] hover:text-[#084B83] font-bold underline flex items-center gap-1 cursor-pointer"
+              title="ABDM HL7 FHIR R4 Bundle Record"
+            >
+              <FileCode className="w-3.5 h-3.5 text-[#0B5FA5]" />
+              <span>ABDM-FHIR-R4 • JSON देखें / HIS PUSH</span>
+            </button>
           </div>
 
         </div>
@@ -297,6 +348,118 @@ export const TokenScreen: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* FHIR R4 & HIS PUSH MODAL */}
+      {showFhirModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border-2 border-[#0B5FA5] rounded-[3px] max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div className="p-3 bg-[#0B5FA5] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileCode className="w-4 h-4" />
+                <span className="font-bold text-xs uppercase tracking-wide">
+                  ABDM HL7 FHIR R4 Bundle Record (M2/M3 Interoperability)
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowFhirModal(false)}
+                className="p-1 hover:bg-white/20 rounded cursor-pointer"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+
+            <div className="p-4 flex-1 overflow-y-auto space-y-3">
+              <div className="p-2.5 bg-[#EDF7F1] border border-[#186036]/40 rounded-[2px] flex items-center justify-between text-xs text-[#186036]">
+                <span className="font-bold">
+                  ✓ National Health Authority (NHA) NRCeS Validated Document Bundle
+                </span>
+                <span className="font-mono font-bold text-[11px]">
+                  Profile: DocumentBundle
+                </span>
+              </div>
+
+              {hisPushResult && (
+                <div className="p-3 bg-[#F0FDF4] border border-[#15803D] rounded-[2px] text-xs">
+                  <div className="flex items-center gap-1.5 font-black text-[#15803D] mb-1">
+                    <CheckCircle className="w-4 h-4 text-[#15803D]" />
+                    <span>अस्पताल ईएमआर में सफलतापूर्वक दर्ज (Ingested into AIIA Hospital HIS)</span>
+                  </div>
+                  <div className="font-mono text-[11px] text-[#495057] space-y-0.5">
+                    <div>Transaction ID: {hisPushResult.gateway_response?.transaction_id}</div>
+                    <div>Destination: {hisPushResult.destination}</div>
+                    <div>Status: {hisPushResult.gateway_response?.http_status} Accepted (Ack: {hisPushResult.gateway_response?.ack_code})</div>
+                  </div>
+                </div>
+              )}
+
+              {loadingFhir ? (
+                <div className="p-8 text-center text-xs text-[#6C757D]">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#0B5FA5] mb-2" />
+                  <span>FHIR R4 Bundle उत्पन्न किया जा रहा है...</span>
+                </div>
+              ) : fhirBundle ? (
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-bold text-[#6C757D] uppercase">
+                      HL7 FHIR Document Bundle (JSON) • {fhirBundle.total || fhirBundle.entry?.length || 0} Resources
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(JSON.stringify(fhirBundle, null, 2));
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      className="text-[11px] font-bold text-[#0B5FA5] hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      {copied ? <Check className="w-3 h-3 text-[#186036]" /> : <Copy className="w-3 h-3 text-[#0B5FA5]" />}
+                      <span>{copied ? 'कॉपी हो गया' : 'JSON कॉपी करें'}</span>
+                    </button>
+                  </div>
+                  <pre className="p-3 bg-[#1A202C] text-[#E2E8F0] font-mono text-[10px] rounded-[2px] max-h-60 overflow-y-auto leading-relaxed select-all">
+                    {JSON.stringify(fhirBundle, null, 2)}
+                  </pre>
+                </div>
+              ) : (
+                <div className="p-4 text-center text-xs text-[#6C757D]">
+                  डेटा उपलब्ध नहीं है (Bundle not ready)
+                </div>
+              )}
+            </div>
+
+            <div className="p-3 bg-[#F8FAFC] border-t border-[#CED4DA] flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setShowFhirModal(false)}
+                className="py-1.5 px-4 rounded-[2px] border border-[#CED4DA] text-xs font-bold text-[#495057] hover:bg-[#EAEDF0] cursor-pointer"
+              >
+                बंद करें (Close)
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePushHis}
+                disabled={hisPushing || !fhirBundle}
+                className="py-1.5 px-4 rounded-[2px] border border-[#084B83] text-xs font-black text-white flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                style={{ backgroundColor: '#0B5FA5' }}
+              >
+                {hisPushing ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>HIS को भेजा जा रहा है...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5 text-white" />
+                    <span>अस्पताल HIS में भेजें • PUSH TO HOSPITAL HIS</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

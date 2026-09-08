@@ -19,6 +19,10 @@ except ImportError:
     genai = None
     types = None
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from app.models.schemas import (
     IndividualReportExtraction,
     OverallPatientHistory,
@@ -27,7 +31,8 @@ from app.models.schemas import (
 
 logger = logging.getLogger(__name__)
 
-GEMINI_MODEL = os.getenv("LLM_MODEL", "gemini-2.0-flash")
+GEMINI_MODEL = os.getenv("LLM_MODEL", "gemini-3.5-flash")
+GEMINI_FALLBACK_MODEL = os.getenv("LLM_FALLBACK_MODEL", "gemini-3.5-flash-lite")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 INDIVIDUAL_REPORT_SYSTEM_INSTRUCTION = """
@@ -126,12 +131,65 @@ class GeminiVisionService:
             user_prompt += f" Report identifier hint: {report_hint}."
         parts.append(types.Part.from_text(text=user_prompt))
 
+        system_prompt = (
+            INDIVIDUAL_REPORT_SYSTEM_INSTRUCTION
+            + "\nRespond with a valid JSON object with the following fields: "
+            + "report_type (string), medical_specialty (string), report_date (string or null), facility_name (string or null), "
+            + "summary (string), findings (list of objects with test_name, value, unit, reference_range, flag, verified_status), "
+            + "observations (list of strings), impression (string or null), doctor_remarks (string or null), "
+            + "diagnoses (list of strings), medications (list of objects with drug_name, dosage, frequency, anupana), "
+            + "clinical_history (string or null), uncertain_information (list of strings)."
+        )
+
         config = types.GenerateContentConfig(
-            system_instruction=INDIVIDUAL_REPORT_SYSTEM_INSTRUCTION,
+            system_instruction=system_prompt,
             response_mime_type="application/json",
-            response_schema=IndividualReportExtraction,
             temperature=0.1,
         )
+
+        def _parse_report(text: str) -> IndividualReportExtraction:
+            raw = clean_json_markdown(text or "{}")
+            try:
+                return IndividualReportExtraction.model_validate_json(raw)
+            except Exception:
+                data = json.loads(raw)
+                # Map snake_case or variations
+                meds = data.get("medications", [])
+                formatted_meds = []
+                for m in meds:
+                    if isinstance(m, dict):
+                        formatted_meds.append({
+                            "drug_name": m.get("drug_name") or m.get("drugName") or m.get("name", "Unknown Formulation"),
+                            "dosage": m.get("dosage", ""),
+                            "frequency": m.get("frequency", ""),
+                            "anupana": m.get("anupana", ""),
+                        })
+                findings = []
+                for f in data.get("findings", []):
+                    if isinstance(f, dict):
+                        findings.append(ReportFinding(
+                            test_name=f.get("test_name") or f.get("testName", "Investigation"),
+                            value=str(f.get("value", "")),
+                            unit=f.get("unit"),
+                            reference_range=f.get("reference_range") or f.get("referenceRange"),
+                            flag=f.get("flag", "NORMAL"),
+                            verified_status=f.get("verified_status", "verified")
+                        ))
+                return IndividualReportExtraction(
+                    report_type=data.get("report_type", "Prescription / Lab Report"),
+                    medical_specialty=data.get("medical_specialty", "Kayachikitsa (Ayurveda)"),
+                    report_date=data.get("report_date"),
+                    facility_name=data.get("facility_name"),
+                    summary=data.get("summary", ""),
+                    findings=findings,
+                    observations=data.get("observations", []),
+                    impression=data.get("impression"),
+                    doctor_remarks=data.get("doctor_remarks"),
+                    diagnoses=data.get("diagnoses", []),
+                    medications=formatted_meds,
+                    clinical_history=data.get("clinical_history"),
+                    uncertain_information=data.get("uncertain_information", []),
+                )
 
         try:
             response = client.models.generate_content(
@@ -139,16 +197,24 @@ class GeminiVisionService:
                 contents=parts,
                 config=config,
             )
-            raw_text = clean_json_markdown(response.text or "{}")
-            return IndividualReportExtraction.model_validate_json(raw_text)
+            return _parse_report(response.text)
         except Exception as exc:
-            logger.error("Gemini multimodal extraction failed: %s", exc)
-            return IndividualReportExtraction(
-                report_type="Prescription Scan",
-                medical_specialty="Kayachikitsa",
-                summary="Automated extraction processed.",
-                uncertain_information=[str(exc)],
-            )
+            logger.warning("Gemini primary model %s failed (%s), attempting fallback %s", GEMINI_MODEL, exc, GEMINI_FALLBACK_MODEL)
+            try:
+                response = client.models.generate_content(
+                    model=GEMINI_FALLBACK_MODEL,
+                    contents=parts,
+                    config=config,
+                )
+                return _parse_report(response.text)
+            except Exception as exc2:
+                logger.error("Gemini multimodal extraction failed on fallback too: %s", exc2)
+                return IndividualReportExtraction(
+                    report_type="Prescription Scan",
+                    medical_specialty="Kayachikitsa",
+                    summary="Automated extraction processed.",
+                    uncertain_information=[str(exc), str(exc2)],
+                )
 
     def synthesize_patient_history(
         self, individual_reports: List[dict]
@@ -174,9 +240,12 @@ class GeminiVisionService:
         )
 
         config = types.GenerateContentConfig(
-            system_instruction="Synthesize medical reports into longitudinal patient history for BAMS EMR.",
+            system_instruction=(
+                "Synthesize medical reports into longitudinal patient history for BAMS EMR. "
+                "Respond with a valid JSON object with keys: past_medical_surgical_history, "
+                "drug_allergy_history, family_history, personal_history, review_of_systems, prior_investigations_summary."
+            ),
             response_mime_type="application/json",
-            response_schema=OverallPatientHistory,
             temperature=0.1,
         )
 
@@ -189,11 +258,21 @@ class GeminiVisionService:
             raw_text = clean_json_markdown(response.text or "{}")
             return OverallPatientHistory.model_validate_json(raw_text)
         except Exception as exc:
-            logger.error("Gemini history synthesis failed: %s", exc)
-            return OverallPatientHistory(
-                past_medical_surgical_history="Not available in records.",
-                drug_allergy_history="None documented.",
-            )
+            logger.warning("Gemini history synthesis primary %s failed (%s), attempting fallback %s", GEMINI_MODEL, exc, GEMINI_FALLBACK_MODEL)
+            try:
+                response = client.models.generate_content(
+                    model=GEMINI_FALLBACK_MODEL,
+                    contents=[prompt],
+                    config=config,
+                )
+                raw_text = clean_json_markdown(response.text or "{}")
+                return OverallPatientHistory.model_validate_json(raw_text)
+            except Exception as exc2:
+                logger.error("Gemini history synthesis failed on fallback too: %s", exc2)
+                return OverallPatientHistory(
+                    past_medical_surgical_history="Not available in records.",
+                    drug_allergy_history="None documented.",
+                )
 
 
 gemini_vision = GeminiVisionService()

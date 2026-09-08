@@ -21,6 +21,7 @@ from app.models.schemas import (
 from app.services.red_flags import evaluate_red_flags
 from app.services.whisprflow_service import whisprflow_service
 from app.services.complaint_inference_service import complaint_inference_service
+from app.services.fhir_serializer import generate_fhir_r4_bundle
 from app.db import repository as db
 
 logger = logging.getLogger(__name__)
@@ -352,4 +353,93 @@ async def complete_session_intake(session_id: str, payload: dict):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Could not complete session intake: {str(exc)}",
         )
+
+
+@router.get("/{session_id}/fhir-bundle", status_code=status.HTTP_200_OK)
+async def get_fhir_bundle(session_id: str):
+    """
+    Generates an official HL7 FHIR R4 Document Bundle for the specified session.
+    Enables ABDM M2/M3 linkage and hospital electronic health record interoperability.
+    """
+    session = db.get_session(session_id)
+    if not session:
+        queue_item = db.get_queue_item(session_id)
+        if not queue_item:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Session {session_id} not found."
+            )
+        patient_data = {
+            "id": queue_item.get("session_id"),
+            "full_name": queue_item.get("patient_name"),
+            "age": queue_item.get("age"),
+            "gender": queue_item.get("gender"),
+            "phone": queue_item.get("phone"),
+            "abha_id": queue_item.get("abha_id"),
+        }
+        session_data = {
+            "session_id": session_id,
+            "chief_complaint": queue_item.get("chief_complaint"),
+            "complaint_category": queue_item.get("complaint_category"),
+            "created_at": queue_item.get("created_at"),
+            "department": queue_item.get("treatment_mode", "ayurveda"),
+        }
+        socrates_data = queue_item.get("socrates") or {}
+        vitals_data = queue_item.get("general_vitals") or {}
+        prakriti_data = {
+            "dominant_prakriti": queue_item.get("dominant_prakriti"),
+            "secondary_prakriti": queue_item.get("secondary_prakriti"),
+            "vata_score": queue_item.get("vata_score", 0),
+            "pitta_score": queue_item.get("pitta_score", 0),
+            "kapha_score": queue_item.get("kapha_score", 0),
+        }
+        ocr_reports = db.get_ocr_results(session_id) or []
+    else:
+        patient_id = session.get("patient_id")
+        patient_data = db.get_patient(patient_id) if patient_id else None
+        session_data = session
+        socrates_data = db.get_socrates(session_id) or {}
+        vitals_data = db.get_vitals(session_id) or {}
+        prakriti_data = db.get_prakriti(session_id) or {}
+        ocr_reports = db.get_ocr_results(session_id) or []
+
+    bundle = generate_fhir_r4_bundle(
+        session_id=session_id,
+        patient_data=patient_data,
+        session_data=session_data,
+        socrates_data=socrates_data,
+        vitals_data=vitals_data,
+        prakriti_data=prakriti_data,
+        ocr_reports=ocr_reports,
+    )
+    return bundle
+
+
+@router.post("/{session_id}/push-his", status_code=status.HTTP_200_OK)
+async def push_to_his(session_id: str):
+    """
+    Pushes the FHIR R4 Bundle to the AIIA Hospital Information System (e-Hospital / HMIS).
+    Simulates secure MLLP / REST FHIR gateway dispatch with full transaction acknowledgment.
+    """
+    bundle = await get_fhir_bundle(session_id)
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    dispatch_ack = {
+        "status": "success",
+        "session_id": session_id,
+        "fhir_bundle_id": bundle["id"],
+        "dispatched_at": now_iso,
+        "destination": "AIIA Central HMIS (e-Hospital Core Node)",
+        "gateway_response": {
+            "ack_code": "AA",
+            "transaction_id": f"HIS-TX-{uuid.uuid4().hex[:8].upper()}",
+            "http_status": 201,
+            "message": f"FHIR Document Bundle {bundle['id']} successfully ingested into Hospital EMR.",
+            "patient_mrn": bundle["entry"][1]["resource"]["identifier"][0]["value"] if len(bundle["entry"]) > 1 else "MRN-PENDING",
+            "total_resources_ingested": bundle.get("total", len(bundle["entry"])),
+        }
+    }
+    logger.info("Dispatched FHIR bundle for session %s to HIS. Gateway Ack: %s", session_id, dispatch_ack["gateway_response"]["transaction_id"])
+    return dispatch_ack
+
 

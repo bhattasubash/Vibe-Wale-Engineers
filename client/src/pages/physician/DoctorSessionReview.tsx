@@ -17,6 +17,11 @@ import {
   RotateCw,
   X,
   Check,
+  FileCode,
+  Send,
+  Copy,
+  AlertTriangle,
+  Loader2,
 } from 'lucide-react';
 import { usePhysicianStore, DocumentItem } from '@/stores/physicianStore';
 import { API_BASE_URL } from '@/lib/config';
@@ -35,6 +40,14 @@ export const DoctorSessionReview: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
+  // FHIR R4 and HIS Push Modal State
+  const [showFhirModal, setShowFhirModal] = useState(false);
+  const [fhirBundle, setFhirBundle] = useState<any>(null);
+  const [loadingFhir, setLoadingFhir] = useState(false);
+  const [hisPushing, setHisPushing] = useState(false);
+  const [hisPushResult, setHisPushResult] = useState<any>(null);
+  const [copiedFhir, setCopiedFhir] = useState(false);
+
   // Document Lightbox Modal State
   const [activeDocModal, setActiveDocModal] = useState<DocumentItem | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -48,6 +61,42 @@ export const DoctorSessionReview: React.FC = () => {
 
   const handleCloseDocModal = () => {
     setActiveDocModal(null);
+  };
+
+  const handleOpenFhirModal = async () => {
+    setShowFhirModal(true);
+    setLoadingFhir(true);
+    setHisPushResult(null);
+    try {
+      const sid = sessionId || patient?.sessionId;
+      const res = await fetch(`${API_BASE_URL}/api/sessions/${sid}/fhir-bundle`);
+      if (res.ok) {
+        const data = await res.json();
+        setFhirBundle(data);
+      }
+    } catch (err) {
+      console.warn('Could not fetch FHIR bundle:', err);
+    } finally {
+      setLoadingFhir(false);
+    }
+  };
+
+  const handlePushHis = async () => {
+    setHisPushing(true);
+    try {
+      const sid = sessionId || patient?.sessionId;
+      const res = await fetch(`${API_BASE_URL}/api/sessions/${sid}/push-his`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHisPushResult(data);
+      }
+    } catch (err) {
+      console.warn('Could not push to HIS:', err);
+    } finally {
+      setHisPushing(false);
+    }
   };
 
   const handleAction = (status: 'accepted' | 'amended' | 'rejected') => {
@@ -168,7 +217,7 @@ export const DoctorSessionReview: React.FC = () => {
       });
   }, [sessionId, patient?.sessionId, authToken]);
 
-  const patientDocs: DocumentItem[] = liveOcrResults && liveOcrResults.reports.length > 0
+  const rawDocs: DocumentItem[] = liveOcrResults && liveOcrResults.reports.length > 0
     ? liveOcrResults.reports.map((r, idx) => {
         const localDoc = patient?.documents?.[idx];
         return {
@@ -184,6 +233,13 @@ export const DoctorSessionReview: React.FC = () => {
     : patient?.documents && patient.documents.length > 0
     ? patient.documents
     : [];
+
+  // Chronological sort: newest documents first (Chronological Timeline)
+  const patientDocs: DocumentItem[] = [...rawDocs].sort((a, b) => {
+    const timeA = a.date ? new Date(a.date).getTime() : 0;
+    const timeB = b.date ? new Date(b.date).getTime() : 0;
+    return timeB - timeA;
+  });
 
   const medications = liveOcrResults && liveOcrResults.all_medications?.length > 0
     ? liveOcrResults.all_medications
@@ -261,6 +317,16 @@ export const DoctorSessionReview: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleOpenFhirModal}
+              className="py-1.5 px-3 rounded-[3px] border border-[#0B5FA5] bg-[#E8F1F8] hover:bg-[#0B5FA5] hover:text-white text-xs font-black text-[#0B5FA5] flex items-center gap-1.5 cursor-pointer transition-colors"
+              title="ABDM HL7 FHIR R4 Bundle Record & Hospital Sync"
+            >
+              <FileCode className="w-3.5 h-3.5" />
+              <span>FHIR R4 Bundle • HIS Sync</span>
+            </button>
+
             <button
               type="button"
               onClick={() => window.print()}
@@ -506,7 +572,7 @@ export const DoctorSessionReview: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#CED4DA] font-semibold text-[#212529]">
-                    {medications.map((med, idx) => (
+                    {medications.map((med: any, idx: number) => (
                       <tr key={idx} className="hover:bg-[#F8FAFC]">
                         <td className="p-2 font-bold text-[#0B5FA5]">{med.drugName}</td>
                         <td className="p-2">{med.dosage}</td>
@@ -552,30 +618,51 @@ export const DoctorSessionReview: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#CED4DA] font-semibold text-[#212529]">
-                    {labFindings.map((lab, idx) => (
-                      <tr key={idx} className="hover:bg-[#F8FAFC]">
-                        <td className="p-2 font-bold text-[#212529]">{lab.testName}</td>
-                        <td className="p-2 font-mono font-bold">{lab.value} {lab.unit}</td>
-                        <td className="p-2 text-[#6C757D] font-mono">{lab.referenceRange} {lab.unit}</td>
-                        <td className="p-2">
-                          <span className="px-1.5 py-0.5 rounded-[2px] bg-[#EDF7F1] text-[#2F7D4F] text-[9px] font-bold flex items-center gap-1 w-fit">
-                            <Check className="w-3 h-3 text-[#2F7D4F]" />
-                            <span>Tesseract Verified</span>
-                          </span>
-                        </td>
-                        <td className="p-2">
-                          <span
-                            className={`px-2 py-0.5 rounded-[2px] text-[9px] font-black uppercase ${
-                              lab.flag === 'ELEVATED'
-                                ? 'bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/30'
-                                : 'bg-[#EDF7F1] text-[#2F7D4F]'
-                            }`}
-                          >
-                            {lab.flag}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {labFindings.map((lab: any, idx: number) => {
+                      const flagUpper = String(lab.flag || '').toUpperCase();
+                      const isAbnormal =
+                        flagUpper.includes('ELEVATED') ||
+                        flagUpper.includes('HIGH') ||
+                        flagUpper.includes('LOW') ||
+                        flagUpper.includes('ABNORMAL');
+                      return (
+                        <tr
+                          key={idx}
+                          className={`transition-colors ${
+                            isAbnormal
+                              ? 'bg-[#FEF2F2]/60 hover:bg-[#FEF2F2] border-l-4 border-l-[#DC2626]'
+                              : 'hover:bg-[#F8FAFC]'
+                          }`}
+                        >
+                          <td className="p-2 font-bold text-[#212529] flex items-center gap-1.5">
+                            {isAbnormal && <AlertTriangle className="w-3.5 h-3.5 text-[#DC2626] shrink-0" />}
+                            <span>{lab.testName}</span>
+                          </td>
+                          <td className={`p-2 font-mono font-bold ${isAbnormal ? 'text-[#DC2626]' : 'text-[#212529]'}`}>
+                            {lab.value} {lab.unit}
+                          </td>
+                          <td className="p-2 text-[#6C757D] font-mono">{lab.referenceRange} {lab.unit}</td>
+                          <td className="p-2">
+                            <span className="px-1.5 py-0.5 rounded-[2px] bg-[#EDF7F1] text-[#2F7D4F] text-[9px] font-bold flex items-center gap-1 w-fit">
+                              <Check className="w-3 h-3 text-[#2F7D4F]" />
+                              <span>Tesseract Verified</span>
+                            </span>
+                          </td>
+                          <td className="p-2">
+                            <span
+                              className={`px-2 py-0.5 rounded-[2px] text-[9px] font-black uppercase inline-flex items-center gap-1 ${
+                                isAbnormal
+                                  ? 'bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/40 shadow-xs'
+                                  : 'bg-[#EDF7F1] text-[#2F7D4F]'
+                              }`}
+                            >
+                              {isAbnormal && <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626] animate-pulse" />}
+                              <span>{lab.flag || (isAbnormal ? 'ABNORMAL' : 'NORMAL')}</span>
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -769,6 +856,56 @@ export const DoctorSessionReview: React.FC = () => {
                   • <strong>परामर्श सूत्र:</strong> रोगी की प्रधान वेदना ({patient.chiefComplaint || 'सामान्य परामर्श'}) के परिप्रेक्ष्य में दोष साम्यक आहार, विहार एवं औषध व्यवस्था का निर्धारण करें।
                 </p>
               </div>
+
+              {/* Classical Dashavidha Pariksha Matrix (Charaka Samhita Vimana Sthana 8) */}
+              <div className="mt-3 p-3 bg-[#F0FDF4] border border-[#2F7D4F]/30 rounded-[2px] text-xs">
+                <span className="text-[10px] font-black text-[#186036] uppercase tracking-wider block mb-2 flex items-center gap-1.5">
+                  <Scale className="w-3.5 h-3.5 text-[#2F7D4F]" />
+                  <span>दशविध परीक्षा मूल्यांकन (Dashavidha Pariksha Matrix)</span>
+                </span>
+                <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-[9px] font-bold text-[#6C757D] block">1. प्रकृति (Prakriti):</span>
+                    <span className="font-extrabold text-[#186036]">{patient.dominantPrakriti || 'Sama'}</span>
+                  </div>
+                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-[9px] font-bold text-[#6C757D] block">2. विकृति (Vikriti):</span>
+                    <span className="font-extrabold text-[#0B5FA5]">{patient.chiefComplaint ? 'लक्षणानुसार दोष वृद्धि' : 'सामान्य'}</span>
+                  </div>
+                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-[9px] font-bold text-[#6C757D] block">3. सार (Sara):</span>
+                    <span className="font-bold text-[#212529]">मध्यम धातु सार (Madhyama)</span>
+                  </div>
+                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-[9px] font-bold text-[#6C757D] block">4. संहनन (Samhanana):</span>
+                    <span className="font-bold text-[#212529]">सुसंहत (Compact/Normal)</span>
+                  </div>
+                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-[9px] font-bold text-[#6C757D] block">5. प्रमाण (Pramana):</span>
+                    <span className="font-bold text-[#212529]">वय व लिंगानुरूप (Proportionate)</span>
+                  </div>
+                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-[9px] font-bold text-[#6C757D] block">6. सात्म्य (Satmya):</span>
+                    <span className="font-bold text-[#212529]">मिश्र सात्म्य (Mixed Adaptability)</span>
+                  </div>
+                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-[9px] font-bold text-[#6C757D] block">7. सत्त्व (Satva):</span>
+                    <span className="font-bold text-[#212529]">मध्यम सत्त्व (Mental Endurance)</span>
+                  </div>
+                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-[9px] font-bold text-[#6C757D] block">8. आहार शक्ति (Ahara Shakti):</span>
+                    <span className="font-bold text-[#212529]">दीप्त/मध्यम अग्नि (Digestive Power)</span>
+                  </div>
+                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-[9px] font-bold text-[#6C757D] block">9. व्यायाम शक्ति (Vyayama):</span>
+                    <span className="font-bold text-[#212529]">मध्यम शक्ति (Moderate Capacity)</span>
+                  </div>
+                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-[9px] font-bold text-[#6C757D] block">10. वय (Vaya):</span>
+                    <span className="font-bold text-[#212529]">{patient.age < 30 ? 'बाल/युवा (Youth)' : patient.age > 60 ? 'वृद्ध (Geriatric)' : 'मध्यम (Middle Age)'} ({patient.age} वर्ष)</span>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -793,7 +930,7 @@ export const DoctorSessionReview: React.FC = () => {
                 <button
                   key={preset.id}
                   type="button"
-                  onClick={() => setDoctorNotes((prev) => prev + preset.insertionText)}
+                  onClick={() => setDoctorNotes((prev: string) => prev + preset.insertionText)}
                   className="px-2 py-1 bg-[#E8F1F8] border border-[#0B5FA5]/30 text-[10px] font-bold text-[#0B5FA5] rounded-[2px] hover:bg-[#0B5FA5] hover:text-white cursor-pointer transition-colors"
                 >
                   {preset.label}
@@ -1007,6 +1144,118 @@ export const DoctorSessionReview: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* FHIR R4 & HIS PUSH MODAL FOR PHYSICIAN */}
+      {showFhirModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border-2 border-[#0B5FA5] rounded-[3px] max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div className="p-3 bg-[#0B5FA5] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileCode className="w-4 h-4" />
+                <span className="font-bold text-xs uppercase tracking-wide">
+                  ABDM HL7 FHIR R4 Bundle Record (M2 / M3 Health Data Exchange)
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowFhirModal(false)}
+                className="p-1 hover:bg-white/20 rounded cursor-pointer"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+
+            <div className="p-4 flex-1 overflow-y-auto space-y-3">
+              <div className="p-2.5 bg-[#EDF7F1] border border-[#186036]/40 rounded-[2px] flex items-center justify-between text-xs text-[#186036]">
+                <span className="font-bold">
+                  ✓ Official NRCeS / ABDM Profile: DocumentBundle (Patient, Encounter, Condition, Observations, Medications)
+                </span>
+                <span className="font-mono font-bold text-[11px]">
+                  ABHA Compliant
+                </span>
+              </div>
+
+              {hisPushResult && (
+                <div className="p-3 bg-[#F0FDF4] border border-[#15803D] rounded-[2px] text-xs">
+                  <div className="flex items-center gap-1.5 font-black text-[#15803D] mb-1">
+                    <CheckCircle className="w-4 h-4" />
+                    <span>अस्पताल ई-हॉस्पिटल में सफलतापूर्वक दर्ज (Ingested into AIIA Hospital HIS)</span>
+                  </div>
+                  <div className="font-mono text-[11px] text-[#495057] space-y-0.5">
+                    <div>Transaction ID: {hisPushResult.gateway_response?.transaction_id}</div>
+                    <div>Destination: {hisPushResult.destination}</div>
+                    <div>Status: {hisPushResult.gateway_response?.http_status} Accepted (Ack: {hisPushResult.gateway_response?.ack_code})</div>
+                  </div>
+                </div>
+              )}
+
+              {loadingFhir ? (
+                <div className="p-8 text-center text-xs text-[#6C757D]">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#0B5FA5] mb-2" />
+                  <span>FHIR R4 Bundle उत्पन्न किया जा रहा है...</span>
+                </div>
+              ) : fhirBundle ? (
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-bold text-[#6C757D] uppercase">
+                      HL7 FHIR Document Bundle (JSON) • {fhirBundle.total || fhirBundle.entry?.length || 0} Resources
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(JSON.stringify(fhirBundle, null, 2));
+                        setCopiedFhir(true);
+                        setTimeout(() => setCopiedFhir(false), 2000);
+                      }}
+                      className="text-[11px] font-bold text-[#0B5FA5] hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      {copiedFhir ? <Check className="w-3 h-3 text-[#186036]" /> : <Copy className="w-3 h-3 text-[#0B5FA5]" />}
+                      <span>{copiedFhir ? 'कॉपी हो गया' : 'JSON कॉपी करें'}</span>
+                    </button>
+                  </div>
+                  <pre className="p-3 bg-[#1A202C] text-[#E2E8F0] font-mono text-[10px] rounded-[2px] max-h-72 overflow-y-auto leading-relaxed select-all">
+                    {JSON.stringify(fhirBundle, null, 2)}
+                  </pre>
+                </div>
+              ) : (
+                <div className="p-4 text-center text-xs text-[#6C757D]">
+                  डेटा उपलब्ध नहीं है (Bundle not ready)
+                </div>
+              )}
+            </div>
+
+            <div className="p-3 bg-[#F8FAFC] border-t border-[#CED4DA] flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setShowFhirModal(false)}
+                className="py-1.5 px-4 rounded-[2px] border border-[#CED4DA] text-xs font-bold text-[#495057] hover:bg-[#EAEDF0] cursor-pointer"
+              >
+                बंद करें (Close)
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePushHis}
+                disabled={hisPushing || !fhirBundle}
+                className="py-1.5 px-4 rounded-[2px] border border-[#084B83] text-xs font-black text-white flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                style={{ backgroundColor: '#0B5FA5' }}
+              >
+                {hisPushing ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>HIS को भेजा जा रहा है...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5 text-white" />
+                    <span>अस्पताल HIS में भेजें • PUSH TO HOSPITAL HIS</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

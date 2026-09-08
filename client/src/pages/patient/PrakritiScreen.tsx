@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Scale, Check, Volume2 } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
+import { VoiceAnswerButton } from '@/components/ui/VoiceAnswerButton';
 import { useSessionStore } from '@/stores/sessionStore';
 import { PRAKRITI_15_QUESTIONS } from '@/config/prakritiQuestions';
 import { speechEngine } from '@/lib/speech';
@@ -28,6 +29,43 @@ export const PrakritiScreen: React.FC = () => {
     e.stopPropagation();
     speechEngine.stop();
     speechEngine.speak(optText, language);
+  };
+
+  const handleVoiceAnswer = (transcript: string) => {
+    speechEngine.stop();
+    const lower = transcript.toLowerCase();
+    let matchedIdx: number | null = null;
+    let matchedDosha: 'vata' | 'pitta' | 'kapha' | null = null;
+
+    currentQuestion.options.forEach((opt, idx) => {
+      const optHindi = opt.textHindi.toLowerCase();
+      const optEng = opt.textEnglish.toLowerCase();
+      if (
+        lower.includes(optHindi) ||
+        lower.includes(optEng) ||
+        (idx === 0 && (lower.includes('पहला') || lower.includes('एक') || lower.includes('first') || lower.includes('1') || lower.includes('one') || lower.includes('ए') || lower.includes('वात') || lower.includes('vata'))) ||
+        (idx === 1 && (lower.includes('दूसरा') || lower.includes('दो') || lower.includes('second') || lower.includes('2') || lower.includes('two') || lower.includes('बी') || lower.includes('पित्त') || lower.includes('pitta'))) ||
+        (idx === 2 && (lower.includes('तीसरा') || lower.includes('तीन') || lower.includes('third') || lower.includes('3') || lower.includes('three') || lower.includes('सी') || lower.includes('कफ') || lower.includes('kapha'))) ||
+        lower.includes(opt.dosha)
+      ) {
+        matchedIdx = idx;
+        matchedDosha = opt.dosha;
+      }
+    });
+
+    if (matchedIdx !== null && matchedDosha !== null) {
+      handleSelectOption(matchedIdx, matchedDosha);
+    } else {
+      for (let i = 0; i < currentQuestion.options.length; i++) {
+        const opt = currentQuestion.options[i];
+        const words = (opt.textHindi + ' ' + opt.textEnglish).toLowerCase().split(/\s+/);
+        if (words.some((w) => w.length > 3 && lower.includes(w))) {
+          handleSelectOption(i, opt.dosha);
+          return;
+        }
+      }
+      handleSelectOption(0, currentQuestion.options[0].dosha);
+    }
   };
 
   const calculateFinalScores = () => {
@@ -161,12 +199,19 @@ export const PrakritiScreen: React.FC = () => {
             शास्त्रीय मापदंड: {currentQuestion.sanskritParam}
           </div>
 
-          <h2
-            className="text-lg sm:text-2xl font-black mb-3 leading-tight"
-            style={{ color: '#0B5FA5' }}
-          >
-            {language === 'hi' ? currentQuestion.questionHindi : currentQuestion.questionEnglish}
-          </h2>
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <h2
+              className="text-lg sm:text-2xl font-black leading-tight flex-1"
+              style={{ color: '#0B5FA5' }}
+            >
+              {language === 'hi' ? currentQuestion.questionHindi : currentQuestion.questionEnglish}
+            </h2>
+            <VoiceAnswerButton
+              language={language}
+              onTranscript={handleVoiceAnswer}
+              size="sm"
+            />
+          </div>
 
           {/* EXACTLY 3 SPACIOUS TOUCH OPTIONS WITH PER-OPTION AUDIO BUTTONS */}
           <div className="space-y-2.5">

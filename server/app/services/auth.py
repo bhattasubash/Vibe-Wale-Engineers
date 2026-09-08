@@ -86,7 +86,14 @@ def verify_token(token: str) -> Dict[str, Any]:
         hashlib.sha256,
     ).digest()
 
-    provided_sig = _base64url_decode(parts[2])
+    try:
+        provided_sig = _base64url_decode(parts[2])
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token signature encoding. Access denied.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     if not hmac.compare_digest(expected_sig, provided_sig):
         raise HTTPException(
@@ -95,7 +102,14 @@ def verify_token(token: str) -> Dict[str, Any]:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    claims = json.loads(_base64url_decode(parts[1]).decode("utf-8"))
+    try:
+        claims = json.loads(_base64url_decode(parts[1]).decode("utf-8"))
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token claims payload. Access denied.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     if claims.get("exp", 0) < time.time():
         raise HTTPException(

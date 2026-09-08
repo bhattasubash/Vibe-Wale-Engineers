@@ -90,7 +90,10 @@ def get_patient(patient_id: str) -> Optional[Dict[str, Any]]:
 def find_patient_by_abha(abha_id: str) -> Optional[Dict[str, Any]]:
     conn = get_db_connection()
     try:
-        row = conn.execute("SELECT * FROM patients WHERE abha_id = ?", (abha_id,)).fetchone()
+        row = conn.execute(
+            "SELECT * FROM patients WHERE abha_id = ? ORDER BY is_returning DESC, created_at DESC",
+            (abha_id,),
+        ).fetchone()
         return _row_to_dict(row)
     finally:
         conn.close()

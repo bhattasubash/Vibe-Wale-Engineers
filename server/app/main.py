@@ -8,6 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import os
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from app.routers import patients, sessions, prakriti, physician, documents
 

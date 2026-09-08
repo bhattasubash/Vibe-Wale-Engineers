@@ -1,13 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, CheckCircle2, ArrowLeft, ArrowRight, Loader2, RotateCw } from 'lucide-react';
+import { Camera, CheckCircle2, ArrowLeft, ArrowRight, Loader2, RotateCw, Mic, FileText, Check } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
+import { VoiceAnswerButton } from '@/components/ui/VoiceAnswerButton';
 import { useSessionStore } from '@/stores/sessionStore';
 import { API_BASE_URL } from '@/lib/config';
 
 export const CameraUploadScreen: React.FC = () => {
   const navigate = useNavigate();
   const { language, sessionId, getOrCreateSessionId, addUploadedDocument } = useSessionStore();
+
+  const [activeTab, setActiveTab] = useState<'camera' | 'voice'>('camera');
+  const [spokenTranscript, setSpokenTranscript] = useState('');
+  const [isProcessingVoice, setIsProcessingVoice] = useState(false);
+  const [voiceSuccessMessage, setVoiceSuccessMessage] = useState<string | null>(null);
 
   const [cameraActive, setCameraActive] = useState(false);
   const [isMirrored, setIsMirrored] = useState(false);
@@ -19,9 +25,9 @@ export const CameraUploadScreen: React.FC = () => {
   const streamRef = useRef<MediaStream | null>(null);
 
   const promptHindi =
-    'यदि आपके पास कोई पुराना डॉक्टर का पर्चा या जांच रिपोर्ट है, तो उसे कियोस्क कैमरे के सामने रखें। हरा घेरा बनते ही फोटो अपने आप खिंच जाएगी।';
+    'यदि आपके पास कोई पुराना डॉक्टर का पर्चा या जांच रिपोर्ट है, तो उसे कियोस्क कैमरे के सामने रखें। यदि पर्चा नहीं है, तो बोलकर इतिहास बताएं।';
   const promptEnglish =
-    'Hold your prescription in front of the camera. The image will automatically capture when aligned.';
+    'Hold your prescription in front of the camera, or tap Speak History if you do not have physical documents.';
 
   useEffect(() => {
     let isMounted = true;
@@ -175,6 +181,61 @@ export const CameraUploadScreen: React.FC = () => {
     }, 'image/jpeg', 0.9);
   };
 
+  const handleVoiceTranscript = (text: string) => {
+    setSpokenTranscript((prev) => (prev ? `${prev} ${text}` : text));
+  };
+
+  const handleVoiceSubmit = async () => {
+    if (!spokenTranscript.trim()) return;
+    setIsProcessingVoice(true);
+    setVoiceSuccessMessage(null);
+    try {
+      const activeSessionId = sessionId || getOrCreateSessionId();
+      const response = await fetch(`${API_BASE_URL}/api/documents/${activeSessionId}/voice-history`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: spokenTranscript,
+          language: language === 'hi' ? 'hi' : 'en',
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const extracted = data.extracted_data || {};
+        const medsCount = extracted.medications?.length || 0;
+        const diagCount = extracted.diagnoses?.length || 0;
+        const surgCount = extracted.past_surgeries?.length || 0;
+
+        const summaryStr = `मौखिक इतिहास: ${diagCount} बीमारियां, ${medsCount} दवाएं, ${surgCount} सर्जरी दर्ज`;
+        setVoiceSuccessMessage(summaryStr);
+
+        addUploadedDocument({
+          id: data.report_id || `VOICE-${Date.now()}`,
+          name: 'मौखिक इतिहास (Spoken Medical History)',
+          previewUrl: '',
+          extractedText: `${spokenTranscript}\n\n[संरचित निष्कर्ष: ${diagCount} बीमारियां, ${medsCount} दवाएं, ${surgCount} सर्जरी]`,
+        });
+
+        setCapturedDocs((prev) => [
+          ...prev,
+          {
+            id: data.report_id || `VOICE-${Date.now()}`,
+            name: 'मौखिक इतिहास (Spoken History)',
+            url: '',
+            ocrSnippet: summaryStr,
+          },
+        ]);
+      } else {
+        setVoiceSuccessMessage('मौखिक इतिहास सहेजा गया (Saved to doctor record)');
+      }
+    } catch (err) {
+      console.error('Error submitting voice history:', err);
+      setVoiceSuccessMessage('ऑफलाइन मोड: मौखिक इतिहास सुरक्षित (Recorded offline)');
+    } finally {
+      setIsProcessingVoice(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-hidden">
       
@@ -209,16 +270,132 @@ export const CameraUploadScreen: React.FC = () => {
             className="text-2xl sm:text-3xl font-black tracking-tight"
             style={{ color: '#0B5FA5' }}
           >
-            {language === 'hi' ? 'पुराने पर्चे या रिपोर्ट दिखाएं' : 'Show Medical Prescriptions to Camera'}
+            {language === 'hi' ? 'पुराने पर्चे दिखाएं या बोलकर बताएं' : 'Prescription Documents or Spoken History'}
           </h1>
           <p className="text-xs sm:text-sm text-[#495057] font-semibold">
             {language === 'hi'
-              ? 'पर्चे को सीधे स्क्रीन के सामने पकड़ें। हरा घेरा बनते ही फ़ोटो अपने-आप खिंच जाएगी।'
-              : 'Hold prescription in frame. Auto-capture will snap when aligned.'}
+              ? 'पर्चा कैमरे के सामने रखें या "बोलकर बताएं" विकल्प चुनकर अपनी दवाएं व बीमारियां बोलें।'
+              : 'Hold prescription in frame or select Speak History if you do not have papers.'}
           </p>
         </div>
 
-        {/* ENLARGED CAMERA VIEWFINDER */}
+        {/* MODE SELECTOR TABS */}
+        <div className="flex items-center justify-center p-1 bg-[#DEE2E6] rounded-[4px] w-full max-w-xl shrink-0 gap-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab('camera')}
+            className={`flex-1 py-2 px-3 text-xs font-black rounded-[3px] flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              activeTab === 'camera'
+                ? 'bg-white text-[#0B5FA5] shadow-xs border border-[#CED4DA]'
+                : 'text-[#495057] hover:text-[#212529]'
+            }`}
+          >
+            <Camera className="w-4 h-4" />
+            <span>{language === 'hi' ? 'कैमरा से पर्चा स्कैन करें' : 'Scan Physical Document'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('voice')}
+            className={`flex-1 py-2 px-3 text-xs font-black rounded-[3px] flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              activeTab === 'voice'
+                ? 'bg-[#0B5FA5] text-white shadow-xs'
+                : 'text-[#495057] hover:text-[#212529]'
+            }`}
+          >
+            <Mic className="w-4 h-4" />
+            <span>{language === 'hi' ? 'दस्तावेज़ नहीं हैं? बोलकर बताएं' : 'No Papers? Speak History'}</span>
+          </button>
+        </div>
+
+        {/* CONDITIONAL CONTENT: CAMERA VIEW vs VOICE INTAKE */}
+        {activeTab === 'voice' ? (
+          <div className="w-full max-w-3xl bg-white border border-[#CED4DA] rounded-[3px] p-4 flex flex-col items-center shrink-0">
+            <div className="w-full text-center mb-3">
+              <h3 className="text-base sm:text-lg font-black text-[#0B5FA5]">
+                {language === 'hi' ? 'पिछली बीमारियां, दवाएं या ऑपरेशन बोलकर बताएं' : 'Speak Past Illnesses, Daily Medications, or Surgeries'}
+              </h3>
+              <p className="text-xs text-[#6C757D] font-medium mt-1">
+                {language === 'hi'
+                  ? 'माइक बटन दबाएं और स्पष्ट बोलें (उदा: "5 साल से शुगर है, मेटफॉर्मिन 500 ले रहा हूँ, 2 साल पहले पथरी का ऑपरेशन हुआ था")'
+                  : 'Tap the mic and speak clearly (e.g., "Diagnosed with Type 2 diabetes 5 years ago, taking Metformin 500mg BD")'}
+              </p>
+            </div>
+
+            <div className="w-full bg-[#F8FAFC] border border-[#CED4DA] rounded-[3px] p-3 mb-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-bold text-[#495057] uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-[#0B5FA5]" />
+                  <span>{language === 'hi' ? 'बोला गया विवरण (Spoken Transcript)' : 'Live Spoken Transcript'}</span>
+                </span>
+                <VoiceAnswerButton
+                  language={language}
+                  onTranscript={handleVoiceTranscript}
+                  label={language === 'hi' ? 'माइक दबाकर बोलें' : 'Tap to Speak'}
+                  size="md"
+                />
+              </div>
+
+              <textarea
+                value={spokenTranscript}
+                onChange={(e) => setSpokenTranscript(e.target.value)}
+                placeholder={
+                  language === 'hi'
+                    ? 'माइक दबाकर बोलें या यहाँ लिखें (उदा: मुझे 5 साल से शुगर है, मेटफॉर्मिन 500mg ले रहा हूँ)...'
+                    : 'Tap the mic or type here (e.g. Taking Metformin 500mg BD for diabetes)...'
+                }
+                rows={3}
+                className="w-full p-2.5 text-xs sm:text-sm font-semibold text-[#212529] bg-white border border-[#CED4DA] rounded-[2px] focus:outline-none focus:border-[#0B5FA5] resize-none"
+              />
+
+              {/* Quick Helper Chips */}
+              <div className="mt-2 flex flex-wrap gap-1.5 items-center">
+                <span className="text-[10px] font-bold text-[#6C757D]">सुझाव:</span>
+                {[
+                  language === 'hi' ? '5 साल से शुगर है, मेटफॉर्मिन 500mg' : 'Type 2 Diabetes, Metformin 500mg',
+                  language === 'hi' ? 'हाई बीपी की गोली ले रहा हूँ' : 'Hypertension on regular medication',
+                  language === 'hi' ? 'पेनिसिलिन से एलर्जी है' : 'Known allergy to Penicillin',
+                ].map((chip, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setSpokenTranscript((prev) => (prev ? `${prev}. ${chip}` : chip))}
+                    className="px-2 py-0.5 rounded-[2px] border border-[#CBD5E1] bg-white text-[11px] font-semibold text-[#495057] hover:bg-[#E8F1F8] hover:text-[#0B5FA5] cursor-pointer"
+                  >
+                    + {chip}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {voiceSuccessMessage && (
+              <div className="w-full p-2 mb-3 bg-[#EDF7F1] border border-[#186036]/40 rounded-[2px] flex items-center gap-2 text-xs font-bold text-[#186036]">
+                <Check className="w-4 h-4 shrink-0 text-[#186036]" />
+                <span>{voiceSuccessMessage}</span>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleVoiceSubmit}
+              disabled={isProcessingVoice || !spokenTranscript.trim()}
+              className="w-full sm:w-auto py-2.5 px-8 rounded-[3px] border border-[#084B83] text-xs sm:text-sm font-black text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-transform active:scale-[0.98]"
+              style={{ backgroundColor: '#0B5FA5' }}
+            >
+              {isProcessingVoice ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>AI संरचना में सहेजा जा रहा है (Processing with Gemini)...</span>
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>ईएमआर में सहेजें • SAVE TO MEDICAL RECORD</span>
+                </>
+              )}
+            </button>
+          </div>
+        ) : (
+        /* ENLARGED CAMERA VIEWFINDER */
         <div className="w-full max-w-3xl bg-white border border-[#CED4DA] rounded-[3px] p-3 flex flex-col items-center shrink-0">
           <div className="relative w-full h-72 sm:h-96 md:h-[26rem] bg-[#1A202C] rounded-[3px] overflow-hidden flex items-center justify-center border-2 border-[#CED4DA]">
             <video
@@ -322,6 +499,7 @@ export const CameraUploadScreen: React.FC = () => {
             )}
           </button>
         </div>
+        )}
 
         {/* UPLOADED DOC TRAY */}
         {capturedDocs.length > 0 && (

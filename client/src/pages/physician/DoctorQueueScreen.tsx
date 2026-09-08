@@ -19,25 +19,11 @@ export const DoctorQueueScreen: React.FC = () => {
       setIsSyncing(true);
       let token = authToken;
 
-      // Ensure physician has active JWT token
+      // If doctor is not authenticated, redirect to official login screen
       if (!token) {
-        try {
-          const authRes = await fetch(`${API_BASE_URL}/api/physician/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ doctor_id: 'DOC-AIIA-104', pin: '1234' }),
-          });
-          if (authRes.ok) {
-            const authData = await authRes.json();
-            token = authData.access_token;
-            loginDoctor(authData.doctor_id, authData.doctor_name, authData.room_number, authData.access_token);
-          }
-        } catch {
-          // Offline fallback
-        }
+        navigate('/doctor/login');
+        return;
       }
-
-      if (!token) return;
 
       const res = await fetch(`${API_BASE_URL}/api/physician/queue`, {
         headers: { Authorization: `Bearer ${token}` },
