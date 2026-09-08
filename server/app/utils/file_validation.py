@@ -4,11 +4,14 @@ Validates MIME types, file sizes, and image integrity for prescription uploads.
 """
 
 import io
+import logging
 import re
 from pathlib import Path
 from typing import Tuple
 from fastapi import HTTPException, UploadFile, status
 from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 ALLOWED_MIME_TYPES = {
     "image/jpeg",

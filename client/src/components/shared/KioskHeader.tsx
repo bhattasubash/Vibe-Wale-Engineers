@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { PhoneCall, Check } from 'lucide-react';
+import { PhoneCall, Check, Stethoscope } from 'lucide-react';
 import { useSessionStore } from '@/stores/sessionStore';
 
 export const KioskHeader: React.FC = () => {
@@ -110,6 +110,18 @@ export const KioskHeader: React.FC = () => {
             <PhoneCall className="w-3.5 h-3.5" style={{ color: '#0B5FA5' }} />
             <span className="font-semibold text-[11px]">1800-11-2233</span>
           </div>
+
+          {/* Physician / Doctor Portal Access Button */}
+          <button
+            type="button"
+            onClick={() => navigate('/doctor/login')}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[3px] border border-[#0B5FA5]/40 bg-[#0B5FA5]/5 hover:bg-[#0B5FA5]/15 text-xs font-bold text-[#0B5FA5] transition-transform active:scale-[0.98] cursor-pointer"
+            title="Go to Doctor / Physician Portal"
+          >
+            <Stethoscope className="w-3.5 h-3.5 text-[#0B5FA5]" />
+            <span className="hidden md:inline">चिकित्सक लॉगिन</span>
+            <span className="text-[11px] font-extrabold">(Doctor)</span>
+          </button>
 
         </div>
 

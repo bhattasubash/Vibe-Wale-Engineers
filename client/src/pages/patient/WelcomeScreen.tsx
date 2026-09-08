@@ -6,9 +6,10 @@ import { useSessionStore } from '@/stores/sessionStore';
 
 export const WelcomeScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { language } = useSessionStore();
+  const { language, getOrCreateSessionId } = useSessionStore();
 
   const handleStart = () => {
+    getOrCreateSessionId();
     navigate('/kiosk/language');
   };
 
@@ -200,8 +201,16 @@ export const WelcomeScreen: React.FC = () => {
             <span className="text-[#CED4DA]">|</span>
             <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
           </div>
-          <div className="text-[11px] font-semibold text-[#6C757D]">
-            <span>सहायता केंद्र: Room 04 • राष्ट्रीय आयुष हेल्पलाइन: 1800-11-2233</span>
+          <div className="flex items-center gap-3 text-[11px] font-semibold text-[#6C757D]">
+            <span>सहायता केंद्र: Room 04 • हेल्पलाइन: 1800-11-2233</span>
+            <span className="text-[#CED4DA]">|</span>
+            <button
+              type="button"
+              onClick={() => navigate('/doctor/login')}
+              className="text-[#0B5FA5] hover:underline font-bold cursor-pointer"
+            >
+              चिकित्सक कार्यक्षेत्र (Doctor Portal) →
+            </button>
           </div>
         </div>
       </footer>

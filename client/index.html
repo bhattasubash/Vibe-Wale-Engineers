@@ -13,6 +13,27 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <!-- Path-to-Hash Normalizer for HashRouter: allows direct URLs like /doctor/login, /doctor/queue, etc. -->
+    <script>
+      (function() {
+        var pathname = window.location.pathname;
+        var search = window.location.search || '';
+        var hash = window.location.hash || '';
+
+        // If direct navigation to a route without hash (e.g., /doctor/login, /doctor, /kiosk/...)
+        if (pathname && pathname !== '/' && pathname !== '/index.html' && !pathname.endsWith('.html') && !pathname.match(/\.[a-zA-Z0-9]+$/)) {
+          var base = '';
+          if (pathname.indexOf('/Vibe-Wale-Engineers') === 0) {
+            base = '/Vibe-Wale-Engineers';
+            pathname = pathname.slice('/Vibe-Wale-Engineers'.length);
+          }
+          if (pathname && pathname !== '/' && (!hash || hash === '#/' || hash === '#')) {
+            window.location.replace(base + '/#' + pathname + search);
+          }
+        }
+      })();
+    </script>
   </head>
   <body class="bg-[#eaedf0] text-[#212529] antialiased select-none min-h-screen overflow-x-hidden">
     <div id="root"></div>

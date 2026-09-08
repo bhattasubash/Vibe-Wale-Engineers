@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -83,7 +83,46 @@ export const DoctorSessionReview: React.FC = () => {
     }, 1200);
   };
 
-  const patientDocs: DocumentItem[] = patient?.documents && patient.documents.length > 0
+  // Live OCR state fetched from backend API
+  const [liveOcrResults, setLiveOcrResults] = useState<{
+    reports_count: number;
+    reports: any[];
+    all_medications: any[];
+    all_findings: any[];
+    all_diagnoses: string[];
+    combined_summary?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const targetSessionId = sessionId || patient?.sessionId;
+    if (!targetSessionId) return;
+
+    fetch(`${API_BASE_URL}/api/documents/${targetSessionId}/results`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.reports_count > 0) {
+          setLiveOcrResults(data);
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not fetch live OCR data for session:', targetSessionId, err);
+      });
+  }, [sessionId, patient?.sessionId]);
+
+  const patientDocs: DocumentItem[] = liveOcrResults && liveOcrResults.reports.length > 0
+    ? liveOcrResults.reports.map((r, idx) => {
+        const localDoc = patient?.documents?.[idx];
+        return {
+          id: r.report_id || `DOC-${idx + 1}`,
+          name: `${r.report_type} (${r.medical_specialty || 'General'})`,
+          url: localDoc?.url || './sample_reports/CamScanner 09-03-2026 01.07 (2)_page-0001.jpg',
+          type: (r.report_type?.toLowerCase().includes('lab') ? 'Lab Report' : 'Prescription') as 'Prescription' | 'Lab Report' | 'Discharge Summary' | 'Other',
+          date: r.report_date || new Date().toLocaleDateString('en-GB'),
+          facility: r.facility_name || 'AIIA Medical Records',
+          ocrSnippet: r.summary || r.impression || 'Extracted via Dual-Engine Gemini Vision & Tesseract Spatial Verification.',
+        };
+      })
+    : patient?.documents && patient.documents.length > 0
     ? patient.documents
     : [
         {
@@ -93,11 +132,13 @@ export const DoctorSessionReview: React.FC = () => {
           type: 'Prescription',
           date: '14-Aug-2026',
           facility: 'AIIA OPD Kayachikitsa',
-          ocrSnippet: patient.ocrText || 'Rx: Maharasnadi Kwath 20ml BD, Yogaraj Guggulu 2 Tab BD.',
+          ocrSnippet: patient?.ocrText || 'Rx: Maharasnadi Kwath 20ml BD, Yogaraj Guggulu 2 Tab BD.',
         },
       ];
 
-  const medications = patient?.extractedMedications && patient.extractedMedications.length > 0
+  const medications = liveOcrResults && liveOcrResults.all_medications?.length > 0
+    ? liveOcrResults.all_medications
+    : patient?.extractedMedications && patient.extractedMedications.length > 0
     ? patient.extractedMedications
     : [
         {
@@ -126,7 +167,9 @@ export const DoctorSessionReview: React.FC = () => {
         },
       ];
 
-  const labFindings = patient?.extractedLabFindings && patient.extractedLabFindings.length > 0
+  const labFindings = liveOcrResults && liveOcrResults.all_findings?.length > 0
+    ? liveOcrResults.all_findings
+    : patient?.extractedLabFindings && patient.extractedLabFindings.length > 0
     ? patient.extractedLabFindings
     : [
         {
@@ -154,6 +197,8 @@ export const DoctorSessionReview: React.FC = () => {
           verifiedStatus: 'verified' as const,
         },
       ];
+
+  const rawOcrText = liveOcrResults?.combined_summary || patient?.ocrText || 'Rx: Maharasnadi Kwath 20ml BD, Yogaraj Guggulu 2 Tab BD. Diagnosed: Sandhivata.';
 
   return (
     <div className="flex flex-col min-h-screen bg-[#EAEDF0] text-[#212529] font-sans select-none justify-between">
@@ -328,9 +373,17 @@ export const DoctorSessionReview: React.FC = () => {
                 <FileText className="w-4 h-4 text-[#0B5FA5]" />
                 <span>अपलोड किए गए मूल दस्तावेज एवं पर्चे (Original Scanned Documents)</span>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 bg-[#E8F1F8] text-[#0B5FA5] rounded-[2px]">
-                {patientDocs.length} दस्तावेज उपलब्ध
-              </span>
+              <div className="flex items-center gap-2">
+                {liveOcrResults && liveOcrResults.reports_count > 0 && (
+                  <span className="text-[10px] font-black px-2 py-0.5 bg-[#EDF7F1] text-[#2F7D4F] border border-[#2F7D4F]/30 rounded-[2px] flex items-center gap-1">
+                    <Check className="w-3 h-3 text-[#2F7D4F]" />
+                    <span>लाइव OCR निष्कर्षण (Live Gemini + Tesseract Verified)</span>
+                  </span>
+                )}
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-[#E8F1F8] text-[#0B5FA5] rounded-[2px]">
+                  {patientDocs.length} दस्तावेज उपलब्ध
+                </span>
+              </div>
             </div>
 
             {/* Document Thumbnail Cards Grid */}
@@ -384,7 +437,7 @@ export const DoctorSessionReview: React.FC = () => {
                 ऑप्टिकल कैरेक्टर रिकग्निशन (OCR Raw Findings):
               </span>
               <p className="font-mono text-[#212529] text-[11px] leading-relaxed">
-                {patient.ocrText || 'Rx: Maharasnadi Kwath 20ml BD, Yogaraj Guggulu 2 Tab BD. Diagnosed: Sandhivata.'}
+                {rawOcrText}
               </p>
             </div>
           </div>

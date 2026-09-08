@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" width="100%" height="100%">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0D6E6E"/>
+      <stop offset="100%" stop-color="#004D40"/>
+    </linearGradient>
+    <linearGradient id="cardGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F8FAFC"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0D6E6E"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="620" fill="#F1F5F9" rx="16"/>
+
+  <!-- Main Title Banner -->
+  <rect x="20" y="16" width="1160" height="50" fill="url(#headerGrad)" rx="10"/>
+  <text x="600" y="47" fill="#FFFFFF" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" text-anchor="middle" letter-spacing="1">
+    AYUSH-CARE MEDIKIOSK — END-TO-END CLINICAL INTAKE ARCHITECTURE
+  </text>
+
+  <!-- 4 Stage Columns -->
+  <!-- STAGE 1: KIOSK INTAKE -->
+  <g transform="translate(30, 85)">
+    <rect width="260" height="490" fill="url(#cardGrad1)" stroke="#CBD5E1" stroke-width="1.5" rx="12" filter="url(#cardShadow)"/>
+    <rect width="260" height="42" fill="#0D6E6E" rx="12 12 0 0"/>
+    <text x="130" y="27" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+      1. TACTILE &amp; VOICE INTAKE
+    </text>
+    
+    <!-- Sub-boxes -->
+    <rect x="15" y="58" width="230" height="85" fill="#E0F2FE" stroke="#BAE6FD" rx="8"/>
+    <text x="25" y="80" fill="#0369A1" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Audio Intake Pipeline</text>
+    <text x="25" y="100" fill="#334155" font-family="system-ui, sans-serif" font-size="11">16kHz Mono Web Audio API</text>
+    <text x="25" y="118" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Mic Track Auto-Release</text>
+    <text x="25" y="134" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Hindi / English WhisperFlow</text>
+
+    <rect x="15" y="155" width="230" height="80" fill="#F0FDF4" stroke="#BBF7D0" rx="8"/>
+    <text x="25" y="177" fill="#15803D" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Tactile &amp; GIGW Interface</text>
+    <text x="25" y="197" fill="#334155" font-family="system-ui, sans-serif" font-size="11">64px High-Contrast Tap Targets</text>
+    <text x="25" y="215" fill="#334155" font-family="system-ui, sans-serif" font-size="11">WCAG 2.1 AAA Accessibility</text>
+    <text x="25" y="228" fill="#334155" font-family="system-ui, sans-serif" font-size="10" fill-opacity="0.8">Devanagari Noto Sans + Inter</text>
+
+    <rect x="15" y="247" width="230" height="75" fill="#FEF3C7" stroke="#FDE68A" rx="8"/>
+    <text x="25" y="269" fill="#B45309" font-family="system-ui, sans-serif" font-size="12" font-weight="700">DPDP Act 2023 Consent</text>
+    <text x="25" y="289" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Automated Audio Consent Readout</text>
+    <text x="25" y="307" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Digital Timestamp &amp; State Lock</text>
+
+    <rect x="15" y="334" width="230" height="75" fill="#EDE9FE" stroke="#DDD6FE" rx="8"/>
+    <text x="25" y="356" fill="#6D28D9" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Multilingual Document OCR</text>
+    <text x="25" y="376" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Prescription &amp; Lab Report Scan</text>
+    <text x="25" y="394" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Onboard Entity Pre-Extraction</text>
+
+    <rect x="15" y="420" width="230" height="55" fill="#F1F5F9" stroke="#CBD5E1" rx="8"/>
+    <text x="25" y="442" fill="#475569" font-family="system-ui, sans-serif" font-size="11" font-weight="700">Privacy Guarantee</text>
+    <text x="25" y="460" fill="#64748B" font-family="system-ui, sans-serif" font-size="10">Ephemeral Cache (Zero Persistent Local Data)</text>
+  </g>
+
+  <!-- ARROW 1 -> 2 -->
+  <line x1="295" y1="325" x2="320" y2="325" stroke="#0D6E6E" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- STAGE 2: DUAL-ENGINE PROCESSING -->
+  <g transform="translate(325, 85)">
+    <rect width="260" height="490" fill="url(#cardGrad1)" stroke="#CBD5E1" stroke-width="1.5" rx="12" filter="url(#cardShadow)"/>
+    <rect width="260" height="42" fill="#0D6E6E" rx="12 12 0 0"/>
+    <text x="130" y="27" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+      2. DUAL-ENGINE CORE
+    </text>
+
+    <!-- Sub-boxes -->
+    <rect x="15" y="58" width="230" height="95" fill="#FEF2F2" stroke="#FECACA" rx="8"/>
+    <text x="25" y="78" fill="#B91C1C" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Triage Red-Flag Engine</text>
+    <text x="25" y="98" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Deterministic Regex &amp; Token Rules</text>
+    <text x="25" y="116" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Cardiac, Stroke, Acute Symptoms</text>
+    <text x="25" y="136" fill="#DC2626" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Priority Lock &amp; Doctor Alert</text>
+
+    <rect x="15" y="165" width="230" height="95" fill="#F0FDF4" stroke="#BBF7D0" rx="8"/>
+    <text x="25" y="185" fill="#15803D" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Prakriti Deterministic Scorer</text>
+    <text x="25" y="205" fill="#334155" font-family="system-ui, sans-serif" font-size="11">15 Constitutional Traits Sum</text>
+    <text x="25" y="223" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Charaka Samhita Vimana Sthana</text>
+    <text x="25" y="243" fill="#16A34A" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Zero LLM Hallucination</text>
+
+    <rect x="15" y="272" width="230" height="95" fill="#EFF6FF" stroke="#BFDBFE" rx="8"/>
+    <text x="25" y="292" fill="#1D4ED8" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Adaptive SOCRATES Machine</text>
+    <text x="25" y="312" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Dynamic Chief Complaint Branching</text>
+    <text x="25" y="330" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Joint Pain, Acidity, Cough, Skin</text>
+    <text x="25" y="348" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Structured Devanagari Question Sets</text>
+
+    <rect x="15" y="379" width="230" height="95" fill="#FAF5FF" stroke="#E9D5FF" rx="8"/>
+    <text x="25" y="399" fill="#7E22CE" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Clinical Clerk LLM Engine</text>
+    <text x="25" y="419" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Google Gemini 2.5 Flash</text>
+    <text x="25" y="437" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Drafts History &amp; ROS Summary</text>
+    <text x="25" y="457" fill="#9333EA" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Restricted: Never Prescribes</text>
+  </g>
+
+  <!-- ARROW 2 -> 3 -->
+  <line x1="590" y1="325" x2="615" y2="325" stroke="#0D6E6E" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- STAGE 3: CLOUD DB & QUEUE -->
+  <g transform="translate(620, 85)">
+    <rect width="260" height="490" fill="url(#cardGrad1)" stroke="#CBD5E1" stroke-width="1.5" rx="12" filter="url(#cardShadow)"/>
+    <rect width="260" height="42" fill="#0D6E6E" rx="12 12 0 0"/>
+    <text x="130" y="27" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+      3. CLOUD DB &amp; STATE
+    </text>
+
+    <!-- Sub-boxes -->
+    <rect x="15" y="58" width="230" height="95" fill="#F8FAFC" stroke="#E2E8F0" rx="8"/>
+    <text x="25" y="78" fill="#0F172A" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Supabase PostgreSQL 15</text>
+    <text x="25" y="98" fill="#334155" font-family="system-ui, sans-serif" font-size="11">10 Normalized Clinical Tables</text>
+    <text x="25" y="116" fill="#334155" font-family="system-ui, sans-serif" font-size="11">sessions, prakriti, pariksha,</text>
+    <text x="25" y="134" fill="#334155" font-family="system-ui, sans-serif" font-size="11">documents, red_flags, summaries</text>
+
+    <rect x="15" y="165" width="230" height="95" fill="#ECFDF5" stroke="#A7F3D0" rx="8"/>
+    <text x="25" y="185" fill="#065F46" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Security &amp; Isolation</text>
+    <text x="25" y="205" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Row Level Security (RLS)</text>
+    <text x="25" y="223" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Role-Based Access Control (RBAC)</text>
+    <text x="25" y="241" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Zero Patient Data Leakage</text>
+
+    <rect x="15" y="272" width="230" height="95" fill="#EFF6FF" stroke="#BFDBFE" rx="8"/>
+    <text x="25" y="292" fill="#1E40AF" font-family="system-ui, sans-serif" font-size="12" font-weight="700">High-Concurrency Pooler</text>
+    <text x="25" y="312" fill="#334155" font-family="system-ui, sans-serif" font-size="11">AWS IPv4 Pooler (Port 6543)</text>
+    <text x="25" y="330" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Sub-100ms Query Latency</text>
+    <text x="25" y="348" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Scales to 1000+ Concurrent Kiosks</text>
+
+    <rect x="15" y="379" width="230" height="95" fill="#FFFBEB" stroke="#FDE68A" rx="8"/>
+    <text x="25" y="399" fill="#92400E" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Storage &amp; Sync Gateway</text>
+    <text x="25" y="419" fill="#334155" font-family="system-ui, sans-serif" font-size="11">S3-Compatible Document Bucket</text>
+    <text x="25" y="437" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Real-time WebSocket Queue Push</text>
+    <text x="25" y="457" fill="#B45309" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Offline Fallback Local Sync</text>
+  </g>
+
+  <!-- ARROW 3 -> 4 -->
+  <line x1="885" y1="325" x2="910" y2="325" stroke="#0D6E6E" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- STAGE 4: PHYSICIAN DASHBOARD & ABDM -->
+  <g transform="translate(915, 85)">
+    <rect width="260" height="490" fill="url(#cardGrad1)" stroke="#CBD5E1" stroke-width="1.5" rx="12" filter="url(#cardShadow)"/>
+    <rect width="260" height="42" fill="#0D6E6E" rx="12 12 0 0"/>
+    <text x="130" y="27" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+      4. PHYSICIAN &amp; ABDM
+    </text>
+
+    <!-- Sub-boxes -->
+    <rect x="15" y="58" width="230" height="95" fill="#FEF2F2" stroke="#FECACA" rx="8"/>
+    <text x="25" y="78" fill="#B91C1C" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Prioritized Triage Queue</text>
+    <text x="25" y="98" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Red-Flagged Patients Pinned to Top</text>
+    <text x="25" y="116" fill="#334155" font-family="system-ui, sans-serif" font-size="11">OPD Token Tracking</text>
+    <text x="25" y="136" fill="#DC2626" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Emergency Alert Popups</text>
+
+    <rect x="15" y="165" width="230" height="95" fill="#F0FDF4" stroke="#BBF7D0" rx="8"/>
+    <text x="25" y="185" fill="#15803D" font-family="system-ui, sans-serif" font-size="12" font-weight="700">8-Second Intake Scan</text>
+    <text x="25" y="205" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Dominant Prakriti Radar Breakdown</text>
+    <text x="25" y="223" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Dashavidha Pariksha Matrix</text>
+    <text x="25" y="241" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Structured Chief Complaint Timeline</text>
+
+    <rect x="15" y="272" width="230" height="95" fill="#EFF6FF" stroke="#BFDBFE" rx="8"/>
+    <text x="25" y="292" fill="#1D4ED8" font-family="system-ui, sans-serif" font-size="12" font-weight="700">Doctor Clinical Authority</text>
+    <text x="25" y="312" fill="#334155" font-family="system-ui, sans-serif" font-size="11">One-Click Accept / Amend / Reject</text>
+    <text x="25" y="330" fill="#334155" font-family="system-ui, sans-serif" font-size="11">Direct Inline Clinical Editing</text>
+    <text x="25" y="350" fill="#2563EB" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Doctor In Complete Control</text>
+
+    <rect x="15" y="379" width="230" height="95" fill="#F0FDF4" stroke="#86EFAC" rx="8"/>
+    <text x="25" y="399" fill="#166534" font-family="system-ui, sans-serif" font-size="12" font-weight="700">ABDM &amp; HIS Integration</text>
+    <text x="25" y="419" fill="#334155" font-family="system-ui, sans-serif" font-size="11">FHIR JSON Health Summary</text>
+    <text x="25" y="437" fill="#334155" font-family="system-ui, sans-serif" font-size="11">14-Digit ABHA ID Linking</text>
+    <text x="25" y="457" fill="#15803D" font-family="system-ui, sans-serif" font-size="11" font-weight="600">Hospital EMR Push Confirmation</text>
+  </g>
+</svg>

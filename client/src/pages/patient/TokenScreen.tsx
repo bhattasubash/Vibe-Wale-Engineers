@@ -4,17 +4,20 @@ import { CheckCircle, Printer, ArrowRight, MapPin, User, ShieldCheck } from 'luc
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 import { usePhysicianStore } from '@/stores/physicianStore';
+import { API_BASE_URL } from '@/lib/config';
 
 export const TokenScreen: React.FC = () => {
   const navigate = useNavigate();
   const {
     sessionId,
+    getOrCreateSessionId,
     language,
     treatmentMode,
     patient,
     chiefComplaint,
     complaintCategory,
     socrates,
+    generalVitals,
     redFlagTriggered,
     prakritiResult,
     uploadedDocuments,
@@ -25,7 +28,7 @@ export const TokenScreen: React.FC = () => {
   const [countdown, setCountdown] = useState(25);
 
   const isAyurveda = treatmentMode === 'ayurveda';
-  const currentSessionId = sessionId || `SES-${Math.floor(1000 + Math.random() * 9000)}K`;
+  const currentSessionId = sessionId || getOrCreateSessionId();
   const tokenNumber = isAyurveda ? '#AIIA-042' : '#AIIA-G108';
 
   const assignedDoctorName = isAyurveda
@@ -37,15 +40,24 @@ export const TokenScreen: React.FC = () => {
   const assignedRoom = isAyurveda ? 'Room #104' : 'Room #205';
   const assignedBlock = isAyurveda ? 'Block A' : 'Block B';
 
-  // Automatically sync patient intake into Doctor's OPD Workstation Queue
+  // Automatically sync patient intake into Doctor's OPD Workstation Queue and Backend DB
   useEffect(() => {
     const ocrSnippet = uploadedDocuments.map((d) => d.extractedText).filter(Boolean).join(' | ');
+    const docItems = uploadedDocuments.map((d, i) => ({
+      id: d.id || `DOC-${i + 1}`,
+      name: d.name || `पर्चा #${i + 1}`,
+      url: d.previewUrl || './sample_reports/CamScanner 09-03-2026 01.07 (2)_page-0001.jpg',
+      type: 'Prescription' as const,
+      date: new Date().toLocaleDateString('en-GB'),
+      facility: 'AIIA Kiosk Capture',
+      ocrSnippet: d.extractedText || 'Extracted via Dual-Engine Vision & OCR',
+    }));
 
-    addPatientToQueue({
+    const queuePatient = {
       sessionId: currentSessionId,
       patientName: patient.fullName ? `${patient.fullName}` : (language === 'hi' ? 'रामेश्वर दयाल शर्मा (Rameshwar Sharma)' : 'Rameshwar Sharma'),
       age: typeof patient.age === 'number' ? patient.age : 62,
-      gender: patient.gender || 'male',
+      gender: (patient.gender as any) || 'male',
       phone: patient.phone || '9876543210',
       abhaId: patient.abhaId || '91-4523-8901-2345',
       tokenNumber: tokenNumber,
@@ -56,7 +68,7 @@ export const TokenScreen: React.FC = () => {
       pittaScore: prakritiResult?.pittaScore ?? 53,
       kaphaScore: prakritiResult?.kaphaScore ?? 27,
       redFlagTriggered: redFlagTriggered,
-      priority: redFlagTriggered ? 'critical' : 'normal',
+      priority: (redFlagTriggered ? 'critical' : 'normal') as 'critical' | 'normal',
       assignedDoctor: assignedDoctorName,
       roomNumber: assignedRoom,
       createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -67,11 +79,28 @@ export const TokenScreen: React.FC = () => {
         timing: socrates.timing || 'cold-morning',
         familyHistory: socrates.familyHistory || 'family-arthritis',
       },
+      documents: docItems,
       ocrText: ocrSnippet || 'Rx: Formulations and diagnostic lab reports extracted.',
       extractedDrugs: isAyurveda
         ? ['Maharasnadi Kwath 20ml BD', 'Yogaraj Guggulu 2 Tab BD', 'Shallaki Capsule 1 BD']
         : ['Tab Paracetamol 650mg TDS', 'Tab Pantoprazole 40mg OD', 'Syp Azithromycin 500mg'],
-      status: 'awaiting_review',
+      status: 'awaiting_review' as const,
+    };
+
+    addPatientToQueue(queuePatient);
+
+    // Sync complete intake with backend database
+    fetch(`${API_BASE_URL}/api/sessions/${currentSessionId}/complete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...queuePatient,
+        treatment_mode: treatmentMode,
+        prakriti_result: prakritiResult,
+        general_vitals: generalVitals,
+      }),
+    }).catch((err) => {
+      console.warn('Could not sync complete session with backend (offline mode):', err);
     });
   }, []);
 

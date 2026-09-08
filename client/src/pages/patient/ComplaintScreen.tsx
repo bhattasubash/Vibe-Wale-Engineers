@@ -83,6 +83,8 @@ export const ComplaintScreen: React.FC = () => {
     setChiefComplaint,
     setRedFlag,
     setDynamicQuestions,
+    setSessionId,
+    getOrCreateSessionId,
   } = useSessionStore();
 
   const [inputText, setInputText] = useState('');
@@ -347,19 +349,23 @@ export const ComplaintScreen: React.FC = () => {
 
     // Call Gemini Complaint Inference
     setIsInferring(true);
+    const activeSessionId = sessionId || getOrCreateSessionId();
     try {
       const res = await fetch(`${API_BASE_URL}/api/sessions/infer-complaint`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           complaint_text: inputText,
-          session_id: sessionId,
+          session_id: activeSessionId,
           language: language,
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
+        if (data.session_id) {
+          setSessionId(data.session_id);
+        }
         if (data.questions && data.questions.length > 0) {
           setDynamicQuestions(
             data.questions,

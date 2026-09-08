@@ -16,7 +16,10 @@ services:
         value: https://bhattasubash.github.io,http://localhost:5173,http://localhost:3000
       - key: SUPABASE_DB_URL
         sync: false
+      - key: DATA_DIR
+        value: /opt/render/project/src/server/data
       - key: GEMINI_API_KEY
         sync: false
       - key: JWT_SECRET
         generateValue: true
+

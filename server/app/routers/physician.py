@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+import logging
+from datetime import datetime, timezone
 from typing import List, Dict, Any
-from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.models.schemas import (
     DoctorQueueItem,
@@ -13,57 +15,11 @@ from app.services.auth import (
     create_access_token,
     require_physician_auth,
 )
+from app.db import repository as db
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/physician", tags=["Physician Dashboard"])
-
-# Mock Doctor Queue seeded with realistic AIIA OPD cases
-QUEUE_DB: List[Dict[str, Any]] = [
-    {
-        "session_id": "SES-8921A",
-        "patient_name": "कमला देवी (Kamla Devi)",
-        "age": 68,
-        "gender": "female",
-        "abha_id": "91-8821-4432-1109",
-        "token_number": "#AIIA-041",
-        "chief_complaint": "सीने में भारीपन व बेचैनी (Chest Discomfort)",
-        "dominant_prakriti": "VATA-PITTA",
-        "red_flag_triggered": True,
-        "priority": "critical",
-        "assigned_doctor": "डॉ. अनन्या शर्मा",
-        "room_number": "Room 104",
-        "created_at": "10:15 AM",
-    },
-    {
-        "session_id": "SES-8922B",
-        "patient_name": "रामेश्वर दयाल शर्मा (Rameshwar Sharma)",
-        "age": 62,
-        "gender": "male",
-        "abha_id": "91-4523-8901-2345",
-        "token_number": "#AIIA-042",
-        "chief_complaint": "दोनों घुटनों में तेज दर्द (Sandhivata)",
-        "dominant_prakriti": "PITTA-KAPHA",
-        "red_flag_triggered": False,
-        "priority": "normal",
-        "assigned_doctor": "डॉ. अनन्या शर्मा",
-        "room_number": "Room 104",
-        "created_at": "10:22 AM",
-    },
-    {
-        "session_id": "SES-8923C",
-        "patient_name": "सुरेश चंद्र जोशी (Suresh Joshi)",
-        "age": 54,
-        "gender": "male",
-        "abha_id": "91-2234-9988-5541",
-        "token_number": "#AIIA-043",
-        "chief_complaint": "अम्लपित्त एवं पेट में जलन (Chronic Acidity)",
-        "dominant_prakriti": "Predominantly PITTA",
-        "red_flag_triggered": False,
-        "priority": "normal",
-        "assigned_doctor": "डॉ. अनन्या शर्मा",
-        "room_number": "Room 104",
-        "created_at": "10:28 AM",
-    },
-]
 
 
 @router.post("/login", response_model=DoctorLoginResponse, status_code=status.HTTP_200_OK)
@@ -102,13 +58,63 @@ async def login_physician(payload: DoctorLoginRequest):
 async def get_doctor_queue(current_physician: Dict[str, Any] = Depends(require_physician_auth)):
     """
     Returns prioritized patient queue for the authenticated doctor's workstation.
-    Guarded by JWT Bearer authentication.
+    Reads from the persistent database instead of in-memory mock data.
     """
-    sorted_queue = sorted(
-        QUEUE_DB,
-        key=lambda x: (0 if x["priority"] == "critical" else 1, x["created_at"]),
-    )
-    return [DoctorQueueItem(**item) for item in sorted_queue]
+    entries = db.get_queue_entries()
+
+    queue_items = []
+    for entry in entries:
+        queue_items.append(DoctorQueueItem(
+            session_id=entry["session_id"],
+            patient_name=entry.get("patient_name", ""),
+            age=entry.get("age", 0),
+            gender=entry.get("gender", "other"),
+            abha_id=entry.get("abha_id"),
+            token_number=entry.get("token_number", ""),
+            chief_complaint=entry.get("chief_complaint", ""),
+            dominant_prakriti=entry.get("dominant_prakriti", ""),
+            red_flag_triggered=entry.get("red_flag_triggered", False),
+            priority=entry.get("priority", "normal"),
+            assigned_doctor=entry.get("assigned_doctor", ""),
+            room_number=entry.get("room_number", ""),
+            created_at=entry.get("created_at", ""),
+        ))
+
+    return queue_items
+
+
+@router.get("/session/{session_id}")
+async def get_session_details(
+    session_id: str,
+    current_physician: Dict[str, Any] = Depends(require_physician_auth),
+):
+    """
+    Returns full session details for a specific patient, including OCR results,
+    prakriti, SOCRATES data, and any clinical summary.
+    """
+    queue_entry = db.get_queue_entry(session_id)
+    if not queue_entry:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Patient session not found.",
+        )
+
+    # Enrich with OCR results from the database
+    ocr_results = db.get_ocr_results(session_id)
+    prakriti = db.get_prakriti(session_id)
+    socrates = db.get_socrates(session_id)
+    vitals = db.get_vitals(session_id)
+    summary = db.get_summary(session_id)
+
+    return {
+        "session_id": session_id,
+        "queue_entry": queue_entry,
+        "ocr_results": ocr_results,
+        "prakriti": prakriti,
+        "socrates": socrates,
+        "vitals": vitals,
+        "summary": summary,
+    }
 
 
 @router.patch("/session/{session_id}/review", status_code=status.HTTP_200_OK)
@@ -121,36 +127,41 @@ async def review_patient_session(
     Doctor marks session as accepted, amended, or rejected with prescription notes.
     Protected: guarantees only authenticated physicians can modify clinical case status.
     """
-    for item in QUEUE_DB:
-        if item["session_id"] == session_id:
-            item["status"] = payload.status
-            item["reviewed_by"] = current_physician.get("sub", payload.doctor_id)
-            item["reviewed_at"] = datetime.now().isoformat()
-            item["doctor_notes"] = payload.doctor_notes
-            return {
-                "session_id": session_id,
-                "review_status": payload.status,
-                "message": f"Session marked as {payload.status} by {current_physician.get('sub')}",
-            }
+    entry = db.get_queue_entry(session_id)
+    if not entry:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Patient session not found in doctor queue.",
+        )
 
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="Patient session not found in doctor queue.",
+    # Update queue entry status
+    db.update_queue_review(session_id, payload.status, payload.doctor_notes)
+
+    # Also update clinical summary if it exists
+    db.update_summary_review(
+        session_id,
+        doctor_id=current_physician.get("sub", payload.doctor_id),
+        status=payload.status,
+        notes=payload.doctor_notes,
     )
+
+    return {
+        "session_id": session_id,
+        "review_status": payload.status,
+        "message": f"Session marked as {payload.status} by {current_physician.get('sub')}",
+    }
 
 
 @router.get("/stats")
 async def get_dashboard_stats(current_physician: Dict[str, Any] = Depends(require_physician_auth)):
     """
     Returns live OPD statistics for physician dashboard header.
-    Protected: requires valid physician session token.
+    Now computed from real database data instead of hardcoded numbers.
     """
-    total = len(QUEUE_DB)
-    red_flags = sum(1 for item in QUEUE_DB if item["red_flag_triggered"])
+    stats = db.get_queue_stats()
     return {
-        "patients_today": total + 18,
-        "pending_in_queue": total,
-        "red_flags_intercepted": red_flags,
-        "average_consult_time_mins": 4.2,
-        "terminal_uptime": "99.98%",
+        "patients_today": stats["patients_today"],
+        "pending_in_queue": stats["awaiting_review"],
+        "red_flags_intercepted": stats["critical_pending"],
+        "reviewed": stats["reviewed"],
     }

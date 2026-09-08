@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, CheckCircle2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Camera, CheckCircle2, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 import { API_BASE_URL } from '@/lib/config';
 
 export const CameraUploadScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { language, sessionId, addUploadedDocument } = useSessionStore();
+  const { language, sessionId, getOrCreateSessionId, addUploadedDocument } = useSessionStore();
 
   const [cameraActive, setCameraActive] = useState(false);
   const [detectionState, setDetectionState] = useState<'searching' | 'adjusting' | 'holding' | 'captured'>('searching');
@@ -132,12 +132,11 @@ export const CameraUploadScreen: React.FC = () => {
       setCapturedDocs((prev) => [...prev, newDoc]);
 
       try {
+        const activeSessionId = sessionId || getOrCreateSessionId();
         const formData = new FormData();
         formData.append('files', blob, `${docId}.jpg`);
-        if (sessionId) {
-          formData.append('session_id', sessionId);
-        }
-        formData.append('sync', 'false');
+        formData.append('session_id', activeSessionId);
+        formData.append('sync', 'true');
 
         const response = await fetch(`${API_BASE_URL}/api/documents/process-reports`, {
           method: 'POST',
@@ -258,20 +257,49 @@ export const CameraUploadScreen: React.FC = () => {
                 </div>
               )}
 
-              <div className="text-[9px] font-bold text-white/80 bg-black/50 px-2 py-0.5 rounded-[2px]">
-                A4 Document Alignment Zone
+            {/* PROMINENT ANIMATED OCR SCANNING OVERLAY FOR PATIENT */}
+            {isUploading && (
+              <div className="absolute inset-0 bg-[#0B5FA5]/90 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-center z-30 animate-in fade-in duration-200">
+                <Loader2 className="w-12 h-12 text-white animate-spin mb-2" />
+                <span className="text-base sm:text-lg font-black text-white block tracking-wide">
+                  दस्तावेज़ की AI जांच हो रही है...
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-white/95 block mt-0.5">
+                  AI is analyzing your prescription (approx. 3-4 seconds)
+                </span>
+                <div className="w-44 h-1.5 bg-white/20 rounded-full mt-3 overflow-hidden">
+                  <div className="h-full bg-white animate-pulse w-3/4 rounded-full" />
+                </div>
+                <span className="text-[11px] font-semibold text-white/80 mt-2">
+                  कृपया शांत खड़े रहें • Please hold still
+                </span>
               </div>
+            )}
+
+            <div className="text-[9px] font-bold text-white/80 bg-black/50 px-2 py-0.5 rounded-[2px]">
+              A4 Document Alignment Zone
             </div>
           </div>
+        </div>
 
-          <button
+        <button
             type="button"
             onClick={handleCaptureDocument}
-            className="mt-2 py-2 px-5 rounded-[3px] border border-[#084B83] text-xs font-black text-white flex items-center gap-1.5 cursor-pointer transition-transform active:scale-[0.98]"
+            disabled={isUploading}
+            className="mt-2 py-2 px-5 rounded-[3px] border border-[#084B83] text-xs font-black text-white flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-transform active:scale-[0.98]"
             style={{ backgroundColor: '#0B5FA5' }}
           >
-            <Camera className="w-3.5 h-3.5" />
-            <span>{isUploading ? 'अपलोड हो रहा है (Uploading)...' : 'फ़ोटो खींचें • MANUAL SNAP'}</span>
+            {isUploading ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>जांच प्रगति पर है (Analyzing)...</span>
+              </>
+            ) : (
+              <>
+                <Camera className="w-3.5 h-3.5" />
+                <span>फ़ोटो खींचें • MANUAL SNAP</span>
+              </>
+            )}
           </button>
         </div>
 
@@ -286,8 +314,9 @@ export const CameraUploadScreen: React.FC = () => {
             </div>
             <button
               type="button"
+              disabled={isUploading}
               onClick={() => setDetectionState('searching')}
-              className="px-2.5 py-1 bg-[#E8F1F8] border border-[#0B5FA5]/30 text-xs font-bold text-[#0B5FA5] rounded-[2px] hover:bg-[#0B5FA5] hover:text-white cursor-pointer"
+              className="px-2.5 py-1 bg-[#E8F1F8] border border-[#0B5FA5]/30 text-xs font-bold text-[#0B5FA5] rounded-[2px] hover:bg-[#0B5FA5] hover:text-white cursor-pointer disabled:opacity-50"
             >
               + एक और जोड़ें
             </button>
@@ -298,16 +327,18 @@ export const CameraUploadScreen: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl shrink-0">
           <button
             type="button"
+            disabled={isUploading}
             onClick={() => setDetectionState('searching')}
-            className="h-12 sm:h-14 px-4 rounded-[3px] border border-[#CED4DA] bg-white hover:bg-[#EAEDF0] font-black text-xs sm:text-sm text-[#495057] flex items-center justify-center cursor-pointer transition-transform active:scale-[0.98]"
+            className="h-12 sm:h-14 px-4 rounded-[3px] border border-[#CED4DA] bg-white hover:bg-[#EAEDF0] font-black text-xs sm:text-sm text-[#495057] flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-transform active:scale-[0.98]"
           >
             <span>+ एक और पर्चा जोड़ें</span>
           </button>
 
           <button
             type="button"
+            disabled={isUploading}
             onClick={() => navigate('/kiosk/token')}
-            className="h-12 sm:h-14 px-6 rounded-[3px] border border-[#084B83] text-sm sm:text-base font-black text-white flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
+            className="h-12 sm:h-14 px-6 rounded-[3px] border border-[#084B83] text-sm sm:text-base font-black text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-transform active:scale-[0.98]"
             style={{ backgroundColor: '#0B5FA5' }}
           >
             <span>डॉक्टर को भेजें एवं टोकन लें • FINISH</span>

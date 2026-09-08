@@ -160,6 +160,7 @@ export interface SessionState {
   setPrakritiResult: (result: SessionState['prakritiResult']) => void;
   addUploadedDocument: (doc: SessionState['uploadedDocuments'][0]) => void;
   setAssignedDoctor: (doc: DoctorAssignment) => void;
+  getOrCreateSessionId: () => string;
   resetSession: () => void;
 }
 
@@ -173,7 +174,7 @@ const initialPatientState: PatientInfo = {
   isReturning: false,
 };
 
-export const useSessionStore = create<SessionState>((set) => ({
+export const useSessionStore = create<SessionState>((set, get) => ({
   sessionId: null,
   language: 'hi',
   treatmentMode: 'ayurveda',
@@ -197,6 +198,13 @@ export const useSessionStore = create<SessionState>((set) => ({
   setLanguage: (lang) => set({ language: lang }),
   setTreatmentMode: (mode) => set({ treatmentMode: mode }),
   setSessionId: (id) => set({ sessionId: id }),
+  getOrCreateSessionId: () => {
+    const current = get().sessionId;
+    if (current) return current;
+    const newId = `SES-${Math.floor(100000 + Math.random() * 900000)}`;
+    set({ sessionId: newId });
+    return newId;
+  },
   setCurrentStep: (step) => set({ currentStep: step }),
   setConsentGranted: (granted) =>
     set({

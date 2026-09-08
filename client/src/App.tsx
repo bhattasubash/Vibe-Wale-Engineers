@@ -26,7 +26,27 @@ export const App: React.FC = () => {
     <HashRouter>
       <Routes>
         {/* ======================================================= */}
-        {/* 1. PATIENT KIOSK WORKFLOW (/kiosk/*)                    */}
+        {/* 1. PHYSICIAN EMR WORKSTATION (/doctor/*)                */}
+        {/*    Must be above the /* catch-all to match first        */}
+        {/* ======================================================= */}
+        {/* S-16: Doctor Authentication Login */}
+        <Route path="/doctor/login" element={<DoctorLoginScreen />} />
+        <Route path="/doctor" element={<Navigate to="/doctor/login" replace />} />
+        <Route path="/doctor/" element={<Navigate to="/doctor/login" replace />} />
+        <Route path="/login" element={<Navigate to="/doctor/login" replace />} />
+        <Route path="/physician" element={<Navigate to="/doctor/login" replace />} />
+        <Route path="/physician/login" element={<DoctorLoginScreen />} />
+
+        {/* S-17: Prioritized Patient OPD Queue */}
+        <Route path="/doctor/queue" element={<DoctorQueueScreen />} />
+        <Route path="/physician/queue" element={<DoctorQueueScreen />} />
+
+        {/* S-18: Dense Clinical Case Sheet Review & Actions */}
+        <Route path="/doctor/session/:sessionId" element={<DoctorSessionReview />} />
+        <Route path="/physician/session/:sessionId" element={<DoctorSessionReview />} />
+
+        {/* ======================================================= */}
+        {/* 2. PATIENT KIOSK WORKFLOW (/kiosk/*)                    */}
         {/* ======================================================= */}
         <Route
           path="/*"
@@ -79,19 +99,6 @@ export const App: React.FC = () => {
             </div>
           }
         />
-
-        {/* ======================================================= */}
-        {/* 2. PHYSICIAN EMR WORKSTATION (/doctor/*)                */}
-        {/* ======================================================= */}
-        {/* S-16: Doctor Authentication Login */}
-        <Route path="/doctor/login" element={<DoctorLoginScreen />} />
-        <Route path="/doctor" element={<Navigate to="/doctor/login" replace />} />
-
-        {/* S-17: Prioritized Patient OPD Queue */}
-        <Route path="/doctor/queue" element={<DoctorQueueScreen />} />
-
-        {/* S-18: Dense Clinical Case Sheet Review & Actions */}
-        <Route path="/doctor/session/:sessionId" element={<DoctorSessionReview />} />
       </Routes>
     </HashRouter>
   );

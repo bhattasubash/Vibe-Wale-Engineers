@@ -43,3 +43,17 @@ server/data/
 *.pytest_cache/
 .coverage
 
+# Temporary debug logs & archives
+*_out.txt
+*_err.txt
+out.txt
+err.txt
+test_out.txt
+git_*.txt
+npm_build_*.txt
+server/out.txt
+client/npm_build_*.txt
+*.zip
+pptx_extracted/
+pptx_final_extracted/
+
