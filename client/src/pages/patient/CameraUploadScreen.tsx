@@ -237,9 +237,9 @@ export const CameraUploadScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-hidden">
+    <div className="flex flex-col min-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-y-auto">
       
-      {/* Non-Scrollable Centered Main Container */}
+      {/* Centered Main Container */}
       <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-2 flex-1 flex flex-col justify-evenly items-center">
         
         {/* Top Prompter */}
@@ -397,7 +397,7 @@ export const CameraUploadScreen: React.FC = () => {
         ) : (
         /* CAMERA VIEWFINDER */
         <div className="w-full max-w-3xl bg-white border border-[#CED4DA] rounded-[3px] p-3 flex flex-col items-center shrink-0">
-          <div className="relative w-full h-72 sm:h-96 md:h-[26rem] bg-[#1A202C] rounded-[3px] overflow-hidden flex items-center justify-center border-2 border-[#CED4DA]">
+          <div className="relative w-full h-48 sm:h-56 md:h-64 bg-[#1A202C] rounded-[3px] overflow-hidden flex items-center justify-center border-2 border-[#CED4DA]">
             <video
               ref={videoRef}
               autoPlay
@@ -503,17 +503,25 @@ export const CameraUploadScreen: React.FC = () => {
 
         {/* UPLOADED DOC TRAY */}
         {capturedDocs.length > 0 && (
-          <div className="w-full max-w-xl bg-white border border-[#CED4DA] rounded-[3px] p-2 flex items-center justify-between text-xs shrink-0">
+          <div className="w-full max-w-xl bg-white border border-[#15803D]/40 rounded-[3px] p-2.5 flex items-center justify-between text-xs shrink-0 shadow-2xs">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[#15803D]" />
-              <span className="font-extrabold text-[#212529]">
-                {capturedDocs.length} पर्चा जोड़ा गया
-              </span>
+              <CheckCircle2 className="w-4 h-4 text-[#15803D] shrink-0" />
+              <div>
+                <span className="font-extrabold text-[#15803D] block">
+                  ✓ {capturedDocs.length} पर्चा सुरक्षित किया गया (Saved)
+                </span>
+                <span className="text-[10px] text-[#495057] font-semibold">
+                  {language === 'hi' ? 'नीचे "टोकन पर्ची प्राप्त करें" दबाएं' : 'Tap "Finish & Get Token" below'}
+                </span>
+              </div>
             </div>
             <button
               type="button"
               disabled={isUploading}
-              onClick={() => setDetectionState('searching')}
+              onClick={() => {
+                setActiveTab('camera');
+                setDetectionState('searching');
+              }}
               className="px-2.5 py-1 bg-[#E8F1F8] border border-[#0B5FA5]/30 text-xs font-bold text-[#0B5FA5] rounded-[2px] hover:bg-[#0B5FA5] hover:text-white cursor-pointer disabled:opacity-50"
             >
               + एक और जोड़ें
@@ -522,13 +530,17 @@ export const CameraUploadScreen: React.FC = () => {
         )}
 
         {/* 2 ACTION BUTTONS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl shrink-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl shrink-0 my-2">
           <button
             type="button"
             disabled={isUploading}
-            onClick={() => setDetectionState('searching')}
-            className="h-12 sm:h-14 px-4 rounded-[3px] border border-[#CED4DA] bg-white hover:bg-[#EAEDF0] font-black text-xs sm:text-sm text-[#495057] flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-transform active:scale-[0.98]"
+            onClick={() => {
+              setActiveTab('camera');
+              setDetectionState('searching');
+            }}
+            className="h-12 sm:h-14 px-4 rounded-[3px] border border-[#CED4DA] bg-white hover:bg-[#EAEDF0] font-black text-xs sm:text-sm text-[#495057] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-transform active:scale-[0.98]"
           >
+            <Camera className="w-4 h-4 text-[#0B5FA5]" />
             <span>+ एक और पर्चा जोड़ें</span>
           </button>
 
@@ -536,7 +548,7 @@ export const CameraUploadScreen: React.FC = () => {
             type="button"
             disabled={isUploading}
             onClick={() => navigate('/kiosk/token')}
-            className="h-12 sm:h-14 px-6 rounded-[3px] border border-[#084B83] text-sm sm:text-base font-black text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-transform active:scale-[0.98]"
+            className="h-12 sm:h-14 px-6 rounded-[3px] border border-[#084B83] text-sm sm:text-base font-black text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-transform active:scale-[0.98] shadow-md hover:brightness-105"
             style={{ backgroundColor: '#0B5FA5' }}
           >
             <span>{language === 'hi' ? 'टोकन पर्ची प्राप्त करें' : 'Finish & Get Token'}</span>

@@ -87,6 +87,19 @@
         { "hindi": "लगातार बना रहता है, आराम करने पर भी आराम नहीं मिलता", "english": "Constant pain, persistent even at rest", "value": "constant_no_relief" },
         { "hindi": "सुबह उठने पर बहुत जकड़न होती है, हल्का चलने पर खुलती है", "english": "Worst in morning, eases with gentle movement", "value": "morning_stiff_eases_movement" }
       ]
+    },
+    {
+      "id": "jp-05",
+      "key": "associated",
+      "category": "गतिशीलता व संबद्ध लक्षण (Mobility & Associated Symptoms)",
+      "titleHindi": "क्या जोड़ों में सूजन, चलने में भारी असमर्थता या बुखार महसूस होता है?",
+      "titleEnglish": "Do you experience joint swelling, difficulty walking, or fever?",
+      "options": [
+        { "hindi": "हाँ, जोड़ों में सूजन व चलने में भारी असमर्थता", "english": "Joint swelling and severe difficulty walking", "value": "swelling_mobility_loss" },
+        { "hindi": "चलने पर जोड़ों से कट-कट की आवाज (Crepitus) आना", "english": "Cracking or popping sound in joints while walking", "value": "crepitus_cracking" },
+        { "hindi": "जोड़ों के दर्द के साथ हल्का बुखार या भारी थकान", "english": "Mild fever or generalized fatigue with pain", "value": "fever_fatigue" },
+        { "hindi": "केवल दर्द है, कोई सूजन या बुखार नहीं", "english": "Pain only, no swelling or fever", "value": "pain_only" }
+      ]
     }
   ]
 }

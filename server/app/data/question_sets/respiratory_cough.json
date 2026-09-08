@@ -78,6 +78,19 @@
         { "hindi": "भूख न लगना या कमजोरी व वजन घटना", "english": "Poor appetite, fatigue or weakness", "value": "loss_of_appetite_weight" },
         { "hindi": "केवल खांसी है, कोई अन्य लक्षण नहीं", "english": "Only cough, no other symptoms", "value": "no_other_symptoms" }
       ]
+    },
+    {
+      "id": "rc-05",
+      "key": "history",
+      "category": "धूम्रपान, एलर्जी व इतिहास (Allergy & Smoking History)",
+      "titleHindi": "क्या आपको धूल/धुएं से एलर्जी है या धूम्रपान की आदत रही है?",
+      "titleEnglish": "Do you have allergies to dust/smoke or history of smoking/exposure?",
+      "options": [
+        { "hindi": "हाँ, धूल, धुएं या मौसम बदलते ही छींक व खांसी", "english": "Dust, smoke allergy or seasonal sneezing/cough", "value": "allergy_dust_smoke" },
+        { "hindi": "हाँ, बीड़ी/सिगरेट या चूल्हे के धुएं का इतिहास", "english": "Bidi/cigarette smoking or wood stove smoke exposure", "value": "smoke_exposure" },
+        { "hindi": "हाँ, परिवार में पहले से दमा (Asthma) की बीमारी है", "english": "Family history of asthma or respiratory illness", "value": "family_asthma" },
+        { "hindi": "नहीं, कोई एलर्जी या धूम्रपान की आदत नहीं है", "english": "No allergies and non-smoker", "value": "no_allergy_non_smoker" }
+      ]
     }
   ]
 }

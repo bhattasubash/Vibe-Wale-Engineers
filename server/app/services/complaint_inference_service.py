@@ -184,8 +184,8 @@ class ComplaintInferenceService:
                     "3. If it DOES NOT match any of the registered question sets:\n"
                     "   - Set matched = false\n"
                     "   - Set matched_set_id = null\n"
-                    "   - Generate 3 to 4 general information questions in 'general_questions' to ask the patient basic health information.\n"
-                    "   - Each general question must have: id ('gen-01', 'gen-02', etc.), key ('site', 'onset', 'severity', 'history'), "
+                    "   - Generate exactly 5 relevant clinical exploration questions in 'general_questions' tailored to elicit the patient's condition thoroughly.\n"
+                    "   - Each general question must have: id ('gen-01' to 'gen-05'), key ('site', 'onset', 'severity', 'timing', 'history'), "
                     "category, bilingual titleHindi, bilingual titleEnglish, and 3 to 4 touch options with hindi, english, and value.\n"
                     "   - Ensure the options are easy for a patient to touch-select on a kiosk screen.\n"
                 )
@@ -337,14 +337,28 @@ class ComplaintInferenceService:
             ),
             DynamicQuestion(
                 id="gen-04",
+                key="timing",
+                category="समय व कारण (Timing & Triggers)",
+                titleHindi="यह तकलीफ किस समय या किस स्थिति में ज्यादा बढ़ जाती है?",
+                titleEnglish="When or under what situation does this trouble worsen?",
+                options=[
+                    QuestionOption(hindi="सुबह उठने पर या ठंड के मौसम में", english="Morning time or in cold weather", value="morning_cold"),
+                    QuestionOption(hindi="खाना खाने के बाद या खाली पेट", english="After meals or on an empty stomach", value="meals_empty"),
+                    QuestionOption(hindi="शारीरिक श्रम, चलने या काम करने पर", english="During physical work, walking or exertion", value="exertion"),
+                    QuestionOption(hindi="दिनभर लगातार एक जैसी बनी रहती है", english="Constant throughout the whole day", value="constant"),
+                ]
+            ),
+            DynamicQuestion(
+                id="gen-05",
                 key="history",
-                category="पूर्व इतिहास (Prior History)",
+                category="पूर्व इतिहास (Prior Medical History)",
                 titleHindi="क्या आपको पहले से कोई पुरानी बीमारी या नियमित दवा चल रही है?",
                 titleEnglish="Do you have any existing chronic condition or ongoing medications?",
                 options=[
                     QuestionOption(hindi="हाँ, शुगर (Diabetes) या बीपी (Blood Pressure)", english="Yes, Diabetes or Hypertension", value="htn_dm"),
                     QuestionOption(hindi="हाँ, अन्य कोई पुरानी बीमारी है", english="Yes, other chronic condition", value="other_chronic"),
                     QuestionOption(hindi="नहीं, कोई पुरानी बीमारी नहीं है", english="No existing conditions", value="none"),
+                    QuestionOption(hindi="मुझे निश्चित जानकारी नहीं है", english="Not sure / Don't know", value="unsure"),
                 ]
             ),
         ]

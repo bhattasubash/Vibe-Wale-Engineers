@@ -621,17 +621,24 @@ export const ComplaintScreen: React.FC = () => {
             type="button"
             onClick={handleProceed}
             disabled={!inputText.trim() || isInferring}
-            className="w-full py-3.5 px-6 rounded-[3px] border border-[#084B83] text-sm sm:text-base font-black text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-transform active:scale-[0.98]"
-            style={{ backgroundColor: '#0B5FA5' }}
+            className="h-12 sm:h-14 px-6 rounded-[3px] border font-black text-sm sm:text-base text-white flex items-center justify-center gap-2 transition-transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: inputText.trim() ? '#0B5FA5' : '#6C757D',
+              borderColor: inputText.trim() ? '#084B83' : '#495057',
+            }}
           >
             {isInferring ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin text-white" />
-                <span>{language === 'hi' ? 'विवरण दर्ज कर रहे हैं...' : 'Saving details...'}</span>
+                <span>
+                  {language === 'hi'
+                    ? 'लक्षणों का विश्लेषण जारी है (5 प्रश्न तैयार हो रहे हैं)...'
+                    : 'Analyzing symptoms & tailoring 5 questions...'}
+                </span>
               </>
             ) : (
               <>
-                <span>{language === 'hi' ? 'आगे बढ़ें (सवाल पूछें)' : 'Proceed to Questions'}</span>
+                <span>{language === 'hi' ? 'आगे बढ़ें (5 सवाल पूछें)' : 'Proceed to 5 Questions'}</span>
                 <ArrowRight className="w-5 h-5 text-white" />
               </>
             )}

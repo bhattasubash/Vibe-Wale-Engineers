@@ -33,7 +33,7 @@ def test_question_sets_loaded():
     assert jp["id"] == "joint_pain"
     assert "title" in jp
     assert "questions" in jp
-    assert len(jp["questions"]) >= 4
+    assert len(jp["questions"]) == 5
     assert "options" in jp["questions"][0]
     assert len(jp["questions"][0]["options"]) >= 3
 

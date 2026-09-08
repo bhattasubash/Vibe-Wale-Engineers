@@ -80,6 +80,19 @@
         { "hindi": "ढीला, पतला मल या दिन में 3-4 बार जाना", "english": "Loose stools / frequent urgency", "value": "loose_frequent" },
         { "hindi": "चिपचिपा मल (आंव) व पेट भारी रहना", "english": "Sticky stools with mucus / incomplete evacuation", "value": "mucus_sticky" }
       ]
+    },
+    {
+      "id": "da-05",
+      "key": "associated",
+      "category": "भूख व अन्य लक्षण (Appetite & Associated Symptoms)",
+      "titleHindi": "क्या उल्टी, मतली, भूख न लगना या वजन में कमी भी महसूस हो रही है?",
+      "titleEnglish": "Do you experience nausea, vomiting, loss of appetite, or weight loss?",
+      "options": [
+        { "hindi": "हाँ, बार-बार जी मिचलाना या खट्टा पानी गले में आना", "english": "Frequent nausea or sour fluid refluxing in throat", "value": "nausea_sour_fluid" },
+        { "hindi": "भूख बिल्कुल नहीं लगती या थोड़ा खाने पर पेट भारी होना", "english": "Loss of appetite or early fullness", "value": "poor_appetite_fullness" },
+        { "hindi": "हाँ, उल्टी होना या पेट में तेज जलन", "english": "Vomiting or intense burning in stomach", "value": "vomiting_intense_burning" },
+        { "hindi": "नहीं, भूख सामान्य है और कोई उल्टी नहीं", "english": "Normal appetite, no vomiting or nausea", "value": "appetite_normal" }
+      ]
     }
   ]
 }

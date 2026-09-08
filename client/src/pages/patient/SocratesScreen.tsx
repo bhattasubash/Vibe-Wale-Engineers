@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Activity, Check, Volume2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Activity, Check, Volume2, Sparkles, PenLine } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { VoiceAnswerButton } from '@/components/ui/VoiceAnswerButton';
 import { useSessionStore } from '@/stores/sessionStore';
@@ -10,6 +10,7 @@ export interface SocratesQuestion {
   key: string;
   titleHindi: string;
   titleEnglish: string;
+  category?: string;
   options: Array<{
     value: string;
     hindi: string;
@@ -17,11 +18,12 @@ export interface SocratesQuestion {
   }>;
 }
 
-const SOCRATES_QUESTIONS: SocratesQuestion[] = [
+const DEFAULT_SOCRATES_QUESTIONS: SocratesQuestion[] = [
   {
     key: 'site',
     titleHindi: 'दर्द या परेशानी शरीर के किस हिस्से में सबसे ज्यादा महसूस हो रही है?',
     titleEnglish: 'Where in your body is the discomfort primarily located?',
+    category: 'स्थान (Location)',
     options: [
       { value: 'head-neck', hindi: 'सिर / गर्दन / गला', english: 'Head, Neck & Throat' },
       { value: 'chest-abdomen', hindi: 'छाती / पेट का ऊपरी हिस्सा', english: 'Chest & Upper Abdomen' },
@@ -34,6 +36,7 @@ const SOCRATES_QUESTIONS: SocratesQuestion[] = [
     key: 'onset',
     titleHindi: 'यह तकलीफ कब से शुरू हुई है?',
     titleEnglish: 'When did this problem start?',
+    category: 'अवधि (Duration)',
     options: [
       { value: 'acute-few-days', hindi: 'कुछ ही दिनों से (1 से 7 दिन)', english: 'Past few days (1 to 7 days)' },
       { value: 'subacute-few-weeks', hindi: '2 से 4 सप्ताह से', english: '2 to 4 weeks' },
@@ -45,6 +48,7 @@ const SOCRATES_QUESTIONS: SocratesQuestion[] = [
     key: 'severity',
     titleHindi: 'तकलीफ की तीव्रता (दर्द का स्तर) 1 से 10 के पैमाने पर कितनी है?',
     titleEnglish: 'How severe is the discomfort on a scale of 1 to 10?',
+    category: 'तीव्रता (Severity)',
     options: [
       { value: 'mild-3', hindi: 'हल्का (1–3): दैनिक कार्य सामान्य रूप से संभव हैं', english: 'Mild (1-3): Normal activities manageable' },
       { value: 'moderate-6', hindi: 'मध्यम (4–6): काम करने या उठने-बैठने में कष्ट', english: 'Moderate (4-6): Interferes with work or movement' },
@@ -56,6 +60,7 @@ const SOCRATES_QUESTIONS: SocratesQuestion[] = [
     key: 'timing',
     titleHindi: 'यह तकलीफ किस समय या किस स्थिति में अधिक महसूस होती है?',
     titleEnglish: 'When or in what situation is this trouble most noticeable?',
+    category: 'समय व कारक (Timing & Triggers)',
     options: [
       { value: 'morning-cold', hindi: 'सुबह उठने पर या ठंड के मौसम में', english: 'Morning time or in cold weather' },
       { value: 'meals', hindi: 'भोजन के बाद या खाली पेट', english: 'After meals or on an empty stomach' },
@@ -66,8 +71,9 @@ const SOCRATES_QUESTIONS: SocratesQuestion[] = [
   },
   {
     key: 'familyHistory',
-    titleHindi: 'क्या परिवार में किसी अन्य सदस्य को भी ऐसी समस्या रही है?',
-    titleEnglish: 'Has anyone in your family had a similar condition?',
+    titleHindi: 'क्या परिवार में किसी अन्य सदस्य को भी ऐसी समस्या या पुरानी बीमारी रही है?',
+    titleEnglish: 'Has anyone in your family had a similar condition or chronic illness?',
+    category: 'पारिवारिक व संबद्ध इतिहास (Family History)',
     options: [
       { value: 'family-similar', hindi: 'हाँ, माता-पिता या भाई-बहन को यही रोग रहा है', english: 'Yes, same condition in parents or siblings' },
       { value: 'family-chronic', hindi: 'हाँ, परिवार में मधुमेह (शुगर) या उच्च रक्तचाप (BP) है', english: 'Yes, family history of diabetes or blood pressure' },
@@ -81,36 +87,97 @@ export const SocratesScreen: React.FC = () => {
   const navigate = useNavigate();
   const {
     language,
+    socrates,
     setSocratesResponse,
     chiefComplaint,
     treatmentMode,
     activeQuestionSet,
+    dynamicQuestions,
   } = useSessionStore();
 
   const [currentTurn, setCurrentTurn] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [customAnswer, setCustomAnswer] = useState<string>('');
+  const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
 
-  const questionsList =
-    activeQuestionSet?.questions && activeQuestionSet.questions.length > 0
-      ? activeQuestionSet.questions.map((q) => ({
-          key: q.key,
-          titleHindi: q.titleHindi,
-          titleEnglish: q.titleEnglish,
-          options: q.options.map((opt) => ({
-            value: opt.value,
-            hindi: opt.hindi,
-            english: opt.english,
-          })),
-        }))
-      : SOCRATES_QUESTIONS;
+  // Dynamic question selection (Gemini inferred question set -> dynamic questions -> default)
+  const questionsList: SocratesQuestion[] = useMemo(() => {
+    if (activeQuestionSet?.questions && activeQuestionSet.questions.length > 0) {
+      return activeQuestionSet.questions.map((q) => ({
+        key: q.key,
+        category: q.category,
+        titleHindi: q.titleHindi,
+        titleEnglish: q.titleEnglish,
+        options: q.options.map((opt) => ({
+          value: opt.value,
+          hindi: opt.hindi,
+          english: opt.english,
+        })),
+      }));
+    }
+    if (dynamicQuestions && dynamicQuestions.length > 0) {
+      return dynamicQuestions.map((q) => ({
+        key: q.key,
+        category: q.category,
+        titleHindi: q.titleHindi,
+        titleEnglish: q.titleEnglish,
+        options: q.options.map((opt) => ({
+          value: opt.value,
+          hindi: opt.hindi,
+          english: opt.english,
+        })),
+      }));
+    }
+    return DEFAULT_SOCRATES_QUESTIONS;
+  }, [activeQuestionSet, dynamicQuestions]);
 
   const totalQuestions = questionsList.length;
   const question = questionsList[Math.min(currentTurn, totalQuestions - 1)];
 
+  // Initialize or restore answer when turn changes
+  useEffect(() => {
+    speechEngine.stop();
+    setVoiceNotice(null);
+    if (!question) return;
+
+    const existingAnswer = (socrates as any)[question.key];
+    if (existingAnswer) {
+      const isPreset = question.options.some((opt) => opt.value === existingAnswer);
+      if (isPreset) {
+        setSelectedOption(existingAnswer);
+        setCustomAnswer('');
+      } else {
+        setSelectedOption('__custom__');
+        setCustomAnswer(String(existingAnswer));
+      }
+    } else {
+      setSelectedOption(null);
+      setCustomAnswer('');
+    }
+  }, [currentTurn, question?.key]);
+
   const handleSelectOption = (optValue: string) => {
     speechEngine.stop();
     setSelectedOption(optValue);
+    setVoiceNotice(null);
     setSocratesResponse(question.key as any, optValue);
+  };
+
+  const handleCustomInputChange = (text: string) => {
+    setCustomAnswer(text);
+    setSelectedOption('__custom__');
+    setVoiceNotice(null);
+    if (text.trim()) {
+      setSocratesResponse(question.key as any, text.trim());
+    }
+  };
+
+  const handleSelectCustom = () => {
+    speechEngine.stop();
+    setSelectedOption('__custom__');
+    if (customAnswer.trim()) {
+      setSocratesResponse(question.key as any, customAnswer.trim());
+    }
   };
 
   const handleVoiceAnswer = (transcript: string) => {
@@ -118,6 +185,7 @@ export const SocratesScreen: React.FC = () => {
     const currentQ = questionsList[currentTurn];
     if (!currentQ) return;
 
+    // Check if voice matched one of the preset options
     let matchedVal: string | null = null;
     currentQ.options.forEach((opt, idx) => {
       const optHindi = opt.hindi.toLowerCase();
@@ -137,15 +205,11 @@ export const SocratesScreen: React.FC = () => {
 
     if (matchedVal) {
       handleSelectOption(matchedVal);
+      setVoiceNotice(language === 'hi' ? `विकल्प चुना गया: ${transcript}` : `Option selected: ${transcript}`);
     } else {
-      for (const opt of currentQ.options) {
-        const words = (opt.hindi + ' ' + opt.english).toLowerCase().split(/\s+/);
-        if (words.some((w) => w.length > 3 && lower.includes(w))) {
-          handleSelectOption(opt.value);
-          return;
-        }
-      }
-      if (currentQ.options[0]) handleSelectOption(currentQ.options[0].value);
+      // Freeform speech: populate custom answer so no patient words are lost
+      handleCustomInputChange(transcript);
+      setVoiceNotice(language === 'hi' ? `बोला गया विवरण दर्ज: "${transcript}"` : `Recorded response: "${transcript}"`);
     }
   };
 
@@ -155,11 +219,16 @@ export const SocratesScreen: React.FC = () => {
     speechEngine.speak(text, language);
   };
 
+  const isCurrentAnswerValid =
+    selectedOption !== null &&
+    (selectedOption !== '__custom__' || customAnswer.trim().length > 0);
+
   const handleNextTurn = () => {
     speechEngine.stop();
+    if (!isCurrentAnswerValid) return;
+
     if (currentTurn < totalQuestions - 1) {
       setCurrentTurn((prev) => prev + 1);
-      setSelectedOption(null);
     } else {
       if (treatmentMode === 'allopathy') {
         navigate('/kiosk/vitals');
@@ -173,20 +242,23 @@ export const SocratesScreen: React.FC = () => {
     speechEngine.stop();
     if (currentTurn > 0) {
       setCurrentTurn((prev) => prev - 1);
-      setSelectedOption(null);
     } else {
       navigate('/kiosk/complaint');
     }
   };
 
+  const hasDynamicAiQuestions = Boolean(
+    activeQuestionSet?.title || (dynamicQuestions && dynamicQuestions.length > 0)
+  );
+
   return (
-    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-hidden">
+    <div className="flex flex-col min-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-y-auto">
       
-      {/* Non-Scrollable Centered Main Container */}
-      <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-2 flex-1 flex flex-col justify-evenly items-center">
+      {/* Centered Main Container */}
+      <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-3 flex-1 flex flex-col justify-evenly items-center">
         
         {/* Top Prompter */}
-        <div className="shrink-0">
+        <div className="shrink-0 mb-1">
           <AudioSpeaker
             hindiText={question.titleHindi}
             englishText={question.titleEnglish}
@@ -195,27 +267,36 @@ export const SocratesScreen: React.FC = () => {
           />
         </div>
 
-        {/* Progress & Category Header */}
-        <div className="w-full max-w-2xl shrink-0">
-          <div className="flex items-center justify-between mb-1.5">
-            <div
-              className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[3px] border text-[11px] font-bold uppercase tracking-wider"
-              style={{
-                backgroundColor: '#E8F1F8',
-                borderColor: 'rgba(11, 95, 165, 0.3)',
-                color: '#0B5FA5',
-              }}
-            >
-              <Activity className="w-3.5 h-3.5" />
-              <span>
-                {language === 'hi'
-                  ? `स्वास्थ्य विवरण • प्रश्न ${currentTurn + 1} / ${totalQuestions}`
-                  : `Health Details • Question ${currentTurn + 1} of ${totalQuestions}`}
+        {/* Progress & Dynamic AI Badge Header */}
+        <div className="w-full max-w-2xl shrink-0 mb-2">
+          
+          {/* DYNAMIC GEMINI CLINICAL BANNER */}
+          <div
+            className="w-full px-3 py-1.5 rounded-[3px] border mb-2 flex items-center justify-between text-xs shadow-2xs"
+            style={{
+              backgroundColor: hasDynamicAiQuestions ? '#E8F1F8' : '#F8FAFC',
+              borderColor: hasDynamicAiQuestions ? 'rgba(11, 95, 165, 0.4)' : '#CED4DA',
+            }}
+          >
+            <div className="flex items-center gap-2 truncate">
+              {hasDynamicAiQuestions ? (
+                <Sparkles className="w-4 h-4 text-[#0B5FA5] shrink-0" />
+              ) : (
+                <Activity className="w-4 h-4 text-[#0B5FA5] shrink-0" />
+              )}
+              <span className="font-extrabold text-[#0B5FA5] truncate">
+                {hasDynamicAiQuestions
+                  ? (language === 'hi'
+                      ? `✨ Gemini AI द्वारा आपके लक्षणों के आधार पर तैयार 5 प्रश्न (${activeQuestionSet?.title || chiefComplaint || 'लक्षण'})`
+                      : `✨ 5 Clinical Questions tailored by Gemini AI (${activeQuestionSet?.title || chiefComplaint || 'Symptoms'})`)
+                  : (language === 'hi'
+                      ? `प्राथमिक 5 नैदानिक प्रश्न • लक्षण: ${chiefComplaint || 'सामान्य'}`
+                      : `Primary 5 Clinical Questions • Symptoms: ${chiefComplaint || 'General'}`)}
               </span>
             </div>
 
-            <span className="text-xs font-extrabold text-[#495057] truncate max-w-xs">
-              {chiefComplaint ? `लक्षण: ${chiefComplaint}` : 'लक्षण विवरण'}
+            <span className="text-[11px] font-black text-[#495057] bg-white px-2 py-0.5 rounded border border-[#CED4DA] shrink-0 ml-2">
+              {currentTurn + 1} / {totalQuestions}
             </span>
           </div>
 
@@ -231,12 +312,22 @@ export const SocratesScreen: React.FC = () => {
         </div>
 
         {/* Current Question Container */}
-        <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-4 sm:p-5 shrink-0">
+        <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-4 sm:p-5 shrink-0 mb-3 shadow-xs">
           
-          <div className="text-[10px] font-bold text-[#6C757D] uppercase tracking-wider mb-0.5">
-            {language === 'hi' ? 'एक विकल्प चुनें (Single Choice):' : 'Select one option:'}
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <span className="text-[10px] font-bold text-[#6C757D] uppercase tracking-wider">
+              {question.category || (language === 'hi' ? 'नैदानिक विवरण:' : 'Clinical Parameter:')}
+            </span>
+
+            {/* Voice notice feedback chip */}
+            {voiceNotice && (
+              <span className="text-[11px] font-bold text-[#15803D] bg-[#F0FDF4] px-2 py-0.5 rounded border border-[#15803D]/30 truncate max-w-xs">
+                ✓ {voiceNotice}
+              </span>
+            )}
           </div>
 
+          {/* Question Title & Dedicated Voice Input Button */}
           <div className="flex items-start justify-between gap-3 mb-3">
             <h2
               className="text-lg sm:text-2xl font-black leading-tight flex-1"
@@ -244,15 +335,20 @@ export const SocratesScreen: React.FC = () => {
             >
               {language === 'hi' ? question.titleHindi : question.titleEnglish}
             </h2>
-            <VoiceAnswerButton
-              language={language}
-              onTranscript={handleVoiceAnswer}
-              size="sm"
-            />
+
+            {/* Prominent Voice Answer Button for EVERY question turn */}
+            <div className="shrink-0">
+              <VoiceAnswerButton
+                language={language}
+                onTranscript={handleVoiceAnswer}
+                size="md"
+                label={language === 'hi' ? 'बोलकर जवाब दें' : 'Tap to Speak'}
+              />
+            </div>
           </div>
 
-          {/* TOUCH OPTIONS WITH RADIO BUTTON INDICATOR & AUDIO BUTTON */}
-          <div className="space-y-2">
+          {/* TOUCH PRESET OPTIONS */}
+          <div className="space-y-2 mb-3">
             {question.options.map((opt, idx) => {
               const isSelected = selectedOption === opt.value;
               const optionText = language === 'hi' ? opt.hindi : opt.english;
@@ -261,7 +357,7 @@ export const SocratesScreen: React.FC = () => {
                   key={opt.value}
                   type="button"
                   onClick={() => handleSelectOption(opt.value)}
-                  className="w-full min-h-[50px] sm:min-h-[56px] py-2 px-4 rounded-[3px] border text-left transition-transform active:scale-[0.98] cursor-pointer flex items-center justify-between group"
+                  className="w-full min-h-[50px] sm:min-h-[54px] py-2 px-3 sm:px-4 rounded-[3px] border text-left transition-transform active:scale-[0.98] cursor-pointer flex items-center justify-between group"
                   style={{
                     backgroundColor: isSelected ? '#0B5FA5' : '#FFFFFF',
                     borderColor: isSelected ? '#084B83' : '#CED4DA',
@@ -269,7 +365,7 @@ export const SocratesScreen: React.FC = () => {
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    {/* Radio Button Indicator */}
+                    {/* Radio Indicator */}
                     <div
                       className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
                       style={{
@@ -293,7 +389,7 @@ export const SocratesScreen: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0 ml-2">
-                    {/* Dedicated Per-Option Speaker Button */}
+                    {/* Speaker Button */}
                     <div
                       role="button"
                       tabIndex={0}
@@ -317,10 +413,60 @@ export const SocratesScreen: React.FC = () => {
             })}
           </div>
 
+          {/* TYPE YOUR OWN OPTION FALLBACK (FOR EVERY QUESTION TURN) */}
+          <div
+            onClick={handleSelectCustom}
+            className={`p-3 rounded-[3px] border transition-all cursor-pointer ${
+              selectedOption === '__custom__'
+                ? 'border-[#0B5FA5] bg-[#F0F7FD] shadow-2xs'
+                : 'border-dashed border-[#CBD5E1] bg-[#F8FAFC] hover:border-[#0B5FA5]'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
+                  style={{
+                    borderColor: selectedOption === '__custom__' ? '#0B5FA5' : '#6C757D',
+                    backgroundColor: selectedOption === '__custom__' ? '#FFFFFF' : 'transparent',
+                  }}
+                >
+                  {selectedOption === '__custom__' && (
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#0B5FA5]" />
+                  )}
+                </div>
+                <span className="text-xs font-black text-[#0B5FA5] flex items-center gap-1">
+                  <PenLine className="w-3.5 h-3.5" />
+                  <span>
+                    {language === 'hi'
+                      ? '✎ अन्य / अपना उत्तर लिखकर बताएं (Type your own option):'
+                      : '✎ Other / Type or Speak your custom answer:'}
+                  </span>
+                </span>
+              </div>
+              <span className="text-[10px] text-[#6C757D] font-bold">
+                {language === 'hi' ? '(वैकल्पिक)' : '(Custom answer)'}
+              </span>
+            </div>
+
+            <input
+              type="text"
+              value={customAnswer}
+              onChange={(e) => handleCustomInputChange(e.target.value)}
+              onFocus={handleSelectCustom}
+              placeholder={
+                language === 'hi'
+                  ? 'यदि आपका उत्तर ऊपर के विकल्पों में नहीं है, तो यहाँ लिखें या ऊपर माइक दबाकर बोलें...'
+                  : 'Type your answer here or tap the mic button above...'
+              }
+              className="w-full p-2.5 text-xs sm:text-sm font-bold text-[#212529] bg-white border border-[#CED4DA] rounded-[2px] focus:outline-none focus:border-[#0B5FA5]"
+            />
+          </div>
+
         </div>
 
         {/* 2 LARGE ACTION BUTTONS */}
-        <div className="grid grid-cols-2 gap-3 w-full max-w-2xl shrink-0">
+        <div className="grid grid-cols-2 gap-3 w-full max-w-2xl shrink-0 mb-3">
           <button
             type="button"
             onClick={handlePrevTurn}
@@ -333,11 +479,11 @@ export const SocratesScreen: React.FC = () => {
           <button
             type="button"
             onClick={handleNextTurn}
-            disabled={selectedOption === null}
+            disabled={!isCurrentAnswerValid}
             className="h-12 sm:h-14 px-6 rounded-[3px] border font-black text-sm sm:text-base text-white flex items-center justify-center gap-2 transition-transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              backgroundColor: selectedOption !== null ? '#0B5FA5' : '#6C757D',
-              borderColor: selectedOption !== null ? '#084B83' : '#495057',
+              backgroundColor: isCurrentAnswerValid ? '#0B5FA5' : '#6C757D',
+              borderColor: isCurrentAnswerValid ? '#084B83' : '#495057',
             }}
           >
             <span>
@@ -360,7 +506,7 @@ export const SocratesScreen: React.FC = () => {
             <span className="font-semibold text-[#495057]">नई दिल्ली</span>
           </div>
           <div className="flex items-center gap-1 text-[11px] font-semibold text-[#6C757D]">
-            <span>राष्ट्रीय आयुष मिशन • ओपीडी सहायता प्रणाली</span>
+            <span>राष्ट्रीय आयुष मिशन • 5-चरणीय नैदानिक इतिहास संकलन</span>
           </div>
         </div>
       </footer>

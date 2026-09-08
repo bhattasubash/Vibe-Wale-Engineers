@@ -78,6 +78,19 @@
         { "hindi": "रात को सोते समय या बिस्तर की गर्मी से", "english": "At night under warm blankets", "value": "night_time" },
         { "hindi": "खट्टा, तला हुआ या बासी खाना खाने पर", "english": "After eating sour, fermented or spicy food", "value": "sour_fermented_food" }
       ]
+    },
+    {
+      "id": "sd-05",
+      "key": "associated",
+      "category": "नींद व संबद्ध प्रभाव (Sleep Impact & Complications)",
+      "titleHindi": "क्या खुजली से नींद में खलल पड़ता है या त्वचा से पानी/खून रिसता है?",
+      "titleEnglish": "Does itching disrupt sleep, or does the skin bleed or ooze fluid?",
+      "options": [
+        { "hindi": "रात को इतनी तेज खुजली होती है कि नींद खुल जाती है", "english": "Severe itching that disturbs sleep at night", "value": "sleep_disturbed" },
+        { "hindi": "खुजलाने पर जलन, पानी या खून रिसने लगता है", "english": "Burning sensation, weeping fluid or bleeding", "value": "oozing_bleeding" },
+        { "hindi": "किसी नई दवा या खाने के बाद अचानक दाने निकले", "english": "Triggered right after a new medicine or specific food", "value": "drug_food_allergy" },
+        { "hindi": "मध्यम खुजली है, कोई रिसाव या नींद में खलल नहीं", "english": "Mild to moderate itching, no bleeding or sleeplessness", "value": "mild_no_oozing" }
+      ]
     }
   ]
 }
