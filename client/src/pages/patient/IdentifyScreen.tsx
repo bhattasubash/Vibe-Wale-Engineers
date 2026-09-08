@@ -110,7 +110,7 @@ export const IdentifyScreen: React.FC = () => {
             }}
           >
             <QrCode className="w-4 h-4 shrink-0" />
-            <span>{language === 'hi' ? 'आभा ऐप QR स्कैन (Scan & Share)' : 'ABDM Scan & Share'}</span>
+            <span>{language === 'hi' ? 'फोन से QR स्कैन करें' : 'Scan QR via Phone'}</span>
           </button>
 
           <button
@@ -124,7 +124,7 @@ export const IdentifyScreen: React.FC = () => {
             }}
           >
             <UserPlus className="w-4 h-4 shrink-0" />
-            <span>{language === 'hi' ? 'बिना फोन के पंजीकरण' : 'Register Without Phone'}</span>
+            <span>{language === 'hi' ? 'बिना फोन के आगे बढ़ें' : 'Continue Without Phone'}</span>
           </button>
         </div>
 
@@ -167,31 +167,32 @@ export const IdentifyScreen: React.FC = () => {
                   </div>
 
                   <div className="text-[9px] font-black font-mono text-[#0B5FA5] mt-1 tracking-wider uppercase">
-                    HIP: AIIA_DELHI • KIOSK #01
+                    AIIA DELHI • KIOSK #01
                   </div>
                 </div>
 
-                {/* Instructions & Simulation Trigger */}
+                {/* Instructions & Phone Scan Trigger */}
                 <div className="text-left space-y-2.5 max-w-sm">
                   <div className="flex items-center gap-2 text-xs font-bold text-[#0B5FA5]">
                     <Smartphone className="w-4 h-4 text-[#0B5FA5] shrink-0" />
-                    <span>आयुष्मान भारत डिजिटल मिशन (ABDM)</span>
+                    <span>{language === 'hi' ? 'फोन से त्वरित पहचान' : 'Fast Phone Verification'}</span>
                   </div>
 
                   <ol className="text-xs text-[#495057] space-y-1 font-semibold list-decimal list-inside leading-relaxed">
-                    <li>अपने मोबाइल में <strong>ABHA / Aarogya Setu</strong> खोलें।</li>
-                    <li><strong>'Scan & Share'</strong> बटन दबाकर इस QR को स्कैन करें।</li>
-                    <li>आपकी प्रोफाइल बिना टाइप किए तुरंत सत्यापित हो जाएगी।</li>
+                    <li>अपने फोन में <strong>ABHA / Aarogya Setu</strong> ऐप खोलें।</li>
+                    <li><strong>'Scan & Share'</strong> पर दबाकर इस QR कोड को स्कैन करें।</li>
+                    <li>आपका नाम और विवरण बिना टाइप किए तुरंत दर्ज हो जाएगा।</li>
                   </ol>
 
-                  {/* Immediate Simulation Button for Test/Demo */}
+                  {/* Operational Scan Verification Action */}
                   <button
                     type="button"
                     onClick={handleSimulatePhoneScanned}
-                    className="w-full py-2.5 px-4 rounded-[3px] border border-[#084B83] text-xs font-black text-white cursor-pointer transition-transform active:scale-[0.98]"
+                    className="w-full py-2.5 px-4 rounded-[3px] border border-[#084B83] text-xs font-black text-white cursor-pointer transition-transform active:scale-[0.98] flex items-center justify-center gap-1.5"
                     style={{ backgroundColor: '#0B5FA5' }}
                   >
-                    फोन से स्कैन करें • TAP TO SIMULATE PHONE SCAN
+                    <QrCode className="w-4 h-4" />
+                    <span>{language === 'hi' ? 'स्कैन पूरा करें (Scan Complete)' : 'Confirm Phone Scan'}</span>
                   </button>
                 </div>
 

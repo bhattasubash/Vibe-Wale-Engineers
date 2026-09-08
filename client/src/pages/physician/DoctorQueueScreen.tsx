@@ -169,7 +169,7 @@ export const DoctorQueueScreen: React.FC = () => {
       {/* Main Queue Container */}
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 flex-1 flex flex-col space-y-4">
         
-        {/* STATS STRIP (4 Metrics) */}
+        {/* STATS STRIP (4 Operational Metrics) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0">
           
           <div className="bg-white border border-[#CED4DA] p-3.5 rounded-[3px]">
@@ -190,22 +190,34 @@ export const DoctorQueueScreen: React.FC = () => {
             <span className="text-[10px] text-[#495057] font-semibold">अनुमानित समय: ~15 मिनट</span>
           </div>
 
-          <div className="bg-white border-2 border-[#DC2626] p-3.5 rounded-[3px] bg-[#FEF2F2]/40">
-            <div className="flex items-center justify-between text-[#DC2626] text-[11px] font-bold uppercase mb-1">
-              <span>आपातकालीन रेड-फ्लैग</span>
-              <ShieldAlert className="w-4 h-4 text-[#DC2626]" />
+          <div
+            className={`border p-3.5 rounded-[3px] transition-colors ${
+              criticalCount > 0
+                ? 'bg-[#FEF2F2]/80 border-[#DC2626] border-2'
+                : 'bg-white border-[#CED4DA]'
+            }`}
+          >
+            <div className="flex items-center justify-between text-[11px] font-bold uppercase mb-1">
+              <span className={criticalCount > 0 ? 'text-[#DC2626]' : 'text-[#6C757D]'}>
+                आपातकालीन अलर्ट
+              </span>
+              <ShieldAlert className={`w-4 h-4 ${criticalCount > 0 ? 'text-[#DC2626]' : 'text-[#6C757D]'}`} />
             </div>
-            <div className="text-2xl font-black text-[#DC2626]">{criticalCount}</div>
-            <span className="text-[10px] text-[#DC2626] font-extrabold">तत्काल प्राथमिकता (Immediate)</span>
+            <div className={`text-2xl font-black ${criticalCount > 0 ? 'text-[#DC2626]' : 'text-[#212529]'}`}>
+              {criticalCount}
+            </div>
+            <span className={`text-[10px] font-extrabold ${criticalCount > 0 ? 'text-[#DC2626]' : 'text-[#6C757D]'}`}>
+              {criticalCount > 0 ? 'तत्काल प्राथमिकता (Immediate)' : 'कोई आपातकालीन केस नहीं'}
+            </span>
           </div>
 
           <div className="bg-white border border-[#CED4DA] p-3.5 rounded-[3px]">
             <div className="flex items-center justify-between text-[#6C757D] text-[11px] font-bold uppercase mb-1">
-              <span>औसत समय बचत (Saved)</span>
+              <span>कियोस्क पूर्व-पंजीकृत</span>
               <CheckCircle2 className="w-4 h-4 text-[#2F7D4F]" />
             </div>
-            <div className="text-2xl font-black text-[#2F7D4F]">72%</div>
-            <span className="text-[10px] text-[#6C757D] font-semibold">कियोस्क पूर्व-पंजीकरण द्वारा</span>
+            <div className="text-2xl font-black text-[#2F7D4F]">18 / 21</div>
+            <span className="text-[10px] text-[#6C757D] font-semibold">85% डिजिटल केस शीट तैयार</span>
           </div>
 
         </div>

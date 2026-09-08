@@ -20,13 +20,14 @@ export interface SocratesQuestion {
 const SOCRATES_QUESTIONS: SocratesQuestion[] = [
   {
     key: 'site',
-    titleHindi: 'दर्द या तकलीफ शरीर के किस हिस्से में सबसे ज्यादा महसूस हो रही है?',
-    titleEnglish: 'Where is the pain or discomfort located?',
+    titleHindi: 'दर्द या परेशानी शरीर के किस हिस्से में सबसे ज्यादा महसूस हो रही है?',
+    titleEnglish: 'Where in your body is the discomfort primarily located?',
     options: [
-      { value: 'bilateral-knees', hindi: 'दोनों घुटने व जोड़ (Bilateral Knees)', english: 'Bilateral Knees & Joints' },
-      { value: 'epigastrium', hindi: 'पेट का ऊपरी हिस्सा / छाती (Epigastrium)', english: 'Upper Abdomen / Chest' },
-      { value: 'lower-back', hindi: 'कमर का निचला हिस्सा (Lumbar/Spine)', english: 'Lower Back & Spine' },
-      { value: 'general-body', hindi: 'पूरे शरीर में भारीपन व थकान (Generalized)', english: 'Whole Body / Fatigue' },
+      { value: 'head-neck', hindi: 'सिर / गर्दन / गला', english: 'Head, Neck & Throat' },
+      { value: 'chest-abdomen', hindi: 'छाती / पेट का ऊपरी हिस्सा', english: 'Chest & Upper Abdomen' },
+      { value: 'back-spine', hindi: 'कमर / पीठ / पेट का निचला हिस्सा', english: 'Lower Back, Spine & Pelvis' },
+      { value: 'limbs-joints', hindi: 'हाथ / पैर / घुटने व जोड़', english: 'Arms, Legs, Knees & Joints' },
+      { value: 'general-skin', hindi: 'पूरे शरीर में / त्वचा पर', english: 'Generalized / Skin / Whole Body' },
     ],
   },
   {
@@ -34,43 +35,44 @@ const SOCRATES_QUESTIONS: SocratesQuestion[] = [
     titleHindi: 'यह तकलीफ कब से शुरू हुई है?',
     titleEnglish: 'When did this problem start?',
     options: [
-      { value: 'acute-few-days', hindi: 'कुछ ही दिनों से (Recent / Acute)', english: 'Past few days (Acute)' },
-      { value: 'subacute-few-weeks', hindi: '2 से 4 सप्ताह से (Subacute)', english: '2 to 4 weeks' },
-      { value: 'chronic-6-months', hindi: '6 महीने या उससे अधिक (Chronic / पुराना)', english: '6+ months (Chronic)' },
-      { value: 'years-recurrent', hindi: 'सालों से बार-बार होती है (Recurrent)', english: 'Recurrent for years' },
+      { value: 'acute-few-days', hindi: 'कुछ ही दिनों से (1 से 7 दिन)', english: 'Past few days (1 to 7 days)' },
+      { value: 'subacute-few-weeks', hindi: '2 से 4 सप्ताह से', english: '2 to 4 weeks' },
+      { value: 'chronic-6-months', hindi: '6 महीने या उससे अधिक (पुराना रोग)', english: '6+ months (Chronic)' },
+      { value: 'years-recurrent', hindi: 'सालों से बार-बार होती है', english: 'Recurrent for years' },
     ],
   },
   {
     key: 'severity',
-    titleHindi: 'तकलीफ की गंभीरता (दर्द का स्तर) 1 से 10 के पैमाने पर कितनी है?',
+    titleHindi: 'तकलीफ की तीव्रता (दर्द का स्तर) 1 से 10 के पैमाने पर कितनी है?',
     titleEnglish: 'How severe is the discomfort on a scale of 1 to 10?',
     options: [
-      { value: 'mild-3', hindi: 'हल्का दर्द (1 से 3) - काम में रुकावट नहीं', english: 'Mild (1-3) - Manageable' },
-      { value: 'moderate-6', hindi: 'मध्यम दर्द (4 से 6) - उठने-बैठने में कष्ट', english: 'Moderate (4-6) - Affects mobility' },
-      { value: 'severe-8', hindi: 'तेज दर्द (7 से 8) - बिना सहारे चलना मुश्किल', english: 'Severe (7-8) - Severe pain' },
-      { value: 'unbearable-10', hindi: 'असहनीय दर्द (9 से 10) - तत्काल राहत चाहिए', english: 'Unbearable (9-10) - Critical' },
+      { value: 'mild-3', hindi: 'हल्का (1–3): दैनिक कार्य सामान्य रूप से संभव हैं', english: 'Mild (1-3): Normal activities manageable' },
+      { value: 'moderate-6', hindi: 'मध्यम (4–6): काम करने या उठने-बैठने में कष्ट', english: 'Moderate (4-6): Interferes with work or movement' },
+      { value: 'severe-8', hindi: 'तेज (7–8): बिना सहारे चलना या बैठना मुश्किल', english: 'Severe (7-8): Severe pain, restricts mobility' },
+      { value: 'unbearable-10', hindi: 'असहनीय (9–10): अत्यधिक कष्ट, तत्काल राहत चाहिए', english: 'Very Severe (9-10): Unbearable, urgent relief needed' },
     ],
   },
   {
     key: 'timing',
-    titleHindi: 'यह तकलीफ किस समय या किस स्थिति में ज्यादा बढ़ जाती है?',
-    titleEnglish: 'When or in what situation does the problem worsen?',
+    titleHindi: 'यह तकलीफ किस समय या किस स्थिति में अधिक महसूस होती है?',
+    titleEnglish: 'When or in what situation is this trouble most noticeable?',
     options: [
-      { value: 'cold-morning', hindi: 'सुबह उठने पर व ठंड के मौसम में (Morning/Cold)', english: 'Morning stiffness / Cold' },
-      { value: 'post-meal', hindi: 'भोजन के तुरंत बाद या खाली पेट (Post-Meal)', english: 'After meals / Empty stomach' },
-      { value: 'physical-exertion', hindi: 'पैदल चलने व सीढ़ी चढ़ने पर (Exertion)', english: 'Walking / Climbing stairs' },
-      { value: 'night-rest', hindi: 'रात को सोते समय (At Night)', english: 'During sleep / Night' },
+      { value: 'morning-cold', hindi: 'सुबह उठने पर या ठंड के मौसम में', english: 'Morning time or in cold weather' },
+      { value: 'meals', hindi: 'भोजन के बाद या खाली पेट', english: 'After meals or on an empty stomach' },
+      { value: 'exertion', hindi: 'काम करने, चलने या सीढ़ी चढ़ने पर', english: 'During physical work, walking or stairs' },
+      { value: 'night-rest', hindi: 'शाम को या रात को सोते समय', english: 'In the evening or during sleep at night' },
+      { value: 'constant', hindi: 'दिनभर लगभग एक जैसी बनी रहती है', english: 'Constant throughout the day' },
     ],
   },
   {
     key: 'familyHistory',
-    titleHindi: 'क्या परिवार में माता-पिता या भाई-बहन को भी ऐसी समस्या रही है?',
-    titleEnglish: 'Is there any family history of this health condition?',
+    titleHindi: 'क्या परिवार में किसी अन्य सदस्य को भी ऐसी समस्या रही है?',
+    titleEnglish: 'Has anyone in your family had a similar condition?',
     options: [
-      { value: 'family-arthritis', hindi: 'हाँ, माता या पिता को जोड़ों/गठिया का दर्द रहा है', english: 'Yes, family history of arthritis' },
-      { value: 'family-digestive', hindi: 'हाँ, परिवार में पेट व पाचन की समस्या रही है', english: 'Yes, family history of digestive issues' },
-      { value: 'family-metabolic', hindi: 'हाँ, मधुमेह (शुगर) या उच्च रक्तचाप (BP)', english: 'Yes, diabetes or hypertension' },
-      { value: 'family-none', hindi: 'नहीं, परिवार में किसी को ऐसा रोग नहीं है', english: 'No, no such family history' },
+      { value: 'family-similar', hindi: 'हाँ, माता-पिता या भाई-बहन को यही रोग रहा है', english: 'Yes, same condition in parents or siblings' },
+      { value: 'family-chronic', hindi: 'हाँ, परिवार में मधुमेह (शुगर) या उच्च रक्तचाप (BP) है', english: 'Yes, family history of diabetes or blood pressure' },
+      { value: 'family-none', hindi: 'नहीं, परिवार में किसी को ऐसा रोग नहीं है', english: 'No, no such history in the family' },
+      { value: 'family-unsure', hindi: 'मुझे इस बारे में निश्चित जानकारी नहीं है', english: 'I am not sure / Don’t know' },
     ],
   },
 ];
@@ -126,7 +128,8 @@ export const SocratesScreen: React.FC = () => {
         (idx === 0 && (lower.includes('पहला') || lower.includes('first') || lower.includes('1') || lower.includes('one'))) ||
         (idx === 1 && (lower.includes('दूसरा') || lower.includes('second') || lower.includes('2') || lower.includes('two'))) ||
         (idx === 2 && (lower.includes('तीसरा') || lower.includes('third') || lower.includes('3') || lower.includes('three'))) ||
-        (idx === 3 && (lower.includes('चौथा') || lower.includes('fourth') || lower.includes('4') || lower.includes('four')))
+        (idx === 3 && (lower.includes('चौथा') || lower.includes('fourth') || lower.includes('4') || lower.includes('four'))) ||
+        (idx === 4 && (lower.includes('पांचवां') || lower.includes('fifth') || lower.includes('5') || lower.includes('five')))
       ) {
         matchedVal = opt.value;
       }
@@ -205,14 +208,14 @@ export const SocratesScreen: React.FC = () => {
             >
               <Activity className="w-3.5 h-3.5" />
               <span>
-                {activeQuestionSet?.title
-                  ? `${activeQuestionSet.title} • प्रश्न ${currentTurn + 1} / ${totalQuestions}`
-                  : `SOCRATES नैदानिक प्रश्न ${currentTurn + 1} / ${totalQuestions}`}
+                {language === 'hi'
+                  ? `स्वास्थ्य विवरण • प्रश्न ${currentTurn + 1} / ${totalQuestions}`
+                  : `Health Details • Question ${currentTurn + 1} of ${totalQuestions}`}
               </span>
             </div>
 
             <span className="text-xs font-extrabold text-[#495057] truncate max-w-xs">
-              लक्षण: {chiefComplaint || 'जोड़ों का दर्द (संधिवात)'}
+              {chiefComplaint ? `लक्षण: ${chiefComplaint}` : 'लक्षण विवरण'}
             </span>
           </div>
 
@@ -231,7 +234,7 @@ export const SocratesScreen: React.FC = () => {
         <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-4 sm:p-5 shrink-0">
           
           <div className="text-[10px] font-bold text-[#6C757D] uppercase tracking-wider mb-0.5">
-            लक्षण विस्तृत विश्लेषण (Adaptive Clinical Exploration)
+            {language === 'hi' ? 'एक विकल्प चुनें (Single Choice):' : 'Select one option:'}
           </div>
 
           <div className="flex items-start justify-between gap-3 mb-3">
@@ -248,7 +251,7 @@ export const SocratesScreen: React.FC = () => {
             />
           </div>
 
-          {/* 4 SPACIOUS TOUCH OPTIONS WITH PER-OPTION AUDIO SPEAKER BUTTONS */}
+          {/* TOUCH OPTIONS WITH RADIO BUTTON INDICATOR & AUDIO BUTTON */}
           <div className="space-y-2">
             {question.options.map((opt, idx) => {
               const isSelected = selectedOption === opt.value;
@@ -258,7 +261,7 @@ export const SocratesScreen: React.FC = () => {
                   key={opt.value}
                   type="button"
                   onClick={() => handleSelectOption(opt.value)}
-                  className="w-full h-14 sm:h-16 px-4 rounded-[3px] border text-left transition-transform active:scale-[0.98] cursor-pointer flex items-center justify-between group"
+                  className="w-full min-h-[50px] sm:min-h-[56px] py-2 px-4 rounded-[3px] border text-left transition-transform active:scale-[0.98] cursor-pointer flex items-center justify-between group"
                   style={{
                     backgroundColor: isSelected ? '#0B5FA5' : '#FFFFFF',
                     borderColor: isSelected ? '#084B83' : '#CED4DA',
@@ -266,17 +269,23 @@ export const SocratesScreen: React.FC = () => {
                   }}
                 >
                   <div className="flex items-center gap-3">
+                    {/* Radio Button Indicator */}
                     <div
-                      className="w-7 h-7 rounded-[2px] font-black flex items-center justify-center shrink-0 text-xs"
+                      className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
                       style={{
-                        backgroundColor: isSelected ? '#FFFFFF' : '#E8F1F8',
-                        color: '#0B5FA5',
+                        borderColor: isSelected ? '#FFFFFF' : '#0B5FA5',
+                        backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
                       }}
                     >
-                      {idx + 1}
+                      {isSelected && (
+                        <div
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ backgroundColor: '#0B5FA5' }}
+                        />
+                      )}
                     </div>
                     <span
-                      className="text-xs sm:text-sm font-extrabold"
+                      className="text-xs sm:text-sm font-extrabold leading-snug"
                       style={{ color: isSelected ? '#FFFFFF' : '#212529' }}
                     >
                       {optionText}
@@ -298,21 +307,9 @@ export const SocratesScreen: React.FC = () => {
                         borderColor: isSelected ? 'rgba(255, 255, 255, 0.4)' : '#CBD5E1',
                         color: isSelected ? '#FFFFFF' : '#0B5FA5',
                       }}
-                      title="इस विकल्प को आवाज़ में सुनें (Listen aloud)"
+                      title="इस विकल्प को सुनें"
                     >
                       <Volume2 className="w-3.5 h-3.5" />
-                    </div>
-
-                    {/* Check Indicator */}
-                    <div
-                      className="w-5 h-5 rounded-[2px] border flex items-center justify-center shrink-0"
-                      style={{
-                        backgroundColor: isSelected ? '#FFFFFF' : '#EAEDF0',
-                        borderColor: isSelected ? '#FFFFFF' : '#CED4DA',
-                        color: isSelected ? '#0B5FA5' : '#495057',
-                      }}
-                    >
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </div>
                   </div>
                 </button>
@@ -330,7 +327,7 @@ export const SocratesScreen: React.FC = () => {
             className="h-12 sm:h-14 px-4 rounded-[3px] border border-[#CED4DA] bg-white hover:bg-[#EAEDF0] font-black text-xs sm:text-sm text-[#495057] flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{currentTurn === 0 ? 'शिकायत पर वापस' : 'पिछला सवाल (Previous)'}</span>
+            <span>{currentTurn === 0 ? 'लक्षण पर वापस' : 'पिछला सवाल (Previous)'}</span>
           </button>
 
           <button
@@ -344,9 +341,9 @@ export const SocratesScreen: React.FC = () => {
             }}
           >
             <span>
-              {currentTurn === SOCRATES_QUESTIONS.length - 1
-                ? (treatmentMode === 'allopathy' ? 'सामान्य जांच शुरू करें • START VITALS' : 'प्रकृति परीक्षण शुरू करें • START PRAKRITI')
-                : 'अगला सवाल • NEXT'}
+              {currentTurn === totalQuestions - 1
+                ? (treatmentMode === 'allopathy' ? 'सामान्य जांच शुरू करें (Next)' : 'प्रकृति परीक्षण शुरू करें (Next)')
+                : 'अगला सवाल (Next)'}
             </span>
             <ArrowRight className="w-5 h-5 text-white" />
           </button>
@@ -360,10 +357,10 @@ export const SocratesScreen: React.FC = () => {
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
-            <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
+            <span className="font-semibold text-[#495057]">नई दिल्ली</span>
           </div>
           <div className="flex items-center gap-1 text-[11px] font-semibold text-[#6C757D]">
-            <span>SOCRATES Clinical Protocol • Standard OPD Triage</span>
+            <span>राष्ट्रीय आयुष मिशन • ओपीडी सहायता प्रणाली</span>
           </div>
         </div>
       </footer>

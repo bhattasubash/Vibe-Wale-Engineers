@@ -46,7 +46,7 @@ export const ConsentScreen: React.FC = () => {
             }}
           >
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>डिजिटल व्यक्तिगत डेटा संरक्षण (DPDP) अधिनियम 2023</span>
+            <span>{language === 'hi' ? 'आपकी जानकारी की गोपनीयता एवं सुरक्षा' : 'Patient Privacy & Consent'}</span>
           </div>
 
           <h1
@@ -54,17 +54,17 @@ export const ConsentScreen: React.FC = () => {
             style={{ color: '#0B5FA5' }}
           >
             {language === 'hi'
-              ? 'स्वास्थ्य विवरण एवं परीक्षण सहमति'
-              : 'Patient Care & DPDP Consent'}
+              ? 'आपकी जानकारी की गोपनीयता'
+              : 'Your Information & Privacy'}
           </h1>
           <p className="text-xs sm:text-sm text-[#495057] font-semibold">
             {language === 'hi'
-              ? `रोगी: ${patient.fullName || 'नागरिक'} • डॉक्टर परामर्श पूर्व विवरण`
-              : `Patient: ${patient.fullName || 'Citizen'} • Pre-consultation intake`}
+              ? `रोगी: ${patient.fullName || 'नागरिक'} • डॉक्टर से मिलने से पूर्व जानकारी`
+              : `Patient: ${patient.fullName || 'Citizen'} • Pre-consultation information`}
           </p>
         </div>
 
-        {/* Spacious 3-Point DPDP Card */}
+        {/* Spacious 3-Point Card */}
         <div className="w-full bg-white border border-[#CED4DA] rounded-[3px] p-5 space-y-3.5 text-sm sm:text-base text-[#212529] shrink-0 shadow-xs">
           
           <div className="flex items-start gap-3">
@@ -74,11 +74,11 @@ export const ConsentScreen: React.FC = () => {
             <p className="font-medium leading-normal">
               {language === 'hi' ? (
                 <>
-                  <strong className="text-[#0B5FA5]">लक्षण एवं स्वास्थ्य विवरण:</strong> हम आपकी बीमारी, पुराने पर्चे और प्रकृति के संबंध में प्रश्न पूछेंगे।
+                  <strong className="text-[#0B5FA5]">स्वास्थ्य के बारे में:</strong> हम आपकी बीमारी, पुराने पर्चे और स्वास्थ्य से जुड़े कुछ आसान सवाल पूछेंगे।
                 </>
               ) : (
                 <>
-                  <strong className="text-[#0B5FA5]">Symptoms & History:</strong> We will ask simple questions about your symptoms, prior prescriptions, and body constitution.
+                  <strong className="text-[#0B5FA5]">About Your Health:</strong> We will ask simple questions about your symptoms, prior prescriptions, and body health.
                 </>
               )}
             </p>
@@ -91,11 +91,11 @@ export const ConsentScreen: React.FC = () => {
             <p className="font-medium leading-normal">
               {language === 'hi' ? (
                 <>
-                  <strong className="text-[#0B5FA5]">सीधा डॉक्टर को:</strong> यह विवरण 100% गोपनीय है और केवल आपके अधिकृत चिकित्सक के ईएमआर पोर्टल पर पहुंचेगा।
+                  <strong className="text-[#0B5FA5]">सीधे आपके डॉक्टर के पास:</strong> यह जानकारी पूरी तरह सुरक्षित है और केवल आपके डॉक्टर को परामर्श कक्ष में दिखेगी।
                 </>
               ) : (
                 <>
-                  <strong className="text-[#0B5FA5]">Direct to Physician:</strong> All information is confidential and transmitted exclusively to your treating physician’s workstation.
+                  <strong className="text-[#0B5FA5]">Directly to Your Doctor:</strong> All information is confidential and visible exclusively to your consulting physician.
                 </>
               )}
             </p>
@@ -108,11 +108,11 @@ export const ConsentScreen: React.FC = () => {
             <p className="font-medium leading-normal">
               {language === 'hi' ? (
                 <>
-                  <strong className="text-[#0B5FA5]">पूर्ण गोपनीयता:</strong> टोकन पर्ची जारी होते ही इस कियोस्क टर्मिनल से आपका डेटा स्वतः मिटा दिया जाएगा।
+                  <strong className="text-[#0B5FA5]">स्क्रीन से डेटा सुरक्षा:</strong> टोकन पर्ची जारी होने के बाद इस मशीन से आपका विवरण सुरक्षित रूप से हटा दिया जाता है।
                 </>
               ) : (
                 <>
-                  <strong className="text-[#0B5FA5]">Ephemeral Privacy:</strong> Your temporary session data is automatically purged from this kiosk upon token issuance.
+                  <strong className="text-[#0B5FA5]">Data Privacy:</strong> Your temporary session information is safely cleared from this kiosk after your token is issued.
                 </>
               )}
             </p>
@@ -126,10 +126,9 @@ export const ConsentScreen: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowDeclineModal(true)}
-            className="h-14 sm:h-16 px-6 rounded-[3px] border border-[#DC2626] bg-white text-[#DC2626] hover:bg-[#FEF2F2] font-black text-sm sm:text-base flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
+            className="h-14 sm:h-16 px-6 rounded-[3px] border border-[#CED4DA] bg-white text-[#495057] hover:bg-[#F8F9FA] hover:text-[#212529] font-bold text-sm sm:text-base flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
           >
-            <XCircle className="w-5 h-5 text-[#DC2626]" />
-            <span>{language === 'hi' ? 'असहमत • DECLINE' : 'DECLINE'}</span>
+            <span>{language === 'hi' ? 'असहमत (नहीं पूछना)' : 'Do Not Agree'}</span>
           </button>
 
           <button
@@ -138,7 +137,7 @@ export const ConsentScreen: React.FC = () => {
             className="h-14 sm:h-16 px-6 rounded-[3px] border border-[#084B83] text-white font-black text-sm sm:text-base flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
             style={{ backgroundColor: '#0B5FA5' }}
           >
-            <span>{language === 'hi' ? 'सहमत हैं • I AGREE' : 'I AGREE & PROCEED'}</span>
+            <span>{language === 'hi' ? 'सहमत हूँ और आगे बढ़ें' : 'I Agree & Proceed'}</span>
             <ArrowRight className="w-5 h-5 text-white" />
           </button>
 
@@ -162,27 +161,27 @@ export const ConsentScreen: React.FC = () => {
       {showDeclineModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white max-w-md w-full p-6 rounded-[3px] border border-[#CED4DA] text-center">
-            <XCircle className="w-12 h-12 text-[#DC2626] mx-auto mb-2" />
+            <XCircle className="w-12 h-12 text-[#495057] mx-auto mb-2" />
             <h2 className="text-xl font-black text-[#212529] mb-1">
               {language === 'hi' ? 'सहमति के बिना आगे नहीं बढ़ सकते' : 'Consent is Required'}
             </h2>
             <p className="text-xs text-[#495057] font-semibold mb-4">
               {language === 'hi'
-                ? 'DPDP अधिनियम के तहत आपकी सहमति अनिवार्य है। सीधे ओपीडी काउंटर नंबर 01 पर जाएं।'
-                : 'Patient consent is mandatory under DPDP Act 2023. Please proceed to OPD Counter #01.'}
+                ? 'यदि आप कियोस्क पर जानकारी नहीं देना चाहते, तो सीधे ओपीडी पंजीकरण काउंटर नंबर 01 पर जाएं।'
+                : 'If you prefer not to enter details at the kiosk, please proceed directly to OPD Registration Counter #01.'}
             </p>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => navigate('/')}
-                className="flex-1 py-2 rounded-[3px] border border-[#CED4DA] text-xs font-bold text-[#495057] hover:bg-[#EAEDF0] cursor-pointer"
+                className="flex-1 py-2.5 rounded-[3px] border border-[#CED4DA] text-xs font-bold text-[#495057] hover:bg-[#EAEDF0] cursor-pointer"
               >
                 मुख्य पृष्ठ (Exit)
               </button>
               <button
                 type="button"
                 onClick={() => setShowDeclineModal(false)}
-                className="flex-1 py-2 rounded-[3px] border border-[#084B83] text-xs font-black text-white cursor-pointer"
+                className="flex-1 py-2.5 rounded-[3px] border border-[#084B83] text-xs font-black text-white cursor-pointer"
                 style={{ backgroundColor: '#0B5FA5' }}
               >
                 पुनः विचार करें (Review)
@@ -198,11 +197,11 @@ export const ConsentScreen: React.FC = () => {
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
-            <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
+            <span className="font-semibold text-[#495057]">नई दिल्ली</span>
           </div>
           <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#6C757D]">
             <Lock className="w-3.5 h-3.5 text-[#0B5FA5]" />
-            <span>256-Bit Encrypted Healthcare Session</span>
+            <span>सुरक्षित परामर्श सत्र (Confidential)</span>
           </div>
         </div>
       </footer>

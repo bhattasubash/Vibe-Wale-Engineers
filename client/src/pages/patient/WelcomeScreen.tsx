@@ -71,21 +71,21 @@ export const WelcomeScreen: React.FC = () => {
           
           <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-wider mb-3 border-b border-[#CED4DA] pb-2">
             <span style={{ color: '#0B5FA5' }}>
-              {language === 'hi' ? 'कियोस्क प्रक्रिया (3 आसान चरण)' : 'How It Works (3 Easy Steps)'}
+              {language === 'hi' ? 'यह प्रक्रिया आसान है' : 'How It Works (Simple Steps)'}
             </span>
             
-            {/* Single Saffron Accent Highlight (Used Sparingly per GIGW Rule) */}
+            {/* Realistic operational time estimation */}
             <span
               className="px-2 py-0.5 rounded-[2px] text-[11px] font-bold"
               style={{ backgroundColor: '#FFF4EB', color: '#E07B1A', border: '1px solid rgba(224, 123, 26, 0.3)' }}
             >
-              {language === 'hi' ? 'समय: ~2 मिनट' : 'Time: ~2 mins'}
+              {language === 'hi' ? 'समय: लगभग 5–7 मिनट' : 'Time: ~5–7 mins'}
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             
-            {/* Step 1: Speak / Select (Primary Brand Blue) */}
+            {/* Step 1: Speak or Select */}
             <div className="flex items-start gap-2.5 p-3 rounded-[3px] bg-white border border-[#CED4DA]">
               <div
                 className="w-7 h-7 rounded-[2px] font-black flex items-center justify-center shrink-0 text-xs text-white"
@@ -99,17 +99,17 @@ export const WelcomeScreen: React.FC = () => {
                   style={{ color: '#0B5FA5' }}
                 >
                   <Mic className="w-4 h-4 text-[#0B5FA5]" strokeWidth={1.75} />
-                  <span>{language === 'hi' ? 'बोलकर बताएं' : 'Speak / Select'}</span>
+                  <span>{language === 'hi' ? 'अपनी समस्या बताएं' : 'Tell Your Problem'}</span>
                 </div>
                 <p className="text-[11px] sm:text-xs text-[#495057] mt-0.5 font-medium leading-tight">
                   {language === 'hi'
-                    ? 'टाइप करने की जरूरत नहीं, अपनी भाषा में बोलें।'
-                    : 'Share symptoms naturally by voice or touch.'}
+                    ? 'बोलकर या स्क्रीन छूकर अपनी तकलीफ बताएं।'
+                    : 'Speak or tap to describe your symptoms.'}
                 </p>
               </div>
             </div>
 
-            {/* Step 2: Prakriti Balance (AYUSH-Specific Muted Green #2F7D4F Accent) */}
+            {/* Step 2: Answer Simple Questions */}
             <div
               className="flex items-start gap-2.5 p-3 rounded-[3px] bg-white border"
               style={{ borderColor: 'rgba(47, 125, 79, 0.4)' }}
@@ -126,17 +126,17 @@ export const WelcomeScreen: React.FC = () => {
                   style={{ color: '#2F7D4F' }}
                 >
                   <Scale className="w-4 h-4 text-[#2F7D4F]" strokeWidth={1.75} />
-                  <span>{language === 'hi' ? 'प्रकृति जांच' : 'Prakriti Balance'}</span>
+                  <span>{language === 'hi' ? 'आसान सवालों के जवाब' : 'Simple Questions'}</span>
                 </div>
                 <p className="text-[11px] sm:text-xs text-[#495057] mt-0.5 font-medium leading-tight">
                   {language === 'hi'
-                    ? 'चरक संहिता अनुसार वात, पित्त, कफ की गणना।'
-                    : '15 classical constitutional balance traits.'}
+                    ? 'अपनी दिनचर्या और स्वास्थ्य से जुड़े आसान सवाल।'
+                    : 'A few simple questions about your routine.'}
                 </p>
               </div>
             </div>
 
-            {/* Step 3: Doctor File (Primary Brand Blue) */}
+            {/* Step 3: Scan or Speak History */}
             <div className="flex items-start gap-2.5 p-3 rounded-[3px] bg-white border border-[#CED4DA]">
               <div
                 className="w-7 h-7 rounded-[2px] font-black flex items-center justify-center shrink-0 text-xs text-white"
@@ -150,12 +150,12 @@ export const WelcomeScreen: React.FC = () => {
                   style={{ color: '#0B5FA5' }}
                 >
                   <FileText className="w-4 h-4 text-[#0B5FA5]" strokeWidth={1.75} />
-                  <span>{language === 'hi' ? 'डॉक्टर पर्ची' : 'Doctor File'}</span>
+                  <span>{language === 'hi' ? 'दस्तावेज़ या इतिहास' : 'Reports & History'}</span>
                 </div>
                 <p className="text-[11px] sm:text-xs text-[#495057] mt-0.5 font-medium leading-tight">
                   {language === 'hi'
-                    ? 'डॉक्टर के कंप्यूटर पर पूरा विवरण तुरंत पहुंचेगा।'
-                    : 'Structured case summary sent to doctor queue.'}
+                    ? 'पुराने पर्चे स्कैन करें या बोलकर बताएं।'
+                    : 'Show old reports or share history by voice.'}
                 </p>
               </div>
             </div>
@@ -164,7 +164,7 @@ export const WelcomeScreen: React.FC = () => {
 
         </div>
 
-        {/* Primary CTA Button: Trust-Signaling ABDM Blue (#0B5FA5) */}
+        {/* Primary CTA Button: Dignified Single-Line Action */}
         <div className="w-full max-w-md mt-4 mb-2">
           <button
             type="button"
@@ -174,43 +174,35 @@ export const WelcomeScreen: React.FC = () => {
           >
             <span>
               {language === 'hi'
-                ? 'पंजीकरण आरंभ करें • TAP TO BEGIN'
-                : 'BEGIN CASE INTAKE • आरंभ करें'}
+                ? 'शुरू करें • TAP TO BEGIN'
+                : 'BEGIN INTAKE • शुरू करें'}
             </span>
             <ArrowRight className="w-6 h-6 text-white" />
           </button>
         </div>
 
-        {/* Minimal DPDP Act Security Tag */}
+        {/* Honest Security Tag */}
         <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-[#495057] mt-1">
           <ShieldCheck className="w-4 h-4 text-[#2F7D4F]" />
           <span>
             {language === 'hi'
-              ? 'डिजिटल व्यक्तिगत डेटा संरक्षण (DPDP) अधिनियम 2023 • 100% सुरक्षित एवं गोपनीय'
-              : 'Digital Personal Data Protection (DPDP) Act 2023 • 100% Confidential'}
+              ? 'आपकी जानकारी केवल आपके डॉक्टर के पास सुरक्षित भेजी जाती है।'
+              : 'Your information is safely transmitted directly to your doctor.'}
           </span>
         </div>
 
       </main>
 
-      {/* Persistent Single-Line Clean Kiosk Footer */}
+      {/* Persistent Single-Line Clean Kiosk Footer (Without Doctor Link) */}
       <footer className="w-full bg-white border-t border-[#CED4DA] py-2.5 px-6 text-xs text-[#495057] select-none">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
-            <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
+            <span className="font-semibold text-[#495057]">OPD Terminal</span>
           </div>
           <div className="flex items-center gap-3 text-[11px] font-semibold text-[#6C757D]">
-            <span>सहायता केंद्र: Room 04 • हेल्पलाइन: 1800-11-2233</span>
-            <span className="text-[#CED4DA]">|</span>
-            <button
-              type="button"
-              onClick={() => navigate('/doctor/login')}
-              className="text-[#0B5FA5] hover:underline font-bold cursor-pointer"
-            >
-              चिकित्सक कार्यक्षेत्र (Doctor Portal) →
-            </button>
+            <span>सहायता डेस्क: Room 04 • हेल्पलाइन: 1800-11-2233</span>
           </div>
         </div>
       </footer>

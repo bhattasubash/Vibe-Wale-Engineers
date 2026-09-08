@@ -69,7 +69,7 @@ export const DoctorLoginScreen: React.FC = () => {
 
           <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-[#186036] bg-[#EDF7F1] border border-[#186036]/30 px-3 py-1 rounded-[2px]">
             <ShieldCheck className="w-4 h-4 text-[#186036]" />
-            <span>ABDM-HIP Role-Based Authenticated Terminal</span>
+            <span>अधिकृत चिकित्सक टर्मिनल (Authorized Staff)</span>
           </div>
         </div>
       </header>
@@ -82,13 +82,13 @@ export const DoctorLoginScreen: React.FC = () => {
           <div className="text-center mb-5">
             <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[3px] bg-[#E8F1F8] border border-[#0B5FA5]/30 text-[11px] font-bold text-[#0B5FA5] uppercase tracking-wider mb-2">
               <UserCheck className="w-3.5 h-3.5" />
-              <span>BAMS / MD DOCTOR LOGIN</span>
+              <span>चिकित्सक लॉगिन</span>
             </div>
             <h1 className="text-2xl font-black text-[#0B5FA5] tracking-tight">
-              चिकित्सक लॉगिन
+              चिकित्सक कार्यक्षेत्र लॉगिन
             </h1>
             <p className="text-xs text-[#495057] font-semibold mt-0.5">
-              ओपीडी रोगी कतार एवं नैदानिक सारांश देखने के लिए लॉगिन करें।
+              ओपीडी रोगी कतार एवं नैदानिक केस शीट देखने हेतु प्रवेश करें।
             </p>
           </div>
 
@@ -151,10 +151,10 @@ export const DoctorLoginScreen: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full mt-2 py-3.5 px-6 rounded-[3px] border border-[#084B83] text-sm font-black text-white flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98] disabled:opacity-50"
+              className="w-full mt-2 py-3 px-6 rounded-[3px] border border-[#084B83] text-xs sm:text-sm font-black text-white flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98] disabled:opacity-50"
               style={{ backgroundColor: '#0B5FA5' }}
             >
-              <span>{isSubmitting ? 'प्रवेश सत्यापित हो रहा है...' : 'ओपीडी कतार में प्रवेश करें • ACCESS PATIENT QUEUE'}</span>
+              <span>{isSubmitting ? 'सत्यापित हो रहा है...' : 'ओपीडी कतार में प्रवेश करें (Enter Queue)'}</span>
               <ArrowRight className="w-4 h-4 text-white" />
             </button>
 
@@ -167,8 +167,8 @@ export const DoctorLoginScreen: React.FC = () => {
       {/* Persistent Single-Line Clean Footer */}
       <footer className="w-full bg-white border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <span className="font-bold text-[#0B5FA5]">AIIA Hospital Information System (e-Hospital 2.0)</span>
-          <span className="text-[11px] font-semibold text-[#6C757D]">DPDP Act 2023 & Ayush Grid Compliant</span>
+          <span className="font-bold text-[#0B5FA5]">अखिल भारतीय आयुर्वेद संस्थान (AIIA) • अस्पताल प्रबंधन सूचना प्रणाली</span>
+          <span className="text-[11px] font-semibold text-[#6C757D]">डिजिटल स्वास्थ्य मिशन (ABDM) संगत</span>
         </div>
       </footer>
 

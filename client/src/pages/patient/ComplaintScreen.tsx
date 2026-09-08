@@ -88,20 +88,21 @@ export const ComplaintScreen: React.FC = () => {
   } = useSessionStore();
 
   const [inputText, setInputText] = useState('');
-  const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
+  const [selectedPresets, setSelectedPresets] = useState<string[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isInferring, setIsInferring] = useState(false);
   const [transcriptionNotice, setTranscriptionNotice] = useState<string | null>(null);
   const [micError, setMicError] = useState<string | null>(null);
   const [showRedFlagModal, setShowRedFlagModal] = useState(false);
+  const [showTypingFallback, setShowTypingFallback] = useState(false);
 
   const recognitionRef = useRef<any>(null);
 
   const promptHindi =
-    'आज आपको क्या परेशानी महसूस हो रही है? माइक दबाकर अपनी भाषा में बोलें या नीचे दिए गए लक्षणों पर स्पर्श करें।';
+    'आज आपको क्या परेशानी महसूस हो रही है? बोलकर बताएं या नीचे दिए गए लक्षणों पर निशान लगाएं।';
   const promptEnglish =
-    'What symptoms or health trouble brings you here today? Tap the mic to speak or select from the options below.';
+    'What symptoms bring you here today? Speak using the mic or check the symptom options below.';
 
   // Cleanup on unmount
   useEffect(() => {
@@ -183,13 +184,13 @@ export const ComplaintScreen: React.FC = () => {
         } catch (_) {}
       }
 
-      // If audioRecorder was capturing WAV for Wispr Flow, finalize and send
+      // If audioRecorder was capturing WAV, finalize and send
       if (audioRecorder.recording) {
         try {
           setIsTranscribing(true);
           setTranscriptionNotice(
             language === 'hi'
-              ? 'आवाज़ ट्रांसक्रिप्शन प्रगति पर है...'
+              ? 'आवाज़ ट्रांसक्रिप्शन जारी है...'
               : 'Transcribing voice audio...'
           );
           const audioResult = await audioRecorder.stop();
@@ -207,13 +208,12 @@ export const ComplaintScreen: React.FC = () => {
               if (res.ok) {
                 const data = await res.json();
                 if (data.success && data.text && data.text.trim()) {
-                  setInputText(data.text.trim());
-                  setSelectedPreset(null);
+                  setInputText((prev) => (prev ? `${prev}, ${data.text.trim()}` : data.text.trim()));
                   checkRedFlags(data.text.trim());
                 }
               }
             } catch (apiErr) {
-              console.warn('Wispr Flow API request failed, keeping local transcript:', apiErr);
+              console.warn('Transcription API request failed, keeping local transcript:', apiErr);
             }
           }
         } catch (err) {
@@ -229,7 +229,7 @@ export const ComplaintScreen: React.FC = () => {
     setMicError(null);
     setTranscriptionNotice(null);
 
-    // 2. Start hardware audio recorder for Wispr Flow
+    // 2. Start hardware audio recorder
     try {
       await audioRecorder.start();
     } catch (audioErr) {
@@ -273,7 +273,6 @@ export const ComplaintScreen: React.FC = () => {
           const currentText = finalTranscript || interimTranscript;
           if (currentText.trim()) {
             setInputText(currentText);
-            setSelectedPreset(null);
             checkRedFlags(currentText);
           }
         };
@@ -301,25 +300,27 @@ export const ComplaintScreen: React.FC = () => {
     }
   };
 
-  const handleSelectPreset = (preset: SymptomPreset) => {
+  const handleTogglePreset = (preset: SymptomPreset) => {
     speechEngine.stop();
-    if (isRecording) {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch (_) {}
-      }
-      if (audioRecorder.recording) {
-        audioRecorder.stop().catch(() => {});
-      }
-      setIsRecording(false);
+    const isCurrentlySelected = selectedPresets.includes(preset.id);
+    let nextPresets: string[];
+
+    if (isCurrentlySelected) {
+      nextPresets = selectedPresets.filter((id) => id !== preset.id);
+    } else {
+      nextPresets = [...selectedPresets, preset.id];
     }
+    setSelectedPresets(nextPresets);
 
-    setSelectedPreset(preset.id);
-    const text = language === 'hi' ? `${preset.hindi} (${preset.ayushTerm})` : `${preset.english} (${preset.ayushTerm})`;
-    setInputText(text);
+    // Build text from selected presets + custom input
+    const presetLabels = nextPresets
+      .map((id) => COMMON_SYMPTOMS.find((s) => s.id === id))
+      .filter(Boolean)
+      .map((s) => (language === 'hi' ? `${s!.hindi} (${s!.ayushTerm})` : `${s!.english} (${s!.ayushTerm})`));
 
-    if (preset.isRedFlag) {
+    setInputText(presetLabels.join(', '));
+
+    if (!isCurrentlySelected && preset.isRedFlag) {
       setRedFlag(true, 'Red Flag Triggered: Emergency Chest / Respiratory Disturbance');
       setShowRedFlagModal(true);
     }
@@ -343,11 +344,11 @@ export const ComplaintScreen: React.FC = () => {
 
     if (!inputText.trim() || isInferring) return;
 
-    const activePreset = COMMON_SYMPTOMS.find((s) => s.id === selectedPreset);
+    const activePreset = COMMON_SYMPTOMS.find((s) => selectedPresets.includes(s.id));
     const category = activePreset ? activePreset.category : 'general';
     setChiefComplaint(inputText, category);
 
-    // Call Gemini Complaint Inference
+    // Call Complaint Inference
     setIsInferring(true);
     const activeSessionId = sessionId || getOrCreateSessionId();
     try {
@@ -415,7 +416,7 @@ export const ComplaintScreen: React.FC = () => {
             }}
           >
             <Activity className="w-3.5 h-3.5" />
-            <span>चरण 2: मुख्य स्वास्थ्य समस्या / CHIEF COMPLAINT</span>
+            <span>{language === 'hi' ? 'मुख्य स्वास्थ्य समस्या' : 'Primary Symptoms'}</span>
           </div>
 
           <h1
@@ -428,8 +429,8 @@ export const ComplaintScreen: React.FC = () => {
           </h1>
           <p className="text-xs sm:text-sm text-[#495057] font-semibold">
             {language === 'hi'
-              ? 'माइक दबाकर अपनी भाषा में बोलें या नीचे दिए गए आम लक्षणों पर स्पर्श करें।'
-              : 'Speak using the mic or tap the common symptom tiles below.'}
+              ? 'बोलकर बताएं या नीचे दिए गए लक्षणों में से चुनें (एक या अधिक)'
+              : 'Speak into the mic or select symptoms below (one or more)'}
           </p>
         </div>
 
@@ -445,7 +446,7 @@ export const ComplaintScreen: React.FC = () => {
                   ? 'bg-[#DC2626] border-red-700 animate-pulse'
                   : 'bg-[#0B5FA5] border-[#084B83] hover:bg-[#084B83]'
               }`}
-              title={isRecording ? 'रिकॉर्डिंग रोकें (Stop Recording)' : 'बोलने के लिए माइक दबाएं (Tap to Speak)'}
+              title={isRecording ? 'रोकें (Stop)' : 'बोलने के लिए दबाएं (Tap to Speak)'}
             >
               {isRecording ? <MicOff className="w-6 h-6 text-white" /> : <Mic className="w-6 h-6 text-white" />}
             </button>
@@ -456,10 +457,10 @@ export const ComplaintScreen: React.FC = () => {
                   {isRecording ? (
                     <>
                       <span className="w-2 h-2 rounded-full bg-[#DC2626] inline-block animate-ping" />
-                      <span>सुन रहे हैं... अपनी भाषा में बोलिए (Listening...)</span>
+                      <span>सुन रहे हैं... बोलिए (Listening...)</span>
                     </>
                   ) : (
-                    'आपका विवरण (Recorded Symptoms):'
+                    <span>{language === 'hi' ? 'दर्ज लक्षण (Selected Symptoms):' : 'Selected Symptoms:'}</span>
                   )}
                 </span>
                 {inputText && (
@@ -467,7 +468,7 @@ export const ComplaintScreen: React.FC = () => {
                     type="button"
                     onClick={() => {
                       setInputText('');
-                      setSelectedPreset(null);
+                      setSelectedPresets([]);
                     }}
                     className="text-[#DC2626] hover:underline flex items-center gap-0.5 cursor-pointer font-bold text-[10px]"
                   >
@@ -476,24 +477,17 @@ export const ComplaintScreen: React.FC = () => {
                   </button>
                 )}
               </div>
-              <input
-                type="text"
-                value={inputText}
-                onChange={(e) => {
-                  setInputText(e.target.value);
-                  checkRedFlags(e.target.value);
-                }}
-                placeholder={
-                  isRecording
-                    ? 'आपकी आवाज़ सुनी जा रही है...'
-                    : language === 'hi'
-                    ? 'माइक दबाकर बोलें या यहाँ लिखें...'
-                    : 'Tap mic or type symptoms here...'
-                }
-                className={`w-full p-2.5 bg-[#F8FAFC] border rounded-[3px] text-xs sm:text-sm font-bold text-[#212529] focus:outline-none ${
-                  isRecording ? 'border-[#DC2626] bg-[#FEF2F2]/50' : 'border-[#CED4DA] focus:border-[#0B5FA5]'
+
+              {/* Display Box */}
+              <div
+                className={`w-full min-h-[42px] p-2.5 bg-[#F8FAFC] border rounded-[3px] text-xs sm:text-sm font-bold text-[#212529] flex items-center justify-between ${
+                  isRecording ? 'border-[#DC2626] bg-[#FEF2F2]/50' : 'border-[#CED4DA]'
                 }`}
-              />
+              >
+                <span className={inputText ? 'text-[#212529]' : 'text-[#6C757D] font-normal'}>
+                  {inputText || (language === 'hi' ? 'माइक दबाकर बोलें या नीचे से चुनें...' : 'Speak into mic or choose below...')}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -501,7 +495,7 @@ export const ComplaintScreen: React.FC = () => {
           {isTranscribing && (
             <div className="p-2 bg-[#E8F1F8] border border-[#0B5FA5]/30 rounded-[2px] text-[11px] text-[#0B5FA5] font-bold flex items-center gap-1.5 animate-pulse">
               <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0B5FA5] shrink-0" />
-              <span>{transcriptionNotice || 'आवाज़ ट्रांसक्रिप्शन प्रगति पर है...'}</span>
+              <span>{transcriptionNotice || 'आवाज़ ट्रांसक्रिप्शन जारी है...'}</span>
             </div>
           )}
 
@@ -515,21 +509,26 @@ export const ComplaintScreen: React.FC = () => {
 
         </div>
 
-        {/* SPATIOUS 6 COMMON SYMPTOMS TOUCH GRID */}
+        {/* COMMON SYMPTOMS CHECKBOX GRID (Multi-select) */}
         <div className="w-full max-w-2xl shrink-0">
-          <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#495057] mb-1.5 flex items-center gap-2">
-            <span className="w-2 h-2 bg-[#0B5FA5] rounded-full inline-block"></span>
-            <span>आम ओपीडी समस्याएं (Touch to Select):</span>
+          <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#495057] mb-1.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-[#0B5FA5] rounded-full inline-block"></span>
+              <span>{language === 'hi' ? 'लक्षण चुनें (Touch to Select):' : 'Select Symptoms (Checkboxes):'}</span>
+            </div>
+            <span className="text-[10px] text-[#6C757D] font-bold">
+              {language === 'hi' ? 'एक से अधिक चुन सकते हैं' : 'Multiple selections allowed'}
+            </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {COMMON_SYMPTOMS.map((symptom) => {
-              const isSelected = selectedPreset === symptom.id;
+              const isSelected = selectedPresets.includes(symptom.id);
               return (
                 <button
                   key={symptom.id}
                   type="button"
-                  onClick={() => handleSelectPreset(symptom)}
+                  onClick={() => handleTogglePreset(symptom)}
                   className={`h-14 sm:h-16 px-3.5 rounded-[3px] border text-left transition-transform active:scale-[0.98] cursor-pointer flex items-center justify-between ${
                     symptom.isRedFlag ? 'border-red-300' : ''
                   }`}
@@ -560,20 +559,60 @@ export const ComplaintScreen: React.FC = () => {
                     </span>
                   </div>
 
+                  {/* Checkbox square indicator */}
                   <div
-                    className="w-5 h-5 rounded-[2px] border flex items-center justify-center shrink-0"
+                    className="w-5 h-5 rounded-[2px] border-2 flex items-center justify-center shrink-0"
                     style={{
-                      backgroundColor: isSelected ? '#FFFFFF' : '#EAEDF0',
-                      borderColor: isSelected ? '#FFFFFF' : '#CED4DA',
-                      color: isSelected ? (symptom.isRedFlag ? '#DC2626' : '#0B5FA5') : '#495057',
+                      backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
+                      borderColor: isSelected ? '#FFFFFF' : '#6C757D',
+                      color: isSelected ? (symptom.isRedFlag ? '#DC2626' : '#0B5FA5') : 'transparent',
                     }}
                   >
-                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                   </div>
                 </button>
               );
             })}
           </div>
+        </div>
+
+        {/* TYPING FALLBACK (Clean toggleable section) */}
+        <div className="w-full max-w-2xl shrink-0 text-center">
+          {!showTypingFallback ? (
+            <button
+              type="button"
+              onClick={() => setShowTypingFallback(true)}
+              className="text-xs text-[#0B5FA5] hover:underline font-bold inline-flex items-center gap-1 cursor-pointer py-1"
+            >
+              <span>{language === 'hi' ? 'समस्या सूची में नहीं मिल रही? [ यहाँ लिखकर बताएं ]' : 'Symptom not listed? [ Type Here ]'}</span>
+            </button>
+          ) : (
+            <div className="bg-white border border-[#CED4DA] p-2.5 rounded-[3px] text-left">
+              <label className="block text-[11px] font-bold text-[#495057] mb-1">
+                {language === 'hi' ? 'अपनी समस्या संक्षेप में लिखें:' : 'Type your symptom briefly:'}
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={(e) => {
+                    setInputText(e.target.value);
+                    checkRedFlags(e.target.value);
+                  }}
+                  placeholder={language === 'hi' ? 'जैसे: 3 दिन से पेट में हल्का दर्द...' : 'e.g. mild stomach ache since 3 days...'}
+                  className="flex-1 p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[3px] text-xs font-bold text-[#212529] focus:outline-none focus:border-[#0B5FA5]"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowTypingFallback(false)}
+                  className="px-3 py-1 bg-[#EAEDF0] text-xs font-bold text-[#495057] rounded-[3px] hover:bg-[#CED4DA] cursor-pointer"
+                >
+                  बंद करें
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Primary CTA Button */}
@@ -588,11 +627,11 @@ export const ComplaintScreen: React.FC = () => {
             {isInferring ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin text-white" />
-                <span>लक्षणों का विश्लेषण कर रहे हैं... • ANALYZING...</span>
+                <span>{language === 'hi' ? 'विवरण दर्ज कर रहे हैं...' : 'Saving details...'}</span>
               </>
             ) : (
               <>
-                <span>विस्तार से बताएं • PROCEED TO SOCRATES QUESTIONS</span>
+                <span>{language === 'hi' ? 'आगे बढ़ें (सवाल पूछें)' : 'Proceed to Questions'}</span>
                 <ArrowRight className="w-5 h-5 text-white" />
               </>
             )}
@@ -613,37 +652,38 @@ export const ComplaintScreen: React.FC = () => {
 
       </main>
 
-      {/* EMERGENCY RED FLAG MODAL */}
+      {/* ACTIVE EMERGENCY INTERRUPTION MODAL */}
       {showRedFlagModal && (
-        <div className="fixed inset-0 bg-red-950/80 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4">
           <div className="bg-white max-w-lg w-full p-6 rounded-[3px] border-4 border-[#DC2626] text-center shadow-2xl">
-            <AlertTriangle className="w-16 h-16 text-[#DC2626] mx-auto mb-2" />
+            <AlertTriangle className="w-16 h-16 text-[#DC2626] mx-auto mb-2 animate-bounce" />
             <div className="inline-block px-3 py-1 bg-[#FEF2F2] border border-[#DC2626] text-[#DC2626] text-xs font-extrabold uppercase tracking-widest mb-2">
-              आपातकालीन लक्षण चेतावनी / EMERGENCY ALERT
+              तत्काल आपातकालीन सहायता / EMERGENCY ALERT
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-[#DC2626] mb-2 leading-tight">
-              तत्काल आपातकालीन चिकित्सा कक्ष में जाएं!
+              सीने में दर्द / सांस फूलने की समस्या
             </h2>
-            <p className="text-xs sm:text-sm text-[#212529] font-bold mb-4">
-              आपके लक्षण (सीने में तेज दर्द/सांस फूलना) को तुरंत इमरजेंसी डॉक्टर द्वारा देखने की आवश्यकता है।
+            <p className="text-xs sm:text-sm text-[#212529] font-bold mb-5 leading-relaxed">
+              यदि आपको सीने में तेज दर्द, सांस लेने में भारी तकलीफ या अत्यधिक बेचैनी महसूस हो रही है, तो कृपया कतार में प्रतीक्षा न करें। तुरंत आपातकालीन कक्ष (कमरा सं. 02) में जाएं।
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 type="button"
                 onClick={() => {
+                  alert('अस्पताल सहायता दल को सूचित किया गया है। कृपया काउंटर नंबर 02 (इमरजेंसी) पर तुरंत जाएं।');
                   setShowRedFlagModal(false);
                   navigate('/');
                 }}
-                className="flex-1 py-2.5 bg-[#DC2626] hover:bg-red-700 text-white font-black text-xs rounded-[3px] cursor-pointer"
+                className="flex-1 py-3 bg-[#DC2626] hover:bg-red-700 text-white font-black text-xs sm:text-sm rounded-[3px] cursor-pointer flex items-center justify-center gap-1.5"
               >
-                इमरजेंसी कक्ष में जाएं (Proceed to Emergency)
+                <span>🚨 अस्पताल कर्मचारी को बुलाएँ</span>
               </button>
               <button
                 type="button"
                 onClick={() => setShowRedFlagModal(false)}
-                className="py-2.5 px-3 border border-[#CED4DA] text-xs font-bold text-[#495057] hover:bg-[#EAEDF0] rounded-[3px] cursor-pointer"
+                className="py-3 px-4 border border-[#CED4DA] text-xs sm:text-sm font-bold text-[#495057] hover:bg-[#EAEDF0] rounded-[3px] cursor-pointer"
               >
-                गलती से दर्ज हुआ (Dismiss)
+                सामान्य परामर्श जारी रखें
               </button>
             </div>
           </div>
@@ -656,7 +696,7 @@ export const ComplaintScreen: React.FC = () => {
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
-            <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
+            <span className="font-semibold text-[#495057]">नई दिल्ली</span>
           </div>
           <div className="text-[11px] font-semibold text-[#6C757D]">
             <span>राष्ट्रीय आयुष हेल्पलाइन: 1800-11-2233</span>

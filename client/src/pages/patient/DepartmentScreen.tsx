@@ -61,7 +61,7 @@ export const DepartmentScreen: React.FC = () => {
             }}
           >
             <Shield className="w-3.5 h-3.5" />
-            <span>चरण 1(B): चिकित्सा पद्धति चयन • TREATMENT PATH SELECTION</span>
+            <span>चिकित्सा विभाग चयन</span>
           </div>
 
           <h1
@@ -69,91 +69,66 @@ export const DepartmentScreen: React.FC = () => {
             style={{ color: '#0B5FA5' }}
           >
             {language === 'hi'
-              ? 'आप किस पद्धति में परामर्श लेना चाहते हैं?'
-              : 'Which Treatment System do you prefer?'}
+              ? 'आप किस प्रकार की चिकित्सा के लिए आए हैं?'
+              : 'What type of care are you seeking today?'}
           </h1>
           <p className="text-xs sm:text-sm text-[#495057] font-semibold">
             {language === 'hi'
-              ? 'अपनी पसंद के चिकित्सा विभाग पर स्पर्श करें।'
-              : 'Tap to choose between Ayurvedic Holistic Care and General Modern Medicine.'}
+              ? 'आपकी पसंद के अनुसार आपको संबंधित डॉक्टर के पास भेजा जाएगा।'
+              : 'You will be routed to the appropriate department based on your choice.'}
           </p>
         </div>
 
-        {/* 2 LARGE HIGH-CONTRAST TREATMENT SYSTEM CARDS */}
+        {/* 2 BALANCED TREATMENT SYSTEM CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl shrink-0">
           
-          {/* OPTION 1: AYURVEDA MEDICINE */}
+          {/* OPTION 1: AYURVEDA */}
           <div
             onClick={() => handleSelectMode('ayurveda')}
             className={`p-5 rounded-[3px] border-2 text-left cursor-pointer transition-transform active:scale-[0.98] flex flex-col justify-between shadow-xs ${
               selectedMode === 'ayurveda'
-                ? 'border-[#2F7D4F] bg-[#EDF7F1]'
-                : 'border-[#CED4DA] bg-white hover:border-[#2F7D4F]/50'
+                ? 'border-[#0B5FA5] bg-[#E8F1F8]'
+                : 'border-[#CED4DA] bg-white hover:border-[#0B5FA5]/50'
             }`}
           >
             <div className="flex items-start justify-between mb-3">
               <div
                 className="w-12 h-12 rounded-[3px] flex items-center justify-center shrink-0 text-white"
-                style={{ backgroundColor: '#2F7D4F' }}
+                style={{ backgroundColor: '#186036' }}
               >
                 <Leaf className="w-6 h-6 text-white" />
               </div>
 
-              <div className="flex items-center gap-1.5">
-                {/* Per-Option Audio Speaker */}
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) =>
-                    handleSpeakOption(
-                      e,
-                      language === 'hi'
-                        ? 'आयुर्वेद चिकित्सा विभाग। त्रिदोष एवं प्रकृति परीक्षण, हर्बल औषधि एवं पंचकर्म उपचार।'
-                        : 'Ayurvedic Medicine Department. Tri-dosha Prakriti assessment, classical herbal formulations and panchakarma.'
-                    )
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ')
-                      handleSpeakOption(
-                        e as any,
-                        'आयुर्वेद चिकित्सा विभाग। त्रिदोष एवं प्रकृति परीक्षण, हर्बल औषधि एवं पंचकर्म उपचार।'
-                      );
-                  }}
-                  className="w-8 h-8 rounded-[2px] border border-[#2F7D4F]/30 bg-white text-[#2F7D4F] flex items-center justify-center hover:bg-[#2F7D4F] hover:text-white cursor-pointer transition-colors"
-                  title="विकल्प को आवाज़ में सुनें"
-                >
-                  <Volume2 className="w-4 h-4" />
-                </div>
-
-                {/* Selection Checkbox */}
-                <div
-                  className={`w-6 h-6 rounded-[2px] border flex items-center justify-center ${
-                    selectedMode === 'ayurveda'
-                      ? 'bg-[#2F7D4F] border-[#2F7D4F] text-white'
-                      : 'bg-[#EAEDF0] border-[#CED4DA] text-transparent'
-                  }`}
-                >
-                  <Check className="w-4 h-4 stroke-[3]" />
-                </div>
+              {/* Radio Indicator */}
+              <div
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                  selectedMode === 'ayurveda'
+                    ? 'border-[#0B5FA5] bg-white'
+                    : 'border-[#CED4DA] bg-transparent'
+                }`}
+              >
+                {selectedMode === 'ayurveda' && (
+                  <span className="w-3 h-3 rounded-full bg-[#0B5FA5]" />
+                )}
               </div>
             </div>
 
             <div>
-              <span className="text-base sm:text-lg font-black block text-[#1E4620] mb-0.5">
-                आयुर्वेद चिकित्सा (Ayurvedic Care)
+              <span className="text-lg font-black block text-[#212529] mb-0.5">
+                {language === 'hi' ? 'आयुर्वेद चिकित्सा' : 'Ayurvedic Medicine'}
               </span>
-              <span className="text-[11px] font-bold text-[#2F7D4F] uppercase tracking-wider block mb-2">
-                कायचिकित्सा, पंचकर्म एवं प्राकृतिक उपचार
+              <span className="text-xs font-bold text-[#186036] block mb-2">
+                {language === 'hi' ? 'आयुर्वेदिक डॉक्टर से परामर्श एवं दिनचर्या परीक्षण' : 'Consultation with Ayurvedic Physician'}
               </span>
-              <p className="text-xs text-[#495057] font-medium leading-relaxed">
-                • 15-प्रश्नों की शास्त्रीय <strong>चरक संहिता प्रकृति परीक्षा</strong> (वात-पित्त-कफ)<br />
-                • हर्बल क्वाथ, वटी एवं पंचकर्म चिकित्सा योजना<br />
-                • <strong>आवंटन:</strong> आयुष बी.ए.एम.एस. विशेषज्ञ चिकित्सक
+              <p className="text-xs text-[#495057] font-medium leading-normal">
+                {language === 'hi'
+                  ? 'शारीरिक प्रकृति, खान-पान एवं हर्बल चिकित्सा परामर्श।'
+                  : 'Ayurvedic constitution, diet regimen and herbal consultation.'}
               </p>
             </div>
           </div>
 
-          {/* OPTION 2: GENERAL ALLOPATHIC MEDICINE */}
+          {/* OPTION 2: GENERAL MEDICINE */}
           <div
             onClick={() => handleSelectMode('allopathy')}
             className={`p-5 rounded-[3px] border-2 text-left cursor-pointer transition-transform active:scale-[0.98] flex flex-col justify-between shadow-xs ${
@@ -170,56 +145,31 @@ export const DepartmentScreen: React.FC = () => {
                 <Stethoscope className="w-6 h-6 text-white" />
               </div>
 
-              <div className="flex items-center gap-1.5">
-                {/* Per-Option Audio Speaker */}
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) =>
-                    handleSpeakOption(
-                      e,
-                      language === 'hi'
-                        ? 'सामान्य एलोपैथी चिकित्सा। आधुनिक जांच, रक्तचाप, शुगर, संक्रमण एवं त्वरित लक्षण शमन।'
-                        : 'General Allopathic Medicine. Modern diagnostics, vitals, blood sugar, infections and acute care.'
-                    )
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ')
-                      handleSpeakOption(
-                        e as any,
-                        'सामान्य एलोपैथी चिकित्सा। आधुनिक जांच, रक्तचाप, शुगर, संक्रमण एवं त्वरित लक्षण शमन।'
-                      );
-                  }}
-                  className="w-8 h-8 rounded-[2px] border border-[#0B5FA5]/30 bg-white text-[#0B5FA5] flex items-center justify-center hover:bg-[#0B5FA5] hover:text-white cursor-pointer transition-colors"
-                  title="विकल्प को आवाज़ में सुनें"
-                >
-                  <Volume2 className="w-4 h-4" />
-                </div>
-
-                {/* Selection Checkbox */}
-                <div
-                  className={`w-6 h-6 rounded-[2px] border flex items-center justify-center ${
-                    selectedMode === 'allopathy'
-                      ? 'bg-[#0B5FA5] border-[#0B5FA5] text-white'
-                      : 'bg-[#EAEDF0] border-[#CED4DA] text-transparent'
-                  }`}
-                >
-                  <Check className="w-4 h-4 stroke-[3]" />
-                </div>
+              {/* Radio Indicator */}
+              <div
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                  selectedMode === 'allopathy'
+                    ? 'border-[#0B5FA5] bg-white'
+                    : 'border-[#CED4DA] bg-transparent'
+                }`}
+              >
+                {selectedMode === 'allopathy' && (
+                  <span className="w-3 h-3 rounded-full bg-[#0B5FA5]" />
+                )}
               </div>
             </div>
 
             <div>
-              <span className="text-base sm:text-lg font-black block text-[#0B5FA5] mb-0.5">
-                सामान्य चिकित्सा (General Medicine)
+              <span className="text-lg font-black block text-[#212529] mb-0.5">
+                {language === 'hi' ? 'सामान्य चिकित्सा' : 'General Medicine'}
               </span>
-              <span className="text-[11px] font-bold text-[#0B5FA5] uppercase tracking-wider block mb-2">
-                एलोपैथी, आधुनिक जांच एवं त्वरित राहत
+              <span className="text-xs font-bold text-[#0B5FA5] block mb-2">
+                {language === 'hi' ? 'सामान्य / आधुनिक चिकित्सा डॉक्टर से परामर्श' : 'Consultation with General Medicine Doctor'}
               </span>
-              <p className="text-xs text-[#495057] font-medium leading-relaxed">
-                • रक्तचाप (BP), शुगर, एलर्जी एवं आधुनिक स्वास्थ्य जांच<br />
-                • तीव्र लक्षणों का त्वरित शमन व एंटीबायोटिक/ऑलॉपैथिक परामर्श<br />
-                • <strong>आवंटन:</strong> जनरल फिजिशियन (MD Medicine)
+              <p className="text-xs text-[#495057] font-medium leading-normal">
+                {language === 'hi'
+                  ? 'प्राथमिक स्वास्थ्य विटल्स, रक्तचाप एवं सामान्य चिकित्सा परामर्श।'
+                  : 'General health vitals, blood pressure and routine clinical consultation.'}
               </p>
             </div>
           </div>

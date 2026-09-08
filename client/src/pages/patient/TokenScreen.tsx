@@ -205,7 +205,7 @@ export const TokenScreen: React.FC = () => {
             }}
           >
             <CheckCircle className="w-3.5 h-3.5" />
-            <span>पंजीकरण सफल • CASE DISPATCHED TO OPD DOCTOR</span>
+            <span>{language === 'hi' ? 'पंजीकरण सफल' : 'Registration Complete'}</span>
           </div>
 
           <h1
@@ -216,8 +216,8 @@ export const TokenScreen: React.FC = () => {
           </h1>
           <p className="text-xs sm:text-sm text-[#495057] font-semibold">
             {language === 'hi'
-              ? 'आपका केस विवरण डॉक्टर के कंप्यूटर पर भेज दिया गया है।'
-              : 'Your case summary has been sent directly to the physician workstation.'}
+              ? 'आपका विवरण संबंधित चिकित्सक के कंप्यूटर पर भेज दिया गया है।'
+              : 'Your intake details have been sent to the doctor’s desk.'}
           </p>
         </div>
 
@@ -231,7 +231,7 @@ export const TokenScreen: React.FC = () => {
                 अखिल भारतीय आयुर्वेद संस्थान (AIIA), नई दिल्ली
               </span>
               <span className="text-xs sm:text-sm font-black text-[#0B5FA5]">
-                {isAyurveda ? 'आयुष ओपीडी परामर्श पर्ची (Ayurveda OPD Token Slip)' : 'सामान्य चिकित्सा ओपीडी पर्ची (General Medicine Token Slip)'}
+                {isAyurveda ? 'आयुष ओपीडी परामर्श पर्ची' : 'सामान्य चिकित्सा ओपीडी परामर्श पर्ची'}
               </span>
             </div>
 
@@ -249,7 +249,7 @@ export const TokenScreen: React.FC = () => {
               </div>
               <div>
                 <span className="text-[9px] font-bold text-[#0B5FA5] uppercase tracking-wider block">
-                  आवंटित चिकित्सक (Assigned Physician):
+                  परामर्श चिकित्सक (Doctor):
                 </span>
                 <span className="text-sm sm:text-base font-black text-[#212529] block">
                   {assignedDoctorName}
@@ -260,13 +260,13 @@ export const TokenScreen: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white border border-[#0B5FA5] px-2.5 py-1 rounded-[2px] text-center shrink-0">
-              <div className="flex items-center justify-center gap-0.5 text-[9px] font-bold text-[#0B5FA5]">
-                <MapPin className="w-2.5 h-2.5 text-[#0B5FA5]" />
-                <span>कमरा नं.:</span>
+            <div className="bg-white border border-[#0B5FA5] px-3 py-1.5 rounded-[2px] text-center shrink-0">
+              <div className="flex items-center justify-center gap-0.5 text-[10px] font-bold text-[#0B5FA5]">
+                <MapPin className="w-3 h-3 text-[#0B5FA5]" />
+                <span>कमरा नंबर:</span>
               </div>
-              <span className="text-base font-black text-[#0B5FA5] block leading-none mt-0.5">{assignedRoom}</span>
-              <span className="text-[8px] text-[#6C757D] font-bold block">{assignedBlock}</span>
+              <span className="text-lg font-black text-[#0B5FA5] block leading-none mt-0.5">{assignedRoom}</span>
+              <span className="text-[9px] text-[#6C757D] font-bold block">{assignedBlock}</span>
             </div>
           </div>
 
@@ -275,32 +275,36 @@ export const TokenScreen: React.FC = () => {
             <div>
               <span className="text-[9px] text-[#6C757D] block">रोगी का नाम:</span>
               <span className="font-extrabold text-[#212529] truncate block">
-                {patient.fullName || 'रामेश्वर दयाल शर्मा'}
+                {patient.fullName || 'नागरिक'}
               </span>
             </div>
             <div>
               <span className="text-[9px] text-[#6C757D] block">आयु/लिंग:</span>
-              <span className="font-bold text-[#212529]">{patient.age || 62} वर्ष / {patient.gender === 'female' ? 'महिला' : 'पुरुष'}</span>
+              <span className="font-bold text-[#212529]">
+                {patient.age ? `${patient.age} वर्ष` : '—'} / {patient.gender === 'female' ? 'महिला' : 'पुरुष'}
+              </span>
             </div>
             <div>
-              <span className="text-[9px] text-[#6C757D] block">चिकित्सा पद्धति:</span>
-              <span className={`font-bold ${isAyurveda ? 'text-[#2F7D4F]' : 'text-[#0B5FA5]'}`}>
-                {isAyurveda ? (prakritiResult?.dominantPrakriti || 'PITTA-KAPHA') : 'सामान्य चिकित्सा (Allopathy)'}
+              <span className="text-[9px] text-[#6C757D] block">विभाग:</span>
+              <span className="font-bold text-[#0B5FA5]">
+                {isAyurveda ? 'कायचिकित्सा' : 'सामान्य चिकित्सा'}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[10px] text-[#6C757D]">
+          {/* Instructions Box */}
+          <div className="bg-[#F8FAFC] p-2 rounded-[2px] text-[11px] text-[#495057] font-medium leading-relaxed">
+            <p className="font-bold text-[#212529] mb-0.5">
+              कृपया {assignedRoom} ({assignedBlock}) के बाहर प्रतीक्षालय में बैठें।
+            </p>
+            <p className="text-[10px] text-[#6C757D]">
+              स्क्रीन पर अपना टोकन नंबर {tokenNumber} प्रदर्शित होने पर परामर्श कक्ष में प्रवेश करें।
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] text-[#6C757D] mt-2 pt-1 border-t">
             <span>दिनांक: {new Date().toLocaleDateString('hi-IN')} • समय: {new Date().toLocaleTimeString()}</span>
-            <button
-              type="button"
-              onClick={handleOpenFhirModal}
-              className="font-mono text-[#0B5FA5] hover:text-[#084B83] font-bold underline flex items-center gap-1 cursor-pointer"
-              title="ABDM HL7 FHIR R4 Bundle Record"
-            >
-              <FileCode className="w-3.5 h-3.5 text-[#0B5FA5]" />
-              <span>ABDM-FHIR-R4 • JSON देखें / HIS PUSH</span>
-            </button>
+            <span>अखिल भारतीय आयुर्वेद संस्थान • नई दिल्ली</span>
           </div>
 
         </div>
@@ -313,7 +317,7 @@ export const TokenScreen: React.FC = () => {
             className="h-12 sm:h-14 px-4 rounded-[3px] border border-[#0B5FA5] bg-white text-[#0B5FA5] hover:bg-[#E8F1F8] font-black text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
           >
             <Printer className="w-4 h-4 text-[#0B5FA5]" />
-            <span>टोकन पर्ची प्रिंट करें (Print Token)</span>
+            <span>कागज़ पर टोकन प्रिंट करें (Print Slip)</span>
           </button>
 
           <button
@@ -322,15 +326,15 @@ export const TokenScreen: React.FC = () => {
             className="h-12 sm:h-14 px-6 rounded-[3px] border border-[#084B83] text-sm sm:text-base font-black text-white flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
             style={{ backgroundColor: '#0B5FA5' }}
           >
-            <span>सत्र समाप्त करें • FINISH & EXIT</span>
+            <span>सत्र समाप्त करें (Finish & Exit)</span>
             <ArrowRight className="w-5 h-5 text-white" />
           </button>
         </div>
 
         {/* DPDP Countdown */}
         <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold text-[#6C757D] shrink-0">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#2F7D4F]" />
-          <span>सुरक्षा: गोपनीयता हेतु {countdown} सेकंड में स्क्रीन स्वतः रीसेट हो जाएगी।</span>
+          <ShieldCheck className="w-3.5 h-3.5 text-[#186036]" />
+          <span>गोपनीयता सुरक्षा: {countdown} सेकंड में यह स्क्रीन स्वतः बंद हो जाएगी।</span>
         </div>
 
       </main>
@@ -341,10 +345,10 @@ export const TokenScreen: React.FC = () => {
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
-            <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
+            <span className="font-semibold text-[#495057]">नई दिल्ली</span>
           </div>
           <div className="text-[11px] font-semibold text-[#6C757D]">
-            <span>DPDP Act 2023 Ephemeral Token Auto-Purge Enabled</span>
+            <span>राष्ट्रीय आयुष मिशन • नागरिक स्वास्थ्य सेवा</span>
           </div>
         </div>
       </footer>

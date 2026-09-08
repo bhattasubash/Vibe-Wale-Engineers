@@ -263,7 +263,7 @@ export const CameraUploadScreen: React.FC = () => {
             }}
           >
             <Camera className="w-3.5 h-3.5" />
-            <span>चरण 5: मेडिकल पर्चा स्कैन • DOCUMENT CAPTURE</span>
+            <span>{language === 'hi' ? 'पुराने पर्चे एवं जांच रिपोर्ट (वैकल्पिक)' : 'Prescriptions & Lab Reports (Optional)'}</span>
           </div>
 
           <h1
@@ -291,7 +291,7 @@ export const CameraUploadScreen: React.FC = () => {
             }`}
           >
             <Camera className="w-4 h-4" />
-            <span>{language === 'hi' ? 'कैमरा से पर्चा स्कैन करें' : 'Scan Physical Document'}</span>
+            <span>{language === 'hi' ? 'कैमरे के सामने पर्चा रखें' : 'Scan Physical Document'}</span>
           </button>
           <button
             type="button"
@@ -303,7 +303,7 @@ export const CameraUploadScreen: React.FC = () => {
             }`}
           >
             <Mic className="w-4 h-4" />
-            <span>{language === 'hi' ? 'दस्तावेज़ नहीं हैं? बोलकर बताएं' : 'No Papers? Speak History'}</span>
+            <span>{language === 'hi' ? 'दस्तावेज़ नहीं हैं? बोलकर बताएं' : 'No Paper? Speak History'}</span>
           </button>
         </div>
 
@@ -316,7 +316,7 @@ export const CameraUploadScreen: React.FC = () => {
               </h3>
               <p className="text-xs text-[#6C757D] font-medium mt-1">
                 {language === 'hi'
-                  ? 'माइक बटन दबाएं और स्पष्ट बोलें (उदा: "5 साल से शुगर है, मेटफॉर्मिन 500 ले रहा हूँ, 2 साल पहले पथरी का ऑपरेशन हुआ था")'
+                  ? 'माइक बटन दबाएं और बताएं (उदा: "5 साल से शुगर है, मेटफॉर्मिन 500 ले रहा हूँ, 2 साल पहले पथरी का ऑपरेशन हुआ था")'
                   : 'Tap the mic and speak clearly (e.g., "Diagnosed with Type 2 diabetes 5 years ago, taking Metformin 500mg BD")'}
               </p>
             </div>
@@ -325,7 +325,7 @@ export const CameraUploadScreen: React.FC = () => {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-bold text-[#495057] uppercase tracking-wider flex items-center gap-1.5">
                   <FileText className="w-3.5 h-3.5 text-[#0B5FA5]" />
-                  <span>{language === 'hi' ? 'बोला गया विवरण (Spoken Transcript)' : 'Live Spoken Transcript'}</span>
+                  <span>{language === 'hi' ? 'बोला गया विवरण:' : 'Recorded Spoken Words:'}</span>
                 </span>
                 <VoiceAnswerButton
                   language={language}
@@ -384,18 +384,18 @@ export const CameraUploadScreen: React.FC = () => {
               {isProcessingVoice ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>AI संरचना में सहेजा जा रहा है (Processing with Gemini)...</span>
+                  <span>{language === 'hi' ? 'विवरण सहेजा जा रहा है...' : 'Saving details...'}</span>
                 </>
               ) : (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>ईएमआर में सहेजें • SAVE TO MEDICAL RECORD</span>
+                  <span>{language === 'hi' ? 'विवरण सहेजें' : 'Save Details'}</span>
                 </>
               )}
             </button>
           </div>
         ) : (
-        /* ENLARGED CAMERA VIEWFINDER */
+        /* CAMERA VIEWFINDER */
         <div className="w-full max-w-3xl bg-white border border-[#CED4DA] rounded-[3px] p-3 flex flex-col items-center shrink-0">
           <div className="relative w-full h-72 sm:h-96 md:h-[26rem] bg-[#1A202C] rounded-[3px] overflow-hidden flex items-center justify-center border-2 border-[#CED4DA]">
             <video
@@ -412,10 +412,10 @@ export const CameraUploadScreen: React.FC = () => {
               type="button"
               onClick={() => setIsMirrored(!isMirrored)}
               className="absolute top-2 right-2 z-20 px-2.5 py-1 bg-black/60 hover:bg-black/85 border border-white/40 text-white rounded text-[10px] font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
-              title="Toggle Mirror View (पलटें)"
+              title="Toggle Mirror View"
             >
               <RotateCw className="w-3 h-3" />
-              <span>{isMirrored ? 'मिरर: चालू (Mirrored)' : 'मिरर: बंद (Normal)'}</span>
+              <span>{isMirrored ? 'मिरर: चालू' : 'मिरर: बंद'}</span>
             </button>
 
             {/* Bounding Box */}
@@ -442,10 +442,10 @@ export const CameraUploadScreen: React.FC = () => {
                       : '#0B5FA5',
                 }}
               >
-                {detectionState === 'holding' && `स्थिर रखें • HOLD STILL (${countdown})`}
-                {detectionState === 'adjusting' && 'दस्तावेज़ पास लाएं (Bring Closer)'}
-                {detectionState === 'searching' && 'पर्चा फ्रेम में रखें (Align Inside)'}
-                {detectionState === 'captured' && '✓ फ़ोटो ले ली गई!'}
+                {detectionState === 'holding' && `स्थिर रखें (${countdown})`}
+                {detectionState === 'adjusting' && 'कागज़ थोड़ा पास लाएं'}
+                {detectionState === 'searching' && 'कागज़ फ्रेम के अंदर रखें'}
+                {detectionState === 'captured' && '✓ फ़ोटो ली जा चुकी है'}
               </div>
 
               {countdown !== null && (
@@ -454,27 +454,27 @@ export const CameraUploadScreen: React.FC = () => {
                 </div>
               )}
 
-            {/* PROMINENT ANIMATED OCR SCANNING OVERLAY FOR PATIENT */}
+            {/* PROGRESS OVERLAY FOR PATIENT */}
             {isUploading && (
               <div className="absolute inset-0 bg-[#0B5FA5]/90 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-center z-30 animate-in fade-in duration-200">
                 <Loader2 className="w-12 h-12 text-white animate-spin mb-2" />
                 <span className="text-base sm:text-lg font-black text-white block tracking-wide">
-                  दस्तावेज़ की AI जांच हो रही है...
+                  कागज़ सहेजा जा रहा है...
                 </span>
                 <span className="text-xs sm:text-sm font-bold text-white/95 block mt-0.5">
-                  AI is analyzing your prescription (approx. 3-4 seconds)
+                  Saving prescription (approx. 2-3 seconds)
                 </span>
                 <div className="w-44 h-1.5 bg-white/20 rounded-full mt-3 overflow-hidden">
                   <div className="h-full bg-white animate-pulse w-3/4 rounded-full" />
                 </div>
                 <span className="text-[11px] font-semibold text-white/80 mt-2">
-                  कृपया शांत खड़े रहें • Please hold still
+                  कृपया प्रतीक्षा करें • Please wait
                 </span>
               </div>
             )}
 
             <div className="text-[9px] font-bold text-white/80 bg-black/50 px-2 py-0.5 rounded-[2px]">
-              A4 Document Alignment Zone
+              दस्तावेज़ क्षेत्र (Document Area)
             </div>
           </div>
         </div>
@@ -489,12 +489,12 @@ export const CameraUploadScreen: React.FC = () => {
             {isUploading ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>जांच प्रगति पर है (Analyzing)...</span>
+                <span>कागज़ सहेजा जा रहा है...</span>
               </>
             ) : (
               <>
                 <Camera className="w-3.5 h-3.5" />
-                <span>फ़ोटो खींचें • MANUAL SNAP</span>
+                <span>फ़ोटो खींचें (Take Photo)</span>
               </>
             )}
           </button>
@@ -507,7 +507,7 @@ export const CameraUploadScreen: React.FC = () => {
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-[#15803D]" />
               <span className="font-extrabold text-[#212529]">
-                {capturedDocs.length} पर्चा जोड़ा गया (OCR Extracted)
+                {capturedDocs.length} पर्चा जोड़ा गया
               </span>
             </div>
             <button
@@ -539,7 +539,7 @@ export const CameraUploadScreen: React.FC = () => {
             className="h-12 sm:h-14 px-6 rounded-[3px] border border-[#084B83] text-sm sm:text-base font-black text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-transform active:scale-[0.98]"
             style={{ backgroundColor: '#0B5FA5' }}
           >
-            <span>डॉक्टर को भेजें एवं टोकन लें • FINISH</span>
+            <span>{language === 'hi' ? 'टोकन पर्ची प्राप्त करें' : 'Finish & Get Token'}</span>
             <ArrowRight className="w-5 h-5 text-white" />
           </button>
         </div>
@@ -564,10 +564,10 @@ export const CameraUploadScreen: React.FC = () => {
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
-            <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
+            <span className="font-semibold text-[#495057]">नई दिल्ली</span>
           </div>
           <div className="text-[11px] font-semibold text-[#6C757D]">
-            <span>Dual-Engine OCR: Gemini Vision & Tesseract Spatial Verification</span>
+            <span>राष्ट्रीय आयुष मिशन • कागज़ात सुरक्षा एवं ईएमआर संरक्षण</span>
           </div>
         </div>
       </footer>

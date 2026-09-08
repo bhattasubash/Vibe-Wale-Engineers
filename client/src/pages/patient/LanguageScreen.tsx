@@ -48,9 +48,19 @@ export const LanguageScreen: React.FC = () => {
   const handleSelectLanguage = (langCode: LanguageCode) => {
     setSelectedLang(langCode);
     setLanguage(langCode);
+    
+    // Immediate acoustic confirmation in chosen language
+    if (langCode === 'hi') {
+      speechEngine.speak('आपने हिन्दी चुनी है।', 'hi');
+    } else if (langCode === 'en') {
+      speechEngine.speak('You have selected English.', 'en');
+    } else if (langCode === 'pa') {
+      speechEngine.speak('ਤੁਸੀਂ ਪੰਜਾਬੀ ਚੁਣੀ ਹੈ।', 'pa');
+    }
+
     setTimeout(() => {
       navigate('/kiosk/identify');
-    }, 150);
+    }, 450);
   };
 
   const promptHindi = 'कृपया अपनी पसंदीदा भाषा चुनें। स्क्रीन पर दी गई किसी भी भाषा पर स्पर्श करें।';
@@ -122,15 +132,20 @@ export const LanguageScreen: React.FC = () => {
                       >
                         {lang.nativeName}
                       </span>
+                      {/* Affordance fix: Radio circle when unselected, solid check when selected */}
                       <div
-                        className="w-7 h-7 rounded-[2px] border flex items-center justify-center shrink-0"
+                        className="w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0"
                         style={{
-                          backgroundColor: isSelected ? '#FFFFFF' : '#EAEDF0',
+                          backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
                           borderColor: isSelected ? '#FFFFFF' : '#CED4DA',
-                          color: isSelected ? '#0B5FA5' : '#495057',
+                          color: isSelected ? '#0B5FA5' : 'transparent',
                         }}
                       >
-                        <Check className="w-4 h-4 stroke-[3]" />
+                        {isSelected ? (
+                          <Check className="w-4 h-4 stroke-[3]" />
+                        ) : (
+                          <span className="w-2.5 h-2.5 rounded-full bg-transparent" />
+                        )}
                       </div>
                     </div>
                     <span

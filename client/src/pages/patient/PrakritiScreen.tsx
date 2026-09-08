@@ -173,7 +173,11 @@ export const PrakritiScreen: React.FC = () => {
               }}
             >
               <Scale className="w-3.5 h-3.5 text-[#186036]" />
-              <span>चरक संहिता प्रकृति परीक्षण • प्रश्न {currentIndex + 1} / 15</span>
+              <span>
+                {language === 'hi'
+                  ? `प्रकृति परीक्षण • प्रश्न ${currentIndex + 1} / 15`
+                  : `Prakriti Assessment • Question ${currentIndex + 1} of 15`}
+              </span>
             </div>
 
             <span className="text-xs font-extrabold text-[#495057]">
@@ -186,17 +190,28 @@ export const PrakritiScreen: React.FC = () => {
               className="h-full transition-all duration-300"
               style={{
                 width: `${((currentIndex + 1) / 15) * 100}%`,
-                backgroundColor: '#2F7D4F',
+                backgroundColor: '#186036',
               }}
             />
           </div>
         </div>
 
+        {/* Friendly Reassuring Intro Banner (on Question 1) */}
+        {currentIndex === 0 && (
+          <div className="w-full max-w-2xl p-2.5 bg-[#EDF7F1] border border-[#186036]/30 rounded-[3px] text-left shrink-0">
+            <p className="text-xs text-[#186036] font-bold leading-relaxed">
+              {language === 'hi'
+                ? '🌿 प्रकृति परीक्षण: यह प्रश्नावली आपके स्वाभाविक स्वास्थ्य, स्वभाव और पाचन की प्रकृति समझने के लिए है। कृपया अपनी सामान्य स्थिति के अनुसार उत्तर दें।'
+                : '🌿 Body Constitution Assessment: These 15 questions help your Ayurvedic physician understand your natural body constitution and digestive habits.'}
+            </p>
+          </div>
+        )}
+
         {/* Current Question Container */}
         <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-4 sm:p-5 shrink-0">
           
           <div className="text-[10px] font-bold text-[#6C757D] uppercase tracking-wider mb-0.5">
-            शास्त्रीय मापदंड: {currentQuestion.sanskritParam}
+            {language === 'hi' ? 'एक विकल्प चुनें (Single Choice):' : 'Select one option:'}
           </div>
 
           <div className="flex items-start justify-between gap-3 mb-3">
@@ -213,7 +228,7 @@ export const PrakritiScreen: React.FC = () => {
             />
           </div>
 
-          {/* EXACTLY 3 SPACIOUS TOUCH OPTIONS WITH PER-OPTION AUDIO BUTTONS */}
+          {/* EXACTLY 3 TOUCH OPTIONS WITH RADIO BUTTON INDICATOR & AUDIO BUTTON */}
           <div className="space-y-2.5">
             {currentQuestion.options.map((opt, idx) => {
               const isSelected = selectedOptionIdx === idx;
@@ -223,22 +238,28 @@ export const PrakritiScreen: React.FC = () => {
                   key={idx}
                   type="button"
                   onClick={() => handleSelectOption(idx, opt.dosha)}
-                  className="w-full h-16 sm:h-18 p-3.5 rounded-[3px] border text-left transition-transform active:scale-[0.98] cursor-pointer flex items-center justify-between group"
+                  className="w-full min-h-[56px] sm:min-h-[64px] p-3 rounded-[3px] border text-left transition-transform active:scale-[0.98] cursor-pointer flex items-center justify-between group"
                   style={{
-                    backgroundColor: isSelected ? '#0B5FA5' : '#FFFFFF',
-                    borderColor: isSelected ? '#084B83' : '#CED4DA',
+                    backgroundColor: isSelected ? '#186036' : '#FFFFFF',
+                    borderColor: isSelected ? '#0F3F23' : '#CED4DA',
                     color: isSelected ? '#FFFFFF' : '#212529',
                   }}
                 >
                   <div className="flex items-center gap-3">
+                    {/* Radio Button Indicator */}
                     <div
-                      className="w-7 h-7 rounded-[2px] font-black flex items-center justify-center shrink-0 text-xs"
+                      className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
                       style={{
-                        backgroundColor: isSelected ? '#FFFFFF' : '#E8F1F8',
-                        color: '#0B5FA5',
+                        borderColor: isSelected ? '#FFFFFF' : '#186036',
+                        backgroundColor: isSelected ? '#FFFFFF' : 'transparent',
                       }}
                     >
-                      {idx + 1}
+                      {isSelected && (
+                        <div
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ backgroundColor: '#186036' }}
+                        />
+                      )}
                     </div>
                     <span
                       className="text-xs sm:text-sm font-extrabold leading-snug"
@@ -257,27 +278,15 @@ export const PrakritiScreen: React.FC = () => {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') handleSpeakOption(e as any, optionText);
                       }}
-                      className="w-8 h-8 rounded-[2px] border flex items-center justify-center transition-transform active:scale-90 hover:opacity-90 cursor-pointer"
+                      className="w-7 h-7 rounded-[2px] border flex items-center justify-center transition-transform active:scale-90 hover:opacity-90 cursor-pointer"
                       style={{
                         backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.2)' : '#F1F5F9',
                         borderColor: isSelected ? 'rgba(255, 255, 255, 0.4)' : '#CBD5E1',
-                        color: isSelected ? '#FFFFFF' : '#0B5FA5',
+                        color: isSelected ? '#FFFFFF' : '#186036',
                       }}
-                      title="इस विकल्प को आवाज़ में सुनें (Listen aloud)"
+                      title="इस विकल्प को सुनें"
                     >
-                      <Volume2 className="w-4 h-4" />
-                    </div>
-
-                    {/* Selection Check Indicator */}
-                    <div
-                      className="w-6 h-6 rounded-[2px] border flex items-center justify-center shrink-0"
-                      style={{
-                        backgroundColor: isSelected ? '#FFFFFF' : '#EAEDF0',
-                        borderColor: isSelected ? '#FFFFFF' : '#CED4DA',
-                        color: isSelected ? '#0B5FA5' : '#495057',
-                      }}
-                    >
-                      <Check className="w-4 h-4 stroke-[3]" />
+                      <Volume2 className="w-3.5 h-3.5" />
                     </div>
                   </div>
                 </button>
@@ -287,7 +296,7 @@ export const PrakritiScreen: React.FC = () => {
 
         </div>
 
-        {/* 2 LARGE ACTION BUTTONS (64px Target Height) */}
+        {/* 2 LARGE ACTION BUTTONS */}
         <div className="grid grid-cols-2 gap-3 w-full max-w-2xl shrink-0">
           <button
             type="button"
@@ -295,7 +304,7 @@ export const PrakritiScreen: React.FC = () => {
             className="h-12 sm:h-14 px-4 rounded-[3px] border border-[#CED4DA] bg-white hover:bg-[#EAEDF0] font-black text-xs sm:text-sm text-[#495057] flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{currentIndex === 0 ? 'शिकायत पर वापस' : 'पिछला प्रश्न (Previous)'}</span>
+            <span>{currentIndex === 0 ? 'लक्षण पर वापस' : 'पिछला प्रश्न (Previous)'}</span>
           </button>
 
           <button
@@ -304,14 +313,14 @@ export const PrakritiScreen: React.FC = () => {
             disabled={selectedOptionIdx === null}
             className="h-12 sm:h-14 px-6 rounded-[3px] border font-black text-sm sm:text-base text-white flex items-center justify-center gap-2 transition-transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              backgroundColor: selectedOptionIdx !== null ? '#2F7D4F' : '#6C757D',
-              borderColor: selectedOptionIdx !== null ? '#1E4620' : '#495057',
+              backgroundColor: selectedOptionIdx !== null ? '#186036' : '#6C757D',
+              borderColor: selectedOptionIdx !== null ? '#0F3F23' : '#495057',
             }}
           >
             <span>
               {currentIndex === PRAKRITI_15_QUESTIONS.length - 1
-                ? 'स्कोर देखें • CALCULATE RESULT'
-                : 'अगला प्रश्न • NEXT QUESTION'}
+                ? (language === 'hi' ? 'समीक्षा देखें (Review)' : 'Review Details')
+                : (language === 'hi' ? 'अगला प्रश्न (Next)' : 'Next Question')}
             </span>
             <ArrowRight className="w-5 h-5 text-white" />
           </button>
@@ -325,10 +334,10 @@ export const PrakritiScreen: React.FC = () => {
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
-            <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
+            <span className="font-semibold text-[#495057]">नई दिल्ली</span>
           </div>
           <div className="flex items-center gap-1 text-[11px] font-semibold text-[#6C757D]">
-            <span>चरक संहिता (विमान स्थान 8) • 100% Deterministic Math</span>
+            <span>राष्ट्रीय आयुष मिशन • प्रकृति स्वास्थ्य विश्लेषण</span>
           </div>
         </div>
       </footer>

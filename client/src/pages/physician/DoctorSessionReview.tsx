@@ -22,10 +22,54 @@ import {
   Copy,
   AlertTriangle,
   Loader2,
+  RefreshCw,
 } from 'lucide-react';
 import { usePhysicianStore, DocumentItem } from '@/stores/physicianStore';
 import { API_BASE_URL } from '@/lib/config';
 import { CLINICAL_PRESETS } from '@/config/clinicalPresets';
+
+export const ProvenanceBadge: React.FC<{
+  source: 'patient-reported' | 'patient-selected' | 'document-extracted' | 'lab-report' | 'ai-suggested' | 'doctor-confirmed';
+}> = ({ source }) => {
+  switch (source) {
+    case 'patient-reported':
+      return (
+        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#F1F5F9] text-[#475569] border border-[#CBD5E1]" title="रोगी द्वारा मौखिक/स्वयं दर्ज (Patient reported via voice or text)">
+          <span>🗣️ रोगी द्वारा कथित [Patient reported]</span>
+        </span>
+      );
+    case 'patient-selected':
+      return (
+        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]" title="कियोस्क पर रोगी द्वारा चयनित (Patient selected on kiosk)">
+          <span>☑ रोगी चयनित [Patient selected]</span>
+        </span>
+      );
+    case 'document-extracted':
+      return (
+        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]" title="स्कैन किए गए दस्तावेज से निष्कर्षित (Extracted from uploaded document)">
+          <span>📄 दस्तावेज़ से प्राप्त [Document extracted]</span>
+        </span>
+      );
+    case 'lab-report':
+      return (
+        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0]" title="सत्यापित पैथोलॉजी रिपोर्ट (Verified lab report)">
+          <span>🔬 लैब रिपोर्ट [Lab report]</span>
+        </span>
+      );
+    case 'ai-suggested':
+      return (
+        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#F3E8FF] text-[#6B21A8] border border-[#E9D5FF]" title="कंप्यूटेड सुझाव - चिकित्सक सत्यापन आवश्यक (Computed suggestion — verify)">
+          <span>⚡ संगणित सुझाव [AI suggestion — verify]</span>
+        </span>
+      );
+    case 'doctor-confirmed':
+      return (
+        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC]" title="चिकित्सक द्वारा सत्यापित (Confirmed by physician)">
+          <span>✓ चिकित्सक सत्यापित [Doctor confirmed]</span>
+        </span>
+      );
+  }
+};
 
 export const DoctorSessionReview: React.FC = () => {
   const navigate = useNavigate();
@@ -123,10 +167,10 @@ export const DoctorSessionReview: React.FC = () => {
 
     setToastMessage(
       status === 'accepted'
-        ? 'केस सारांश सफलतापूर्वक स्वीकार किया गया (Case Accepted & Saved to EMR)'
+        ? 'केस सत्यापित एवं अस्पताल HIS में प्रेषित (Case Confirmed & Sent to HIS)'
         : status === 'amended'
-        ? 'संशोधित सारांश ईएमआर में दर्ज किया गया (Amended & Saved to EMR)'
-        : 'केस पुनः परीक्षण हेतु चिह्नित किया गया (Marked for Re-examination)'
+        ? 'संशोधित विवरण ईएमआर में दर्ज (Information Amended & Saved)'
+        : 'केस पुनः परीक्षण / स्पष्टीकरण हेतु चिह्नित (Clarification Requested)'
     );
     setShowToast(true);
     setTimeout(() => {
@@ -227,7 +271,7 @@ export const DoctorSessionReview: React.FC = () => {
           type: (r.report_type?.toLowerCase().includes('lab') ? 'Lab Report' : 'Prescription') as 'Prescription' | 'Lab Report' | 'Discharge Summary' | 'Other',
           date: r.report_date || new Date().toLocaleDateString('en-GB'),
           facility: r.facility_name || 'AIIA Medical Records',
-          ocrSnippet: r.summary || r.impression || 'Extracted via Dual-Engine Gemini Vision & Tesseract Spatial Verification.',
+          ocrSnippet: r.summary || r.impression || 'संलग्न चिकित्सा पर्चे से निष्कर्षित पाठ',
         };
       })
     : patient?.documents && patient.documents.length > 0
@@ -340,6 +384,50 @@ export const DoctorSessionReview: React.FC = () => {
         </div>
       </header>
 
+      {/* Sticky Patient Identification Strip */}
+      <div className="sticky top-[49px] z-20 bg-[#F1F5F9] border-b border-[#CBD5E1] px-6 py-1.5 shadow-xs text-xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <span className="font-mono font-black text-[#0B5FA5] bg-[#E8F1F8] px-2 py-0.5 rounded-[2px] border border-[#0B5FA5]/30">
+              #{patient.tokenNumber}
+            </span>
+            <span className="font-black text-[#212529]">
+              {patient.patientName}
+            </span>
+            <span className="text-[#64748B] font-semibold">
+              {patient.age} वर्ष • {patient.gender === 'female' ? 'महिला' : 'पुरुष'}
+            </span>
+            <span className="text-[#CBD5E1]">|</span>
+            <span className="text-[#64748B]">
+              फोन: <strong className="text-[#334155]">{patient.phone || 'उल्लेख नहीं'}</strong>
+            </span>
+            <span className="text-[#CBD5E1]">|</span>
+            <span className="font-mono text-[11px] text-[#475569]">
+              ABHA: {patient.abhaId || 'लागू नहीं'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-[2px] bg-white border border-[#CBD5E1] text-[#475569]">
+              मार्ग: <strong className="text-[#0B5FA5]">{isAllopathy ? 'एलोपैथी OPD' : (patient.dominantPrakriti || 'आयुर्वेद OPD')}</strong>
+            </span>
+            {patient.redFlagTriggered ? (
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-[2px] bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/40 flex items-center gap-1">
+                <ShieldAlert className="w-3 h-3 text-[#DC2626]" />
+                <span>🚨 आपातकालीन संकेत</span>
+              </span>
+            ) : (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-[2px] bg-[#EDF7F1] text-[#2F7D4F] border border-[#2F7D4F]/30">
+                सामान्य प्राथमिकता
+              </span>
+            )}
+            <span className="text-[10px] font-semibold text-[#64748B]">
+              स्थिति: <strong className="text-[#0B5FA5]">{patient.status === 'accepted' ? 'स्वीकृत' : patient.status === 'amended' ? 'संशोधित' : 'समीक्षाधीन'}</strong>
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Mobile/Tablet Quick-Jump Navigation (<1024px) */}
       <div className="lg:hidden bg-[#E8F1F8] border-b border-[#CED4DA] px-4 py-2 flex items-center justify-around text-xs font-bold text-[#0B5FA5]">
         <button
@@ -370,6 +458,81 @@ export const DoctorSessionReview: React.FC = () => {
       {/* Main 2-Column Clinical Review Interface */}
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 pb-24 lg:pb-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4">
         
+        {/* 10-Second OPD Clinical Snapshot (Above the Fold) */}
+        <div className="lg:col-span-12 bg-white border-2 border-[#0B5FA5]/30 rounded-[3px] p-3.5 shadow-xs">
+          <div className="flex items-center justify-between border-b border-[#CED4DA] pb-2 mb-2.5">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[#0B5FA5] animate-pulse" />
+              <span className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider">
+                नैदानिक त्वरित सारांश • 10-Second Clinical Snapshot
+              </span>
+            </div>
+            <span className="text-[10px] font-bold text-[#6C757D]">
+              ओपीडी परामर्श पूर्व त्वरित अवलोकन (OPD Pre-Consult Glance)
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 text-xs">
+            {/* Chief Complaint */}
+            <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px] col-span-2">
+              <div className="flex items-center justify-between mb-0.5">
+                <span className="text-[10px] text-[#6C757D] font-bold">प्रधान वेदना (Chief Complaint)</span>
+                <ProvenanceBadge source="patient-selected" />
+              </div>
+              <span className="font-black text-sm text-[#212529] line-clamp-1">
+                {patient.chiefComplaint || 'उल्लेख नहीं'}
+              </span>
+              <span className="text-[11px] text-[#6C757D] block truncate">
+                स्थान: {patient.socrates?.site || 'उल्लेख नहीं'}
+              </span>
+            </div>
+
+            {/* Severity & Duration */}
+            <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
+              <span className="text-[10px] text-[#6C757D] font-bold block mb-0.5">तीव्रता एवं अवधि</span>
+              <div className="font-bold text-[#DC2626] text-xs">
+                {patient.socrates?.severity ? `तीव्रता: ${patient.socrates.severity}/10` : 'तीव्रता: उल्लेख नहीं'}
+              </div>
+              <div className="text-[11px] text-[#495057] truncate">
+                {patient.socrates?.onset || 'अवधि: उल्लेख नहीं'}
+              </div>
+            </div>
+
+            {/* Pathway & Prakriti */}
+            <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
+              <span className="text-[10px] text-[#6C757D] font-bold block mb-0.5">चिकित्सा मार्ग / प्रकृति</span>
+              <span className="font-black text-xs text-[#186036] block truncate">
+                {isAllopathy ? 'सामान्य चिकित्सा (Allopathy)' : (patient.dominantPrakriti || 'आयुर्वेद OPD')}
+              </span>
+              <span className="text-[10px] text-[#6C757D] block">
+                {isAllopathy ? 'General OPD' : `V${patient.vataScore ?? 0} P${patient.pittaScore ?? 0} K${patient.kaphaScore ?? 0}`}
+              </span>
+            </div>
+
+            {/* Key Risk / Red Flag */}
+            <div className={`p-2 rounded-[2px] border ${patient.redFlagTriggered ? 'bg-[#FEF2F2] border-[#DC2626]' : 'bg-[#F8FAFC] border-[#CED4DA]'}`}>
+              <span className="text-[10px] text-[#6C757D] font-bold block mb-0.5">आपातकालीन जोखिम</span>
+              <span className={`font-black text-xs block ${patient.redFlagTriggered ? 'text-[#DC2626]' : 'text-[#186036]'}`}>
+                {patient.redFlagTriggered ? '🚨 उच्च जोखिम (Red Flag)' : '✓ कोई आपात संकेत नहीं'}
+              </span>
+              <span className="text-[10px] text-[#6C757D] block truncate">
+                {patient.redFlagTriggered ? 'सीने में दर्द/सांस तकलीफ' : 'सामान्य कतार'}
+              </span>
+            </div>
+
+            {/* Scanned Docs & Labs */}
+            <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
+              <span className="text-[10px] text-[#6C757D] font-bold block mb-0.5">संलग्न दस्तावेज</span>
+              <span className="font-black text-xs text-[#0B5FA5] block">
+                {patientDocs.length} दस्तावेज़ • {labFindings.length} लैब मान
+              </span>
+              <span className="text-[10px] text-[#6C757D] block truncate">
+                {medications.length > 0 ? `${medications.length} पूर्व दवाएं दर्ज` : 'कोई पूर्व दवा नहीं'}
+              </span>
+            </div>
+          </div>
+        </div>
+
         {/* LEFT COLUMN (7 Cols): Demographics, SOCRATES Timeline, Documents & Lab Findings */}
         <div id="section-history" className="lg:col-span-7 space-y-4">
           
@@ -409,9 +572,12 @@ export const DoctorSessionReview: React.FC = () => {
 
             {/* Chief Complaint (Pradhana Vedana) */}
             <div className="p-2.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px] text-xs">
-              <span className="text-[10px] font-extrabold uppercase text-[#6C757D] block mb-0.5">
-                प्रधान वेदना / मुख्य स्वास्थ्य समस्या (Chief Complaint):
-              </span>
+              <div className="flex items-center justify-between mb-0.5">
+                <span className="text-[10px] font-extrabold uppercase text-[#6C757D]">
+                  प्रधान वेदना / मुख्य स्वास्थ्य समस्या (Chief Complaint):
+                </span>
+                <ProvenanceBadge source="patient-selected" />
+              </div>
               <span className="font-black text-sm text-[#212529] block">
                 {patient.chiefComplaint}
               </span>
@@ -420,44 +586,64 @@ export const DoctorSessionReview: React.FC = () => {
 
           {/* 2. SOCRATES CLINICAL TIMELINE (Roga Itihasa) */}
           <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center gap-1.5 border-b border-[#CED4DA] pb-1.5">
-              <Activity className="w-4 h-4 text-[#0B5FA5]" />
-              <span>रोग इतिहास एवं लक्षण अन्वेषण • SOCRATES Timeline</span>
+            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-[#CED4DA] pb-1.5">
+              <div className="flex items-center gap-1.5">
+                <Activity className="w-4 h-4 text-[#0B5FA5]" />
+                <span>रोग इतिहास एवं लक्षण अन्वेषण • Clinical History & Timeline</span>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 bg-[#E8F1F8] text-[#0B5FA5] rounded-[2px]">
+                5 लक्षण बिंदु
+              </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs font-medium">
               <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                <span className="text-[10px] text-[#6C757D] font-bold block">1. स्थान (Site):</span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] text-[#6C757D] font-bold">1. स्थान (Site):</span>
+                  <ProvenanceBadge source="patient-reported" />
+                </div>
                 <span className="font-bold text-[#212529]">
-                  {patient.socrates?.site || 'उल्लेख नहीं (Not specified)'}
+                  {patient.socrates?.site || 'उल्लेख नहीं (Not recorded)'}
                 </span>
               </div>
 
               <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                <span className="text-[10px] text-[#6C757D] font-bold block">2. अवधि (Onset & Duration):</span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] text-[#6C757D] font-bold">2. अवधि (Onset & Duration):</span>
+                  <ProvenanceBadge source="patient-reported" />
+                </div>
                 <span className="font-bold text-[#212529]">
-                  {patient.socrates?.onset || 'उल्लेख नहीं (Not specified)'}
+                  {patient.socrates?.onset || 'उल्लेख नहीं (Not recorded)'}
                 </span>
               </div>
 
               <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                <span className="text-[10px] text-[#6C757D] font-bold block">3. तीव्रता (Severity Scale):</span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] text-[#6C757D] font-bold">3. तीव्रता (Severity Scale):</span>
+                  <ProvenanceBadge source="patient-selected" />
+                </div>
                 <span className="font-black text-[#DC2626]">
-                  {patient.socrates?.severity || 'उल्लेख नहीं (Not specified)'}
+                  {patient.socrates?.severity ? `${patient.socrates.severity}/10` : 'उल्लेख नहीं (Not recorded)'}
                 </span>
               </div>
 
               <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                <span className="text-[10px] text-[#6C757D] font-bold block">4. वर्धक/शामक कारण (Triggers & Timing):</span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] text-[#6C757D] font-bold">4. वर्धक/शामक कारण (Triggers & Timing):</span>
+                  <ProvenanceBadge source="patient-reported" />
+                </div>
                 <span className="font-bold text-[#212529]">
-                  {patient.socrates?.timing || 'उल्लेख नहीं (Not specified)'}
+                  {patient.socrates?.timing || 'उल्लेख नहीं (Not recorded)'}
                 </span>
               </div>
 
               <div className="col-span-2 p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                <span className="text-[10px] text-[#6C757D] font-bold block">5. पारिवारिक इतिहास (Family History / Kulaja):</span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] text-[#6C757D] font-bold">5. पारिवारिक इतिहास (Family History / Kulaja):</span>
+                  <ProvenanceBadge source="patient-reported" />
+                </div>
                 <span className="font-bold text-[#212529]">
-                  {patient.socrates?.familyHistory || 'कोई विशेष पारिवारिक इतिहास नहीं (None recorded)'}
+                  {patient.socrates?.familyHistory || 'उल्लेख नहीं (Not recorded — कोई पारिवारिक इतिहास दर्ज नहीं)'}
                 </span>
               </div>
             </div>
@@ -465,18 +651,13 @@ export const DoctorSessionReview: React.FC = () => {
 
           {/* 3. CAPTURED DOCUMENT SCANS & LIGHTBOX VIEWER GALLERY */}
           <div id="section-documents" className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-[#CED4DA] pb-1.5">
+            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-[#CED4DA] pb-1.5 flex-wrap gap-1">
               <div className="flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-[#0B5FA5]" />
-                <span>अपलोड किए गए मूल दस्तावेज एवं पर्चे (Original Scanned Documents)</span>
+                <span>अपलोड किए गए मूल दस्तावेज एवं पर्चे (Scanned Documents)</span>
               </div>
               <div className="flex items-center gap-2">
-                {liveOcrResults && liveOcrResults.reports_count > 0 && (
-                  <span className="text-[10px] font-black px-2 py-0.5 bg-[#EDF7F1] text-[#2F7D4F] border border-[#2F7D4F]/30 rounded-[2px] flex items-center gap-1">
-                    <Check className="w-3 h-3 text-[#2F7D4F]" />
-                    <span>लाइव OCR निष्कर्षण (Live Gemini + Tesseract Verified)</span>
-                  </span>
-                )}
+                <ProvenanceBadge source="document-extracted" />
                 <span className="text-[10px] font-bold px-2 py-0.5 bg-[#E8F1F8] text-[#0B5FA5] rounded-[2px]">
                   {patientDocs.length} दस्तावेज उपलब्ध
                 </span>
@@ -543,20 +724,26 @@ export const DoctorSessionReview: React.FC = () => {
 
             {/* OCR Extracted Text Box */}
             <div className="p-2.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px] text-xs">
-              <span className="text-[10px] text-[#6C757D] font-bold block mb-0.5">
-                ऑप्टिकल कैरेक्टर रिकग्निशन (OCR Raw Findings):
-              </span>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] text-[#6C757D] font-bold">
+                  दस्तावेज़ पाठ निष्कर्षण (Extracted Document Text):
+                </span>
+                <ProvenanceBadge source="document-extracted" />
+              </div>
               <p className="font-mono text-[#212529] text-[11px] leading-relaxed">
-                {rawOcrText || 'कोई OCR डेटा उपलब्ध नहीं (No OCR text extracted from captured documents)'}
+                {rawOcrText || 'कोई पाठ उपलब्ध नहीं (No text extracted from captured documents)'}
               </p>
             </div>
           </div>
 
           {/* 4. EXTRACTED MEDICATIONS TABLE OR EMPTY STATE */}
           <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center gap-1.5 border-b border-[#CED4DA] pb-1.5">
-              <Stethoscope className="w-4 h-4 text-[#0B5FA5]" />
-              <span>पूर्व औषधि योग एवं मात्रा विवरण (Extracted Formulations & Dosage)</span>
+            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-[#CED4DA] pb-1.5 flex-wrap gap-1">
+              <div className="flex items-center gap-1.5">
+                <Stethoscope className="w-4 h-4 text-[#0B5FA5]" />
+                <span>पूर्व औषधि योग एवं मात्रा विवरण (Prior Formulations & Dosage)</span>
+              </div>
+              <ProvenanceBadge source="document-extracted" />
             </div>
 
             {medications.length > 0 ? (
@@ -568,7 +755,7 @@ export const DoctorSessionReview: React.FC = () => {
                       <th className="p-2">मात्रा (Dosage)</th>
                       <th className="p-2">सेवन काल (Frequency)</th>
                       <th className="p-2">अनुपान (Vehicle)</th>
-                      <th className="p-2">श्रेणी (Category)</th>
+                      <th className="p-2">स्रोत (Source)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#CED4DA] font-semibold text-[#212529]">
@@ -580,7 +767,7 @@ export const DoctorSessionReview: React.FC = () => {
                         <td className="p-2 text-[#495057]">{med.anupana}</td>
                         <td className="p-2">
                           <span className="px-1.5 py-0.5 rounded-[2px] bg-[#EDF7F1] text-[#2F7D4F] text-[9px] font-bold">
-                            {med.source}
+                            {med.source || 'दस्तावेज़'}
                           </span>
                         </td>
                       </tr>
@@ -600,9 +787,12 @@ export const DoctorSessionReview: React.FC = () => {
 
           {/* 5. VERIFIED LAB BIOMARKERS TABLE OR EMPTY STATE */}
           <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center gap-1.5 border-b border-[#CED4DA] pb-1.5">
-              <Activity className="w-4 h-4 text-[#0B5FA5]" />
-              <span>प्रयोगशाला जांच एवं पैथोलॉजी रिपोर्ट (Verified Lab Investigations)</span>
+            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-[#CED4DA] pb-1.5 flex-wrap gap-1">
+              <div className="flex items-center gap-1.5">
+                <Activity className="w-4 h-4 text-[#0B5FA5]" />
+                <span>प्रयोगशाला जांच एवं पैथोलॉजी रिपोर्ट (Verified Lab Investigations)</span>
+              </div>
+              <ProvenanceBadge source="lab-report" />
             </div>
 
             {labFindings.length > 0 ? (
@@ -645,7 +835,7 @@ export const DoctorSessionReview: React.FC = () => {
                           <td className="p-2">
                             <span className="px-1.5 py-0.5 rounded-[2px] bg-[#EDF7F1] text-[#2F7D4F] text-[9px] font-bold flex items-center gap-1 w-fit">
                               <Check className="w-3 h-3 text-[#2F7D4F]" />
-                              <span>Tesseract Verified</span>
+                              <span>मूल रिपोर्ट से सत्यापित</span>
                             </span>
                           </td>
                           <td className="p-2">
@@ -711,7 +901,10 @@ export const DoctorSessionReview: React.FC = () => {
               {/* 4 Clinical Vitals & History Grid */}
               <div className="space-y-2 mb-3 text-xs">
                 <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <span className="text-[10px] text-[#6C757D] font-bold block">1. रक्तचाप स्थिति (Blood Pressure History):</span>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[10px] text-[#6C757D] font-bold">1. रक्तचाप स्थिति (Blood Pressure History):</span>
+                    <ProvenanceBadge source="patient-selected" />
+                  </div>
                   <span className="font-bold text-[#212529]">
                     {patient.generalVitals?.bloodPressureHistory === 'hypertensive-meds'
                       ? 'उच्च रक्तचाप - नियमित दवा चालू (Hypertensive on Meds)'
@@ -719,12 +912,15 @@ export const DoctorSessionReview: React.FC = () => {
                       ? 'बॉर्डरलाइन / कभी-कभार बढ़ता है (Borderline BP)'
                       : patient.generalVitals?.bloodPressureHistory === 'normal-bp'
                       ? 'सामान्य रक्तचाप (Normal Blood Pressure)'
-                      : patient.generalVitals?.bloodPressureHistory || 'सामान्य / उल्लेख नहीं'}
+                      : patient.generalVitals?.bloodPressureHistory || 'उल्लेख नहीं (Not recorded)'}
                   </span>
                 </div>
 
                 <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <span className="text-[10px] text-[#6C757D] font-bold block">2. मधुमेह स्थिति (Diabetes / Blood Sugar):</span>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[10px] text-[#6C757D] font-bold">2. मधुमेह स्थिति (Diabetes / Blood Sugar):</span>
+                    <ProvenanceBadge source="patient-selected" />
+                  </div>
                   <span className="font-bold text-[#212529]">
                     {patient.generalVitals?.diabetesStatus === 'diabetic-meds'
                       ? 'मधुमेह पीड़ित - दवा/इंसुलिन चालू (Diabetic on Treatment)'
@@ -737,22 +933,30 @@ export const DoctorSessionReview: React.FC = () => {
                 </div>
 
                 <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <span className="text-[10px] text-[#6C757D] font-bold block">3. ज्ञात औषध एलर्जी (Drug Allergies):</span>
-                  <span className="font-bold text-[#15803D]">
-                    {patient.generalVitals?.knownAllergies === 'allergy-none' || !patient.generalVitals?.knownAllergies
-                      ? 'कोई ज्ञात दवा एलर्जी नहीं (NKDA - No Known Drug Allergies)'
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[10px] text-[#6C757D] font-bold">3. ज्ञात औषध एलर्जी (Drug Allergies):</span>
+                    <ProvenanceBadge source="patient-selected" />
+                  </div>
+                  <span className={`font-bold ${patient.generalVitals?.knownAllergies && patient.generalVitals?.knownAllergies !== 'allergy-none' ? 'text-[#DC2626]' : 'text-[#15803D]'}`}>
+                    {patient.generalVitals?.knownAllergies === 'allergy-none'
+                      ? 'रोगी द्वारा कोई ज्ञात एलर्जी नहीं बताई गई (Patient stated NKDA)'
                       : patient.generalVitals?.knownAllergies === 'allergy-antibiotic'
                       ? 'पेनिसिलिन / एंटीबायोटिक एलर्जी (Antibiotic Allergy)'
                       : patient.generalVitals?.knownAllergies === 'allergy-nsaid'
                       ? 'दर्द निवारक (NSAIDs / Painkillers) से एलर्जी'
-                      : Array.isArray(patient.generalVitals?.knownAllergies)
+                      : Array.isArray(patient.generalVitals?.knownAllergies) && patient.generalVitals.knownAllergies.length > 0
                       ? patient.generalVitals.knownAllergies.join(', ')
-                      : String(patient.generalVitals?.knownAllergies)}
+                      : patient.generalVitals?.knownAllergies
+                      ? String(patient.generalVitals?.knownAllergies)
+                      : 'उल्लेख नहीं (Not recorded — कृपया जांचें)'}
                   </span>
                 </div>
 
                 <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <span className="text-[10px] text-[#6C757D] font-bold block">4. पूर्व सर्जरी / गंभीर बीमारी (Past Surgeries & History):</span>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[10px] text-[#6C757D] font-bold">4. पूर्व सर्जरी / गंभीर बीमारी (Past Surgeries & History):</span>
+                    <ProvenanceBadge source="patient-selected" />
+                  </div>
                   <span className="font-bold text-[#212529]">
                     {patient.generalVitals?.pastSurgeries === 'surgery-recent-year'
                       ? 'पिछले 1 वर्ष में सर्जरी / अस्पताल में भर्ती'
@@ -760,7 +964,9 @@ export const DoctorSessionReview: React.FC = () => {
                       ? 'पुरानी सर्जरी का इतिहास (Past Surgery)'
                       : patient.generalVitals?.pastSurgeries === 'chronic-cardiac-renal'
                       ? 'हृदय, गुर्दा या थायरॉयड का पुराना उपचार'
-                      : patient.generalVitals?.pastSurgeries || 'कोई पूर्व सर्जरी नहीं (No major surgeries)'}
+                      : patient.generalVitals?.pastSurgeries === 'surgery-none'
+                      ? 'रोगी द्वारा कोई पूर्व सर्जरी नहीं बताई गई (No past surgeries)'
+                      : patient.generalVitals?.pastSurgeries || 'उल्लेख नहीं (Not recorded — कृपया जांचें)'}
                   </span>
                 </div>
               </div>
@@ -778,21 +984,27 @@ export const DoctorSessionReview: React.FC = () => {
           ) : (
             /* 6B. CHARAKA SAMHITA PRAKRITI ANALYSIS (Vimanasthana 8) */
             <div className="bg-white border-2 border-[#2F7D4F] p-4 rounded-[3px] shadow-xs">
-              <div className="flex items-center justify-between border-b border-[#2F7D4F]/30 pb-2 mb-3">
+              <div className="flex items-center justify-between border-b border-[#2F7D4F]/30 pb-2 mb-3 flex-wrap gap-1">
                 <span className="text-xs font-black text-[#2F7D4F] uppercase tracking-wider flex items-center gap-1.5">
                   <Scale className="w-4 h-4 text-[#2F7D4F]" />
                   <span>चरक संहिता प्रकृति विश्लेषण (Constitutional Typology)</span>
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 bg-[#EDF7F1] text-[#2F7D4F] rounded-[2px]">
-                  15 मापदंड
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <ProvenanceBadge source="ai-suggested" />
+                  <span className="text-[10px] font-bold px-2 py-0.5 bg-[#EDF7F1] text-[#2F7D4F] rounded-[2px]">
+                    15 मापदंड
+                  </span>
+                </div>
               </div>
 
               {/* Prakriti Dominance Header */}
               <div className="p-3 bg-[#EDF7F1] border border-[#2F7D4F]/40 rounded-[2px] mb-3 text-center">
-                <span className="text-[10px] font-bold uppercase text-[#2F7D4F] block">
-                  मूल शारीरिक प्रकृति (Innate Prakriti)
-                </span>
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <span className="text-[10px] font-bold uppercase text-[#2F7D4F]">
+                    मूल शारीरिक प्रकृति (Innate Prakriti)
+                  </span>
+                  <ProvenanceBadge source="ai-suggested" />
+                </div>
                 <span className="text-2xl font-black text-[#1E4620] block my-0.5">
                   {patient.dominantPrakriti || 'सम प्रकृति (Sama)'}
                 </span>
@@ -859,10 +1071,13 @@ export const DoctorSessionReview: React.FC = () => {
 
               {/* Classical Dashavidha Pariksha Matrix (Charaka Samhita Vimana Sthana 8) */}
               <div className="mt-3 p-3 bg-[#F0FDF4] border border-[#2F7D4F]/30 rounded-[2px] text-xs">
-                <span className="text-[10px] font-black text-[#186036] uppercase tracking-wider block mb-2 flex items-center gap-1.5">
-                  <Scale className="w-3.5 h-3.5 text-[#2F7D4F]" />
-                  <span>दशविध परीक्षा मूल्यांकन (Dashavidha Pariksha Matrix)</span>
-                </span>
+                <div className="flex items-center justify-between mb-2 flex-wrap gap-1">
+                  <span className="text-[10px] font-black text-[#186036] uppercase tracking-wider flex items-center gap-1.5">
+                    <Scale className="w-3.5 h-3.5 text-[#2F7D4F]" />
+                    <span>दशविध परीक्षा मूल्यांकन (Dashavidha Pariksha Matrix)</span>
+                  </span>
+                  <ProvenanceBadge source="ai-suggested" />
+                </div>
                 <div className="grid grid-cols-2 gap-1.5 text-[11px]">
                   <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
                     <span className="text-[9px] font-bold text-[#6C757D] block">1. प्रकृति (Prakriti):</span>
@@ -911,10 +1126,13 @@ export const DoctorSessionReview: React.FC = () => {
 
           {/* 7. PHYSICIAN CONSULTATION & FINAL PRESCRIPTION BOX */}
           <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <span className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
-              <Edit3 className="w-4 h-4 text-[#0B5FA5]" />
-              <span>वैद्य परामर्श एवं अंतिम व्यवस्थापत्र (Physician Clinical Notes) *</span>
-            </span>
+            <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+              <span className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider flex items-center gap-1.5">
+                <Edit3 className="w-4 h-4 text-[#0B5FA5]" />
+                <span>वैद्य परामर्श एवं अंतिम व्यवस्थापत्र (Physician Clinical Notes) *</span>
+              </span>
+              <ProvenanceBadge source="doctor-confirmed" />
+            </div>
 
             <textarea
               value={doctorNotes}
@@ -938,33 +1156,36 @@ export const DoctorSessionReview: React.FC = () => {
               ))}
             </div>
 
-            {/* 3 ACTIONS BAR: Reject, Amend, Accept */}
+            {/* 3 ACTIONS BAR: Clarify, Amend, Confirm & Send */}
             <div className="grid grid-cols-3 gap-2 mt-4">
               <button
                 type="button"
                 onClick={() => handleAction('rejected')}
-                className="py-2.5 px-2 bg-white border border-[#DC2626] hover:bg-[#FEF2F2] text-[#DC2626] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+                className="py-2.5 px-2 bg-white border border-[#D97706] hover:bg-[#FFFBEB] text-[#B45309] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+                title="पुनः परीक्षण / स्पष्टीकरण का अनुरोध करें"
               >
-                <XCircle className="w-3.5 h-3.5" />
-                <span>पुनः परीक्षण (Reject)</span>
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>पुनः परीक्षण अनुरोध (Request Clarification)</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleAction('amended')}
                 className="py-2.5 px-2 bg-white border border-[#0B5FA5] hover:bg-[#E8F1F8] text-[#0B5FA5] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+                title="विवरण संशोधित करें"
               >
                 <Edit3 className="w-3.5 h-3.5" />
-                <span>संशोधन (Amend)</span>
+                <span>विवरण संशोधन (Edit / Amend)</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleAction('accepted')}
-                className="py-2.5 px-2 bg-[#2F7D4F] border border-[#1E4620] hover:bg-[#25633e] text-white text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98 shadow-xs"
+                className="py-2.5 px-2 bg-[#186036] border border-[#114526] hover:bg-[#14522d] text-white text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98 shadow-xs"
+                title="सत्यापित करें और अस्पताल HIS में भेजें"
               >
                 <CheckCircle className="w-3.5 h-3.5" />
-                <span>स्वीकार करें (Accept)</span>
+                <span>पुष्टि करें और HIS में भेजें (Confirm & Send to HIS)</span>
               </button>
             </div>
           </div>
@@ -1078,7 +1299,7 @@ export const DoctorSessionReview: React.FC = () => {
               </div>
 
               <div className="mt-4 pt-2 border-t text-[10px] text-[#6C757D] font-bold text-center">
-                Tesseract Spatial Bounding-Box Verified
+                मूल दस्तावेज़ से मिलान सत्यापित • Verified Document Match
               </div>
             </div>
 
@@ -1105,28 +1326,28 @@ export const DoctorSessionReview: React.FC = () => {
           <button
             type="button"
             onClick={() => handleAction('rejected')}
-            className="py-2.5 px-2 bg-white border border-[#DC2626] hover:bg-[#FEF2F2] text-[#DC2626] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+            className="py-2.5 px-1 bg-white border border-[#D97706] hover:bg-[#FFFBEB] text-[#B45309] text-[11px] font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
           >
-            <XCircle className="w-3.5 h-3.5" />
+            <RefreshCw className="w-3 h-3" />
             <span>पुनः परीक्षण</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleAction('amended')}
-            className="py-2.5 px-2 bg-white border border-[#0B5FA5] hover:bg-[#E8F1F8] text-[#0B5FA5] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+            className="py-2.5 px-1 bg-white border border-[#0B5FA5] hover:bg-[#E8F1F8] text-[#0B5FA5] text-[11px] font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
           >
-            <Edit3 className="w-3.5 h-3.5" />
+            <Edit3 className="w-3 h-3" />
             <span>संशोधन</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleAction('accepted')}
-            className="py-2.5 px-2 bg-[#186036] border border-[#114526] hover:bg-[#15522e] text-white text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98 shadow-xs"
+            className="py-2.5 px-1 bg-[#186036] border border-[#114526] hover:bg-[#14522d] text-white text-[11px] font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98 shadow-xs"
           >
-            <CheckCircle className="w-3.5 h-3.5" />
-            <span>स्वीकार करें</span>
+            <CheckCircle className="w-3 h-3" />
+            <span>पुष्टि व HIS प्रेषण</span>
           </button>
         </div>
       </div>

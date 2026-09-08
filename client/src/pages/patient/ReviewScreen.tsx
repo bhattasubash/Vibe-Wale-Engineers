@@ -50,23 +50,23 @@ export const ReviewScreen: React.FC = () => {
             }}
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>चरण 4: केस शीट सारांश समीक्षा • CASE SUMMARY REVIEW</span>
+            <span>{language === 'hi' ? 'विवरण समीक्षा' : 'Case Summary Review'}</span>
           </div>
 
           <h1
             className="text-2xl sm:text-3xl font-black tracking-tight"
             style={{ color: '#0B5FA5' }}
           >
-            {language === 'hi' ? 'अपनी जानकारी की जांच करें' : 'Verify Your Clinical Case Summary'}
+            {language === 'hi' ? 'अपनी जानकारी की जांच करें' : 'Verify Your Details'}
           </h1>
           <p className="text-xs sm:text-sm text-[#495057] font-semibold">
             {language === 'hi'
-              ? 'यह आधिकारिक केस शीट सीधे डॉक्टर के कंप्यूटर पर भेजी जाएगी।'
-              : 'This official case sheet will be dispatched directly to the physician.'}
+              ? 'यह विवरण सीधे आपके परामर्श चिकित्सक के कंप्यूटर पर भेजा जाएगा।'
+              : 'This summary will be transmitted directly to your consulting physician.'}
           </p>
         </div>
 
-        {/* AUTHENTIC A4 WHITE PAPER CLINICAL CASE SHEET CONTAINER */}
+        {/* AUTHENTIC WHITE PAPER CASE SHEET CONTAINER */}
         <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-4 sm:p-5 shadow-sm text-left shrink-0">
           
           {/* Institutional Letterhead Strip */}
@@ -76,12 +76,11 @@ export const ReviewScreen: React.FC = () => {
                 अखिल भारतीय आयुर्वेद संस्थान (AIIA), नई दिल्ली
               </span>
               <span className="text-xs sm:text-sm font-black text-[#212529]">
-                {isAyurveda ? 'आयुष ओपीडी पूर्व-परामर्श केस शीट (Ayurveda OPD Case Sheet)' : 'सामान्य चिकित्सा ओपीडी केस शीट (General Medicine Case Sheet)'}
+                {isAyurveda ? 'आयुष ओपीडी पूर्व-परामर्श विवरण' : 'सामान्य चिकित्सा ओपीडी पूर्व-परामर्श विवरण'}
               </span>
             </div>
             <div className="text-right">
-              <span className="text-[9px] font-mono text-[#6C757D] block">DPDP Act 2023 Compliant</span>
-              <span className="text-[10px] font-mono font-bold text-[#2F7D4F]">ABDM-FHIR-R4</span>
+              <span className="text-[10px] font-bold text-[#495057]">ओपीडी परामर्श कक्ष</span>
             </div>
           </div>
 
@@ -89,7 +88,7 @@ export const ReviewScreen: React.FC = () => {
           <div className="border-b border-[#CED4DA] pb-2 mb-2">
             <div className="flex items-center justify-between mb-1">
               <span className="font-black text-xs text-[#0B5FA5] uppercase tracking-wider">
-                1. रोगी विवरण (Patient Demographics)
+                1. रोगी विवरण (Patient Details)
               </span>
               <button
                 type="button"
@@ -97,40 +96,40 @@ export const ReviewScreen: React.FC = () => {
                 className="text-[10px] font-bold text-[#0B5FA5] hover:underline flex items-center gap-0.5 cursor-pointer"
               >
                 <Edit3 className="w-3 h-3" />
-                <span>संशोधन (Edit)</span>
+                <span>बदलें (Edit)</span>
               </button>
             </div>
 
             <div className="grid grid-cols-4 gap-2 text-[#495057] text-[11px]">
               <div>
                 <span className="text-[10px] text-[#6C757D] block">रोगी का नाम:</span>
-                <span className="font-bold text-[#212529]">{patient.fullName || 'रोगी (Walk-In Patient)'}</span>
+                <span className="font-bold text-[#212529]">{patient.fullName || 'नागरिक'}</span>
               </div>
               <div>
                 <span className="text-[10px] text-[#6C757D] block">आयु / लिंग:</span>
                 <span className="font-bold text-[#212529]">
-                  {patient.age ? `${patient.age} वर्ष` : '—'} / {patient.gender === 'female' ? 'महिला' : patient.gender === 'male' ? 'पुरुष' : 'अन्य'}
+                  {patient.age ? `${patient.age} वर्ष` : 'उल्लेख नहीं'} / {patient.gender === 'female' ? 'महिला' : patient.gender === 'male' ? 'पुरुष' : 'अन्य'}
                 </span>
               </div>
               <div>
                 <span className="text-[10px] text-[#6C757D] block">आभा संख्या (ABHA):</span>
-                <span className="font-mono font-bold text-[#212529]">{patient.abhaId || '—'}</span>
+                <span className="font-mono font-bold text-[#212529]">{patient.abhaId || 'लागू नहीं'}</span>
               </div>
               <div>
-                <span className="text-[10px] text-[#6C757D] block">विभाग / कमरा:</span>
+                <span className="text-[10px] text-[#6C757D] block">विभाग:</span>
                 <span className="font-bold text-[#0B5FA5]">
-                  {isAyurveda ? 'कायचिकित्सा (Room 104)' : 'जनरल मेडिसिन (Room 205)'}
+                  {isAyurveda ? 'आयुर्वेद (कमरा 104)' : 'सामान्य चिकित्सा (कमरा 205)'}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* 2. PRADHANA VEDANA (CHIEF COMPLAINT & SOCRATES) */}
+          {/* 2. PRADHANA VEDANA (CHIEF COMPLAINT) */}
           <div className="border-b border-[#CED4DA] pb-2 mb-2">
             <div className="flex items-center justify-between mb-1">
               <span className="font-black text-xs text-[#0B5FA5] uppercase tracking-wider flex items-center gap-1">
                 <Activity className="w-3 h-3 text-[#0B5FA5]" />
-                <span>2. प्रधान वेदना एवं रोग इतिहास (Chief Complaint & Timeline)</span>
+                <span>2. मुख्य स्वास्थ्य समस्या (Primary Symptoms)</span>
               </span>
               <button
                 type="button"
@@ -138,37 +137,37 @@ export const ReviewScreen: React.FC = () => {
                 className="text-[10px] font-bold text-[#0B5FA5] hover:underline flex items-center gap-0.5 cursor-pointer"
               >
                 <Edit3 className="w-3 h-3" />
-                <span>संशोधन (Edit)</span>
+                <span>बदलें (Edit)</span>
               </button>
             </div>
             <div className="bg-[#F8FAFC] border border-[#CED4DA] p-2 rounded-[2px] text-[11px]">
               <div className="flex justify-between items-center mb-1">
                 <span className="font-black text-[#212529]">
-                  {chiefComplaint || 'उल्लेख नहीं (Not specified)'}
+                  {chiefComplaint || 'उल्लेख नहीं (Not recorded)'}
                 </span>
                 {socrates.severity ? (
-                  <span className="text-[10px] font-bold text-[#DC2626]">
-                    तीव्रता: {socrates.severity}/10
+                  <span className="text-[10px] font-bold text-[#0B5FA5]">
+                    दर्द/तीव्रता स्तर: {socrates.severity}/10
                   </span>
                 ) : null}
               </div>
               <div className="text-[#6C757D] text-[10px] space-x-2">
-                <span>स्थान: {socrates.site || '—'}</span>
+                <span>स्थान: {socrates.site || 'उल्लेख नहीं'}</span>
                 <span>•</span>
-                <span>अवधि: {socrates.onset || '—'}</span>
+                <span>अवधि: {socrates.onset || 'उल्लेख नहीं'}</span>
                 <span>•</span>
-                <span>ट्रिगर: {socrates.timing || '—'}</span>
+                <span>स्थिति: {socrates.timing || 'उल्लेख नहीं'}</span>
               </div>
             </div>
           </div>
 
-          {/* 3. ADAPTIVE ASSESSMENT: AYURVEDA PRAKRITI vs ALLOPATHY VITALS */}
+          {/* 3. ASSESSMENT: PRAKRITI (CALM CONFIRMATION, NO BARS) vs VITALS */}
           {isAyurveda ? (
             <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="font-black text-xs text-[#2F7D4F] uppercase tracking-wider flex items-center gap-1">
                   <Scale className="w-3.5 h-3.5 text-[#2F7D4F]" />
-                  <span>3. चरक संहिता प्रकृति निर्धारण (Constitutional Typology)</span>
+                  <span>3. शारीरिक प्रकृति विवरण (Body Constitution)</span>
                 </span>
                 <button
                   type="button"
@@ -176,43 +175,21 @@ export const ReviewScreen: React.FC = () => {
                   className="text-[10px] font-bold text-[#2F7D4F] hover:underline flex items-center gap-0.5 cursor-pointer"
                 >
                   <Edit3 className="w-3 h-3" />
-                  <span>संशोधन (Edit)</span>
+                  <span>बदलें (Edit)</span>
                 </button>
               </div>
 
-              <div className="flex items-center justify-between p-2 bg-[#EDF7F1] border border-[#2F7D4F]/40 rounded-[2px] mb-1.5">
-                <div>
-                  <span className="text-[9px] font-bold uppercase text-[#2F7D4F] block">मूल प्रकृति:</span>
-                  <span className="text-sm font-black text-[#1E4620]">
-                    {prakritiResult?.dominantPrakriti || 'PITTA-KAPHA (द्वन्द्वज)'}
+              {/* Calm, reassuring patient confirmation - zero confusing percentages */}
+              <div className="p-3 bg-[#EDF7F1] border border-[#2F7D4F]/40 rounded-[2px] text-left">
+                <div className="flex items-center gap-2 mb-1">
+                  <CheckCircle2 className="w-4 h-4 text-[#186036] shrink-0" />
+                  <span className="text-xs font-black text-[#186036]">
+                    प्रकृति संबंधी 15 प्रश्नों के उत्तर दर्ज हो चुके हैं
                   </span>
                 </div>
-                <div className="text-right">
-                  <span className="text-[9px] font-bold uppercase text-[#2F7D4F] block">आत्मविश्वास स्तर:</span>
-                  <span className="text-xs font-black text-[#1E4620]">मध्यम (Medium)</span>
-                </div>
-              </div>
-
-              {/* 3 Tridosha Mini Bars */}
-              <div className="grid grid-cols-3 gap-2 text-[10px] font-bold">
-                <div className="p-1.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <span className="text-[#0B5FA5] block">वात (Vata): {prakritiResult?.vataScore ?? 20}%</span>
-                  <div className="w-full h-1 bg-[#CED4DA] rounded-full mt-0.5 overflow-hidden">
-                    <div className="h-full bg-[#0B5FA5]" style={{ width: `${prakritiResult?.vataScore ?? 20}%` }} />
-                  </div>
-                </div>
-                <div className="p-1.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <span className="text-[#E07B1A] block">पित्त (Pitta): {prakritiResult?.pittaScore ?? 53}%</span>
-                  <div className="w-full h-1 bg-[#CED4DA] rounded-full mt-0.5 overflow-hidden">
-                    <div className="h-full bg-[#E07B1A]" style={{ width: `${prakritiResult?.pittaScore ?? 53}%` }} />
-                  </div>
-                </div>
-                <div className="p-1.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <span className="text-[#2F7D4F] block">कफ (Kapha): {prakritiResult?.kaphaScore ?? 27}%</span>
-                  <div className="w-full h-1 bg-[#CED4DA] rounded-full mt-0.5 overflow-hidden">
-                    <div className="h-full bg-[#2F7D4F]" style={{ width: `${prakritiResult?.kaphaScore ?? 27}%` }} />
-                  </div>
-                </div>
+                <p className="text-[11px] text-[#495057] font-medium leading-relaxed">
+                  आपके स्वभाव, खान-पान और शारीरिक आदतों का विवरण सुरक्षित रूप से डॉक्टर के पास भेज दिया गया है। चिकित्सक परामर्श के समय इसका परीक्षण करेंगे।
+                </p>
               </div>
             </div>
           ) : (
@@ -220,7 +197,7 @@ export const ReviewScreen: React.FC = () => {
               <div className="flex items-center justify-between mb-1">
                 <span className="font-black text-xs text-[#0B5FA5] uppercase tracking-wider flex items-center gap-1">
                   <Stethoscope className="w-3.5 h-3.5 text-[#0B5FA5]" />
-                  <span>3. सामान्य स्वास्थ्य व इतिहास (General Vitals & Allergies)</span>
+                  <span>3. सामान्य स्वास्थ्य इतिहास (Health History)</span>
                 </span>
                 <button
                   type="button"
@@ -228,7 +205,7 @@ export const ReviewScreen: React.FC = () => {
                   className="text-[10px] font-bold text-[#0B5FA5] hover:underline flex items-center gap-0.5 cursor-pointer"
                 >
                   <Edit3 className="w-3 h-3" />
-                  <span>संशोधन (Edit)</span>
+                  <span>बदलें (Edit)</span>
                 </button>
               </div>
 
@@ -237,8 +214,12 @@ export const ReviewScreen: React.FC = () => {
                   <span className="text-[10px] text-[#6C757D] block">रक्तचाप स्थिति (BP):</span>
                   <span className="font-bold text-[#212529]">
                     {generalVitals.bloodPressureHistory === 'hypertensive-meds'
-                      ? 'उच्च रक्तचाप (दवा नियमित)'
-                      : generalVitals.bloodPressureHistory || 'सामान्य'}
+                      ? 'उच्च रक्तचाप (नियमित दवा)'
+                      : generalVitals.bloodPressureHistory === 'normal-bp'
+                      ? 'रक्तचाप सामान्य'
+                      : generalVitals.bloodPressureHistory
+                      ? generalVitals.bloodPressureHistory
+                      : 'उल्लेख नहीं (Not recorded)'}
                   </span>
                 </div>
 
@@ -246,26 +227,34 @@ export const ReviewScreen: React.FC = () => {
                   <span className="text-[10px] text-[#6C757D] block">मधुमेह (Diabetes):</span>
                   <span className="font-bold text-[#212529]">
                     {generalVitals.diabetesStatus === 'diabetic-meds'
-                      ? 'मधुमेह पीड़ित (दवा चल रही है)'
-                      : generalVitals.diabetesStatus || 'सामान्य / नहीं'}
+                      ? 'मधुमेह (दवा/इंसुलिन)'
+                      : generalVitals.diabetesStatus === 'non-diabetic'
+                      ? 'मधुमेह नहीं'
+                      : generalVitals.diabetesStatus
+                      ? generalVitals.diabetesStatus
+                      : 'उल्लेख नहीं (Not recorded)'}
                   </span>
                 </div>
 
                 <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
                   <span className="text-[10px] text-[#6C757D] block">औषध एलर्जी (Allergies):</span>
-                  <span className="font-bold text-[#15803D]">
-                    {generalVitals.knownAllergies === 'allergy-none' || !generalVitals.knownAllergies
-                      ? 'कोई ज्ञात दवा एलर्जी नहीं (NKDA)'
-                      : generalVitals.knownAllergies}
+                  <span className="font-bold text-[#212529]">
+                    {generalVitals.knownAllergies === 'allergy-none'
+                      ? 'कोई ज्ञात दवा एलर्जी नहीं'
+                      : generalVitals.knownAllergies
+                      ? generalVitals.knownAllergies
+                      : 'उल्लेख नहीं (Not recorded)'}
                   </span>
                 </div>
 
                 <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
                   <span className="text-[10px] text-[#6C757D] block">पूर्व सर्जरी (Surgeries):</span>
                   <span className="font-bold text-[#212529]">
-                    {generalVitals.pastSurgeries === 'no-surgery' || !generalVitals.pastSurgeries
-                      ? 'कोई पूर्व बड़ा ऑपरेशन नहीं'
-                      : generalVitals.pastSurgeries}
+                    {generalVitals.pastSurgeries === 'no-surgery'
+                      ? 'कोई पूर्व सर्जरी नहीं'
+                      : generalVitals.pastSurgeries
+                      ? generalVitals.pastSurgeries
+                      : 'उल्लेख नहीं (Not recorded)'}
                   </span>
                 </div>
               </div>
@@ -283,7 +272,7 @@ export const ReviewScreen: React.FC = () => {
             style={{ backgroundColor: '#0B5FA5' }}
           >
             <Camera className="w-5 h-5 text-white" />
-            <span>पुराने पर्चे स्कैन करें • SCAN RX & REPORTS</span>
+            <span>{language === 'hi' ? 'पुराने पर्चे जोड़ें (वैकल्पिक)' : 'Add Prescriptions / Reports'}</span>
           </button>
 
           <button
@@ -291,7 +280,7 @@ export const ReviewScreen: React.FC = () => {
             onClick={() => navigate('/kiosk/token')}
             className="h-12 sm:h-14 px-4 rounded-[3px] border border-[#CED4DA] bg-white hover:bg-[#EAEDF0] font-black text-xs sm:text-sm text-[#495057] flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.98]"
           >
-            <span>पर्चा नहीं है (सीधे टोकन लें) • SKIP TO TOKEN</span>
+            <span>{language === 'hi' ? 'पर्चा नहीं है (सीधे टोकन लें)' : 'No Documents (Get Token)'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -316,10 +305,10 @@ export const ReviewScreen: React.FC = () => {
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
-            <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
+            <span className="font-semibold text-[#495057]">नई दिल्ली</span>
           </div>
           <div className="text-[11px] font-semibold text-[#6C757D]">
-            <span>DPDP Act 2023 & NHA Clinical Documentation Protocol</span>
+            <span>राष्ट्रीय आयुष मिशन • ओपीडी सेवा</span>
           </div>
         </div>
       </footer>

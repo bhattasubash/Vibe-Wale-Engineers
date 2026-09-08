@@ -305,8 +305,8 @@ export const PRAKRITI_15_QUESTIONS: PrakritiQuestion[] = [
     questionEnglish: 'How do you react to emotional stress or provocation?',
     options: [
       {
-        textHindi: 'जल्दी घबरा जाना, चिंता (Anxiety) होना या डर लगना',
-        textEnglish: 'Quick to become anxious, nervous, worried or fearful',
+        textHindi: 'जल्दी बेचैनी महसूस होना, विचार बहुत तेजी से चलना या संकोच होना',
+        textEnglish: 'Quick to feel restless, overthinking or uneasy under pressure',
         dosha: 'vata',
         points: 1,
       },
