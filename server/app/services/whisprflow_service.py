@@ -15,17 +15,36 @@ WISPRFLOW_API_URL = os.getenv(
     "WISPRFLOW_API_URL",
     "https://platform-api.wisprflow.ai/api/v1/dash/api"
 )
+WISPRFLOW_WS_URL = os.getenv(
+    "WISPRFLOW_WS_URL",
+    "wss://platform-api.wisprflow.ai/api/v1/dash/client_ws"
+)
 WISPRFLOW_API_KEY = os.getenv("WISPRFLOW_API_KEY", "")
 
 
 class WhisprFlowService:
     def __init__(self):
         self.api_url = WISPRFLOW_API_URL
+        self.ws_url = WISPRFLOW_WS_URL
+
+    def get_api_key(self) -> str:
+        """Resolves API key or client key from environment, stripping duplicate Bearer prefixes."""
+        key = os.getenv("WISPRFLOW_API_KEY", "").strip() or os.getenv("WISPRFLOW_CLIENT_KEY", "").strip()
+        if key.startswith("Bearer "):
+            key = key[7:].strip()
+        return key
 
     def is_configured(self) -> bool:
-        """Checks if WISPRFLOW_API_KEY is configured in environment."""
-        key = os.getenv("WISPRFLOW_API_KEY", "").strip()
-        return bool(key and key != "your_wisprflow_api_key_here")
+        """Checks if WISPRFLOW_API_KEY or WISPRFLOW_CLIENT_KEY is configured in environment."""
+        key = self.get_api_key()
+        return bool(key and key != "your_wisprflow_api_key_here" and key != "<CLIENT_KEY>")
+
+    def get_ws_url(self) -> str:
+        """Returns the fully qualified streaming WebSocket endpoint with auth client_key."""
+        key = self.get_api_key()
+        if not key or not self.is_configured():
+            return ""
+        return f"{self.ws_url}?client_key=Bearer%20{key}"
 
     async def transcribe_audio_base64(
         self,
@@ -62,7 +81,7 @@ class WhisprFlowService:
                 "source": "whisprflow",
             }
 
-        api_key = os.getenv("WISPRFLOW_API_KEY", "").strip()
+        api_key = self.get_api_key()
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, CheckCircle2, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { Camera, CheckCircle2, ArrowLeft, ArrowRight, Loader2, RotateCw } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 import { API_BASE_URL } from '@/lib/config';
@@ -10,6 +10,7 @@ export const CameraUploadScreen: React.FC = () => {
   const { language, sessionId, getOrCreateSessionId, addUploadedDocument } = useSessionStore();
 
   const [cameraActive, setCameraActive] = useState(false);
+  const [isMirrored, setIsMirrored] = useState(false);
   const [detectionState, setDetectionState] = useState<'searching' | 'adjusting' | 'holding' | 'captured'>('searching');
   const [countdown, setCountdown] = useState<number | null>(null);
   const [capturedDocs, setCapturedDocs] = useState<Array<{ id: string; name: string; url: string; ocrSnippet: string }>>([]);
@@ -104,13 +105,15 @@ export const CameraUploadScreen: React.FC = () => {
         ctx.fillRect(0, 0, 640, 480);
         ctx.fillStyle = '#0B5FA5';
         ctx.font = 'bold 20px sans-serif';
-        ctx.fillText('AIIA OPD PRESCRIPTION RECORD', 40, 60);
+        ctx.fillText('AIIA OPD DOCUMENT CAPTURE', 40, 60);
         ctx.fillStyle = '#333333';
-        ctx.font = '16px monospace';
-        ctx.fillText('Rx: Maharasnadi Kwath 20ml BD, Yogaraj Guggulu 2 Tab BD', 40, 120);
-        ctx.fillText(`Date: ${new Date().toLocaleDateString()}`, 40, 160);
+        ctx.font = '16px sans-serif';
+        ctx.fillText('Scanned Document Record', 40, 110);
+        ctx.fillText(`Date: ${new Date().toLocaleDateString('en-GB')}`, 40, 150);
       }
     }
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
     canvas.toBlob(async (blob) => {
       if (!blob) {
@@ -118,14 +121,13 @@ export const CameraUploadScreen: React.FC = () => {
         return;
       }
 
-      const capturedUrl = URL.createObjectURL(blob);
       const docId = `DOC-${Date.now()}`;
       const docName = `पर्चा #${capturedDocs.length + 1}`;
 
       const newDoc = {
         id: docId,
         name: docName,
-        url: capturedUrl,
+        url: dataUrl,
         ocrSnippet: 'प्रसंस्करण प्रगति पर है (OCR Ingesting)...',
       };
 
@@ -148,23 +150,23 @@ export const CameraUploadScreen: React.FC = () => {
           addUploadedDocument({
             id: docId,
             name: docName,
-            previewUrl: capturedUrl,
+            previewUrl: dataUrl,
             extractedText: data.message || 'Prescription verified and queued for physician EMR review.',
           });
         } else {
           addUploadedDocument({
             id: docId,
             name: docName,
-            previewUrl: capturedUrl,
+            previewUrl: dataUrl,
             extractedText: 'पर्चा सुरक्षित रूप से संग्रहीत (Stored locally for doctor review)',
           });
         }
       } catch {
-        // Offline resilient fallback: retain local captured blob
+        // Offline resilient fallback: retain local captured dataUrl
         addUploadedDocument({
           id: docId,
           name: docName,
-          previewUrl: capturedUrl,
+          previewUrl: dataUrl,
           extractedText: 'ऑफलाइन मोड: मूल पर्चा डॉक्टर के लिए सहेजा गया (Stored offline)',
         });
       } finally {
@@ -216,10 +218,28 @@ export const CameraUploadScreen: React.FC = () => {
           </p>
         </div>
 
-        {/* COMPACT CAMERA VIEWFINDER (Non-Scrollable Fitting) */}
-        <div className="w-full max-w-xl bg-white border border-[#CED4DA] rounded-[3px] p-3 flex flex-col items-center shrink-0">
-          <div className="relative w-full h-56 sm:h-64 bg-[#1A202C] rounded-[3px] overflow-hidden flex items-center justify-center border-2 border-[#CED4DA]">
-            <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+        {/* ENLARGED CAMERA VIEWFINDER */}
+        <div className="w-full max-w-3xl bg-white border border-[#CED4DA] rounded-[3px] p-3 flex flex-col items-center shrink-0">
+          <div className="relative w-full h-72 sm:h-96 md:h-[26rem] bg-[#1A202C] rounded-[3px] overflow-hidden flex items-center justify-center border-2 border-[#CED4DA]">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover transition-transform duration-200"
+              style={{ transform: isMirrored ? 'scaleX(-1)' : 'none' }}
+            />
+
+            {/* Mirror Toggle Affordance */}
+            <button
+              type="button"
+              onClick={() => setIsMirrored(!isMirrored)}
+              className="absolute top-2 right-2 z-20 px-2.5 py-1 bg-black/60 hover:bg-black/85 border border-white/40 text-white rounded text-[10px] font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+              title="Toggle Mirror View (पलटें)"
+            >
+              <RotateCw className="w-3 h-3" />
+              <span>{isMirrored ? 'मिरर: चालू (Mirrored)' : 'मिरर: बंद (Normal)'}</span>
+            </button>
 
             {/* Bounding Box */}
             <div
@@ -369,7 +389,7 @@ export const CameraUploadScreen: React.FC = () => {
             <span className="font-semibold text-[#495057]">OPD Terminal #01</span>
           </div>
           <div className="text-[11px] font-semibold text-[#6C757D]">
-            <span>OpenCV Auto-Framing & WASM OCR</span>
+            <span>Dual-Engine OCR: Gemini Vision & Tesseract Spatial Verification</span>
           </div>
         </div>
       </footer>

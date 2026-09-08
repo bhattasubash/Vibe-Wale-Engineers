@@ -104,15 +104,17 @@ export const ReviewScreen: React.FC = () => {
             <div className="grid grid-cols-4 gap-2 text-[#495057] text-[11px]">
               <div>
                 <span className="text-[10px] text-[#6C757D] block">रोगी का नाम:</span>
-                <span className="font-bold text-[#212529]">{patient.fullName || 'रामेश्वर दयाल शर्मा'}</span>
+                <span className="font-bold text-[#212529]">{patient.fullName || 'रोगी (Walk-In Patient)'}</span>
               </div>
               <div>
                 <span className="text-[10px] text-[#6C757D] block">आयु / लिंग:</span>
-                <span className="font-bold text-[#212529]">{patient.age || 62} वर्ष / {patient.gender === 'female' ? 'महिला' : 'पुरुष'}</span>
+                <span className="font-bold text-[#212529]">
+                  {patient.age ? `${patient.age} वर्ष` : '—'} / {patient.gender === 'female' ? 'महिला' : patient.gender === 'male' ? 'पुरुष' : 'अन्य'}
+                </span>
               </div>
               <div>
                 <span className="text-[10px] text-[#6C757D] block">आभा संख्या (ABHA):</span>
-                <span className="font-mono font-bold text-[#212529]">{patient.abhaId || '91-4523-8901-2345'}</span>
+                <span className="font-mono font-bold text-[#212529]">{patient.abhaId || '—'}</span>
               </div>
               <div>
                 <span className="text-[10px] text-[#6C757D] block">विभाग / कमरा:</span>
@@ -142,18 +144,20 @@ export const ReviewScreen: React.FC = () => {
             <div className="bg-[#F8FAFC] border border-[#CED4DA] p-2 rounded-[2px] text-[11px]">
               <div className="flex justify-between items-center mb-1">
                 <span className="font-black text-[#212529]">
-                  {chiefComplaint || 'दोनों घुटनों में कट-कट की आवाज, सूजन व तेज दर्द (Sandhivata)'}
+                  {chiefComplaint || 'उल्लेख नहीं (Not specified)'}
                 </span>
-                <span className="text-[10px] font-bold text-[#DC2626]">
-                  तीव्रता: {socrates.severity || '7/10'} (Moderate-Severe)
-                </span>
+                {socrates.severity ? (
+                  <span className="text-[10px] font-bold text-[#DC2626]">
+                    तीव्रता: {socrates.severity}/10
+                  </span>
+                ) : null}
               </div>
               <div className="text-[#6C757D] text-[10px] space-x-2">
-                <span>स्थान: {socrates.site || 'जानु संधि (Bilateral Knees)'}</span>
+                <span>स्थान: {socrates.site || '—'}</span>
                 <span>•</span>
-                <span>अवधि: {socrates.onset || '6+ महीने'}</span>
+                <span>अवधि: {socrates.onset || '—'}</span>
                 <span>•</span>
-                <span>ट्रिगर: {socrates.timing || 'प्रातः काल / श्रम'}</span>
+                <span>ट्रिगर: {socrates.timing || '—'}</span>
               </div>
             </div>
           </div>

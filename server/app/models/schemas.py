@@ -160,15 +160,28 @@ class DoctorQueueItem(BaseModel):
     patient_name: str
     age: int
     gender: str
+    phone: Optional[str] = None
     abha_id: Optional[str] = None
     token_number: str
     chief_complaint: str
+    complaint_category: Optional[str] = "general"
     dominant_prakriti: str
+    secondary_prakriti: Optional[str] = None
+    vata_score: Optional[int] = 0
+    pitta_score: Optional[int] = 0
+    kapha_score: Optional[int] = 0
+    treatment_mode: Optional[str] = "ayurveda"
     red_flag_triggered: bool
     priority: str  # 'critical' | 'high' | 'normal'
     assigned_doctor: str
     room_number: str
     created_at: str
+    socrates: Optional[Dict[str, Any]] = None
+    documents: Optional[List[Dict[str, Any]]] = None
+    medications: Optional[List[Dict[str, Any]]] = None
+    lab_findings: Optional[List[Dict[str, Any]]] = None
+    ocr_text: Optional[str] = None
+    general_vitals: Optional[Dict[str, Any]] = None
 
 
 class DoctorReviewRequest(BaseModel):
