@@ -1,95 +1,241 @@
 {
   "id": "respiratory_cough",
-  "title": "Respiratory & Cough (Kasa-Shwasa)",
-  "titleHindi": "खांसी, सांस व श्वसन विकार (कास-श्वास)",
-  "description": "Dry or productive cough, throat irritation, phlegm, shortness of breath, wheezing, seasonal allergies or chest congestion.",
+  "title": "Question Set C — Respiratory & Cough",
+  "titleHindi": "प्रश्न सेट C — श्वसन व खांसी (कास-श्वास)",
+  "description": "Doctor-verified 10-question protocol for cough, phlegm, shortness of breath, asthma, and respiratory complaints.",
   "keywords": [
     "cough",
     "phlegm",
-    "breathlessness",
+    "mucus",
+    "respiratory",
+    "cold",
     "asthma",
     "kasa",
     "shwasa",
-    "wheezing",
+    "breathing difficulty",
     "chest congestion",
-    "throat pain",
-    "mucus",
+    "wheezing",
     "खांसी",
     "बलगम",
-    "सांस फूलना",
+    "कफ",
+    "सांस",
     "दमा",
+    "जुकाम",
     "कास",
     "श्वास",
-    "सांस",
-    "गले में खराश",
+    "सांस फूलना",
     "छाती में जकड़न",
-    "जुकाम",
-    "कफ"
+    "घरघराहट"
   ],
   "questions": [
     {
       "id": "rc-01",
-      "key": "character",
-      "category": "खांसी का प्रकार (Cough Character)",
-      "titleHindi": "आपको किस प्रकार की खांसी या सांस की तकलीफ हो रही है?",
-      "titleEnglish": "What kind of cough or breathing discomfort do you have?",
+      "key": "cough_character",
+      "category": "खांसी का प्रकार (Cough Type)",
+      "titleHindi": "खांसी सूखी है, या उसमें बलगम (कफ) भी निकलता है?",
+      "titleEnglish": "Is your cough dry, or does it bring up phlegm/mucus?",
       "options": [
-        { "hindi": "सूखी खांसी, गले में ठसका या खुजली (Dry Cough)", "english": "Dry, hacking cough with throat tickle", "value": "dry_hacking" },
-        { "hindi": "बलगम वाली खांसी, छाती में जकड़न (Wet Cough)", "english": "Wet cough with thick phlegm / chest congestion", "value": "productive_mucus" },
-        { "hindi": "सांस फूलना व सीटी जैसी आवाज आना (दमा/Wheezing)", "english": "Shortness of breath with wheezing sound", "value": "breathless_wheeze" },
-        { "hindi": "गले में दर्द, खराश व निगलने में कष्ट (Sore Throat)", "english": "Sore throat, hoarseness & difficulty swallowing", "value": "throat_irritation" }
+        {
+          "hindi": "सूखी खांसी",
+          "english": "Dry cough",
+          "value": "dry_cough"
+        },
+        {
+          "hindi": "बलगम (कफ) निकलता है",
+          "english": "Brings up phlegm/mucus",
+          "value": "wet_cough"
+        }
       ]
     },
     {
       "id": "rc-02",
       "key": "onset",
       "category": "अवधि (Duration)",
-      "titleHindi": "आपको यह खांसी या सांस की तकलीफ कितने समय से है?",
-      "titleEnglish": "How long have you been coughing or having breathing trouble?",
+      "titleHindi": "यह खांसी आज से शुरू हुई, कुछ दिन पहले से, कुछ हफ्ते पहले से, या एक महीने से भी ज़्यादा समय से है?",
+      "titleEnglish": "Did this start today, a few days ago, a few weeks ago, or longer than a month ago?",
       "options": [
-        { "hindi": "कुछ ही दिनों से (1 से 5 दिन)", "english": "Past few days (1 to 5 days)", "value": "acute_few_days" },
-        { "hindi": "1 से 3 सप्ताह से", "english": "1 to 3 weeks", "value": "subacute_weeks" },
-        { "hindi": "3 सप्ताह से अधिक या महीनों से (पुरानी खांसी)", "english": "More than 3 weeks (Chronic / Persistent)", "value": "chronic_months" },
-        { "hindi": "मौसम बदलते ही या ठंड में बार-बार होती है", "english": "Seasonal / recurrent with weather changes", "value": "seasonal_recurrent" }
+        {
+          "hindi": "आज से",
+          "english": "Today",
+          "value": "today"
+        },
+        {
+          "hindi": "कुछ दिन पहले से",
+          "english": "A few days ago",
+          "value": "few_days_ago"
+        },
+        {
+          "hindi": "कुछ हफ्ते पहले से",
+          "english": "A few weeks ago",
+          "value": "few_weeks_ago"
+        },
+        {
+          "hindi": "एक महीने से भी ज़्यादा समय से",
+          "english": "Longer than a month ago",
+          "value": "longer_than_month"
+        }
       ]
     },
     {
       "id": "rc-03",
-      "key": "triggers",
-      "category": "परेशानी का समय व कारक (Timing & Triggers)",
-      "titleHindi": "यह खांसी या सांस फूलना किस समय सबसे ज्यादा बढ़ता है?",
-      "titleEnglish": "When or under what conditions does this cough worsen?",
+      "key": "night_trigger",
+      "category": "रात / लेटने पर (Night Triggers)",
+      "titleHindi": "रात में या लेटने पर खांसी बढ़ जाती है?",
+      "titleEnglish": "Does it get worse at night, or when you're lying down?",
       "options": [
-        { "hindi": "रात को सोते समय या सुबह उठते ही", "english": "During sleep at night or early morning", "value": "night_early_morning" },
-        { "hindi": "धूल, धुएं या तेज गंध के संपर्क में आने पर", "english": "With exposure to dust, smoke or strong odors", "value": "dust_smoke_pollution" },
-        { "hindi": "ठंडा पानी, आइसक्रीम या ठंडी हवा से", "english": "After cold drinks, refrigerated food or cold air", "value": "cold_food_drinks" },
-        { "hindi": "पूरे दिन लगातार बनी रहती है", "english": "Continuous throughout the whole day", "value": "continuous_all_day" }
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
       ]
     },
     {
       "id": "rc-04",
-      "key": "associated",
-      "category": "अन्य लक्षण (Associated Symptoms)",
-      "titleHindi": "खांसी के साथ क्या कोई अन्य लक्षण भी हैं?",
-      "titleEnglish": "Do you have any other symptoms along with the cough?",
+      "key": "dust_smoke_trigger",
+      "category": "धूल / धुआं (Environmental Triggers)",
+      "titleHindi": "धूल या धुएं से खांसी बढ़ जाती है?",
+      "titleEnglish": "Does it get worse with dust or smoke?",
       "options": [
-        { "hindi": "हल्का या तेज बुखार व शरीर में दर्द", "english": "Fever with chills and body ache", "value": "fever_bodyache" },
-        { "hindi": "छाती में भारीपन या पसलियों में दर्द", "english": "Tightness or heaviness in chest", "value": "chest_tightness" },
-        { "hindi": "भूख न लगना या कमजोरी व वजन घटना", "english": "Poor appetite, fatigue or weakness", "value": "loss_of_appetite_weight" },
-        { "hindi": "केवल खांसी है, कोई अन्य लक्षण नहीं", "english": "Only cough, no other symptoms", "value": "no_other_symptoms" }
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
       ]
     },
     {
       "id": "rc-05",
-      "key": "history",
-      "category": "धूम्रपान, एलर्जी व इतिहास (Allergy & Smoking History)",
-      "titleHindi": "क्या आपको धूल/धुएं से एलर्जी है या धूम्रपान की आदत रही है?",
-      "titleEnglish": "Do you have allergies to dust/smoke or history of smoking/exposure?",
+      "key": "fever_associated",
+      "category": "बुखार (Associated Fever)",
+      "titleHindi": "खांसी के साथ बुखार भी है?",
+      "titleEnglish": "Do you have fever along with the cough?",
       "options": [
-        { "hindi": "हाँ, धूल, धुएं या मौसम बदलते ही छींक व खांसी", "english": "Dust, smoke allergy or seasonal sneezing/cough", "value": "allergy_dust_smoke" },
-        { "hindi": "हाँ, बीड़ी/सिगरेट या चूल्हे के धुएं का इतिहास", "english": "Bidi/cigarette smoking or wood stove smoke exposure", "value": "smoke_exposure" },
-        { "hindi": "हाँ, परिवार में पहले से दमा (Asthma) की बीमारी है", "english": "Family history of asthma or respiratory illness", "value": "family_asthma" },
-        { "hindi": "नहीं, कोई एलर्जी या धूम्रपान की आदत नहीं है", "english": "No allergies and non-smoker", "value": "no_allergy_non_smoker" }
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "rc-06",
+      "key": "chest_pain_cough",
+      "category": "सीने में दर्द (Chest Pain)",
+      "titleHindi": "खांसी के साथ सीने में दर्द भी है?",
+      "titleEnglish": "Do you have chest pain along with the cough?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "rc-07",
+      "key": "blood_in_phlegm",
+      "category": "बलगम में खून (Hemoptysis)",
+      "titleHindi": "बलगम में खून आया है?",
+      "titleEnglish": "Is there any blood in your phlegm?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "rc-08",
+      "key": "weight_loss",
+      "category": "वज़न (Weight Loss)",
+      "titleHindi": "हाल ही में बिना कोशिश के वज़न कम हुआ है?",
+      "titleEnglish": "Have you lost weight recently without trying?",
+      "options": [
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        },
+        {
+          "hindi": "हाँ — पिछले 6 महीने में लगभग 3 किलो",
+          "english": "Yes — about 3 kg in the last 6 months",
+          "value": "yes_3kg_6mo"
+        },
+        {
+          "hindi": "हाँ — पिछले 12 महीने में लगभग 6 किलो",
+          "english": "Yes — about 6 kg in the last 12 months",
+          "value": "yes_6kg_12mo"
+        }
+      ]
+    },
+    {
+      "id": "rc-09",
+      "key": "smoking_history",
+      "category": "धूम्रपान इतिहास (Smoking History)",
+      "titleHindi": "आप बीड़ी-सिगरेट पीते हैं, या पहले पीते थे?",
+      "titleEnglish": "Do you smoke, or have you smoked in the past?",
+      "options": [
+        {
+          "hindi": "हाँ, अभी पीते हैं",
+          "english": "Currently smoke",
+          "value": "current_smoker"
+        },
+        {
+          "hindi": "पहले पीते थे (अब छोड़ दिया)",
+          "english": "Smoked in the past",
+          "value": "past_smoker"
+        },
+        {
+          "hindi": "कभी नहीं पी",
+          "english": "Never smoked",
+          "value": "never_smoked"
+        }
+      ]
+    },
+    {
+      "id": "rc-10",
+      "key": "biomass_work_exposure",
+      "category": "धुआं / काम का वातावरण (Occupational Exposure)",
+      "titleHindi": "क्या आप अक्सर चूल्हे के धुएं, धूल, या काम की जगह के धुएं के आस-पास रहते हैं?",
+      "titleEnglish": "Are you regularly around cooking smoke, dust, or fumes at work?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
       ]
     }
   ]

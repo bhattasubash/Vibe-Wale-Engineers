@@ -34,7 +34,6 @@ export const ReviewScreen: React.FC = () => {
           <AudioSpeaker
             hindiText={promptHindi}
             englishText={promptEnglish}
-            bilingual={language === 'hi'}
             autoPlay={true}
           />
         </div>
@@ -145,9 +144,13 @@ export const ReviewScreen: React.FC = () => {
                 <span className="font-black text-[#212529]">
                   {chiefComplaint || 'उल्लेख नहीं (Not recorded)'}
                 </span>
-                {socrates.severity ? (
+                {(socrates as any).anger_irritation ? (
                   <span className="text-[10px] font-bold text-[#0B5FA5]">
-                    दर्द/तीव्रता स्तर: {socrates.severity}/10
+                    गुस्सा/चिड़चिड़ापन: {(socrates as any).anger_irritation === 'yes' ? 'हाँ (Yes)' : 'नहीं (No)'}
+                  </span>
+                ) : socrates.severity && !String(socrates.severity).includes('/10') ? (
+                  <span className="text-[10px] font-bold text-[#0B5FA5]">
+                    तीव्रता: {socrates.severity}
                   </span>
                 ) : null}
               </div>
@@ -155,8 +158,12 @@ export const ReviewScreen: React.FC = () => {
                 <span>स्थान: {socrates.site || 'उल्लेख नहीं'}</span>
                 <span>•</span>
                 <span>अवधि: {socrates.onset || 'उल्लेख नहीं'}</span>
-                <span>•</span>
-                <span>स्थिति: {socrates.timing || 'उल्लेख नहीं'}</span>
+                {(socrates as any).timing && (
+                  <>
+                    <span>•</span>
+                    <span>स्थिति: {(socrates as any).timing}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -197,7 +204,7 @@ export const ReviewScreen: React.FC = () => {
               <div className="flex items-center justify-between mb-1">
                 <span className="font-black text-xs text-[#0B5FA5] uppercase tracking-wider flex items-center gap-1">
                   <Stethoscope className="w-3.5 h-3.5 text-[#0B5FA5]" />
-                  <span>3. सामान्य स्वास्थ्य इतिहास (Health History)</span>
+                  <span>3. सामान्य चिकित्सा स्वास्थ्य इतिहास (Medical History)</span>
                 </span>
                 <button
                   type="button"
@@ -209,52 +216,70 @@ export const ReviewScreen: React.FC = () => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[11px] font-semibold">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] font-semibold">
                 <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <span className="text-[10px] text-[#6C757D] block">रक्तचाप स्थिति (BP):</span>
+                  <span className="text-[10px] text-[#6C757D] block">उच्च रक्तचाप (BP):</span>
                   <span className="font-bold text-[#212529]">
-                    {generalVitals.bloodPressureHistory === 'hypertensive-meds'
-                      ? 'उच्च रक्तचाप (नियमित दवा)'
-                      : generalVitals.bloodPressureHistory === 'normal-bp'
-                      ? 'रक्तचाप सामान्य'
-                      : generalVitals.bloodPressureHistory
-                      ? generalVitals.bloodPressureHistory
-                      : 'उल्लेख नहीं (Not recorded)'}
+                    {generalVitals.bloodPressureHistory === 'yes'
+                      ? 'हाँ (Yes)'
+                      : generalVitals.bloodPressureHistory === 'no'
+                      ? 'नहीं (No)'
+                      : generalVitals.bloodPressureHistory || 'उल्लेख नहीं'}
+                  </span>
+                </div>
+
+                <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
+                  <span className="text-[10px] text-[#6C757D] block">बीपी की दवा:</span>
+                  <span className="font-bold text-[#212529]">
+                    {generalVitals.bpMedication === 'yes'
+                      ? 'हाँ (Yes)'
+                      : generalVitals.bpMedication === 'no'
+                      ? 'नहीं (No)'
+                      : generalVitals.bpMedication || 'उल्लेख नहीं'}
                   </span>
                 </div>
 
                 <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
                   <span className="text-[10px] text-[#6C757D] block">मधुमेह (Diabetes):</span>
                   <span className="font-bold text-[#212529]">
-                    {generalVitals.diabetesStatus === 'diabetic-meds'
-                      ? 'मधुमेह (दवा/इंसुलिन)'
-                      : generalVitals.diabetesStatus === 'non-diabetic'
-                      ? 'मधुमेह नहीं'
-                      : generalVitals.diabetesStatus
-                      ? generalVitals.diabetesStatus
-                      : 'उल्लेख नहीं (Not recorded)'}
+                    {generalVitals.diabetesStatus === 'yes'
+                      ? 'हाँ (Yes)'
+                      : generalVitals.diabetesStatus === 'no'
+                      ? 'नहीं (No)'
+                      : generalVitals.diabetesStatus || 'उल्लेख नहीं'}
+                  </span>
+                </div>
+
+                <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
+                  <span className="text-[10px] text-[#6C757D] block">शुगर की दवा:</span>
+                  <span className="font-bold text-[#212529]">
+                    {generalVitals.diabetesMedication === 'yes'
+                      ? 'हाँ (Yes)'
+                      : generalVitals.diabetesMedication === 'no'
+                      ? 'नहीं (No)'
+                      : generalVitals.diabetesMedication || 'उल्लेख नहीं'}
                   </span>
                 </div>
 
                 <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
                   <span className="text-[10px] text-[#6C757D] block">औषध एलर्जी (Allergies):</span>
                   <span className="font-bold text-[#212529]">
-                    {generalVitals.knownAllergies === 'allergy-none'
-                      ? 'कोई ज्ञात दवा एलर्जी नहीं'
-                      : generalVitals.knownAllergies
-                      ? generalVitals.knownAllergies
-                      : 'उल्लेख नहीं (Not recorded)'}
+                    {generalVitals.knownAllergies === 'yes'
+                      ? 'हाँ (Yes)'
+                      : generalVitals.knownAllergies === 'no'
+                      ? 'नहीं (No)'
+                      : generalVitals.knownAllergies || 'उल्लेख नहीं'}
                   </span>
                 </div>
 
                 <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <span className="text-[10px] text-[#6C757D] block">पूर्व सर्जरी (Surgeries):</span>
+                  <span className="text-[10px] text-[#6C757D] block">पूर्व सर्जरी/भर्ती (Surgeries):</span>
                   <span className="font-bold text-[#212529]">
-                    {generalVitals.pastSurgeries === 'no-surgery'
-                      ? 'कोई पूर्व सर्जरी नहीं'
-                      : generalVitals.pastSurgeries
-                      ? generalVitals.pastSurgeries
-                      : 'उल्लेख नहीं (Not recorded)'}
+                    {generalVitals.pastSurgeries === 'yes'
+                      ? 'हाँ (Yes)'
+                      : generalVitals.pastSurgeries === 'no'
+                      ? 'नहीं (No)'
+                      : generalVitals.pastSurgeries || 'उल्लेख नहीं'}
                   </span>
                 </div>
               </div>

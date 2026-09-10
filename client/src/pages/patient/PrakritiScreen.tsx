@@ -154,9 +154,9 @@ export const PrakritiScreen: React.FC = () => {
         {/* Top Prompter */}
         <div className="shrink-0">
           <AudioSpeaker
+            key={`prakriti-${currentIndex}-${currentQuestion.id}`}
             hindiText={currentQuestion.questionHindi}
             englishText={currentQuestion.questionEnglish}
-            bilingual={language === 'hi'}
             autoPlay={true}
           />
         </div>

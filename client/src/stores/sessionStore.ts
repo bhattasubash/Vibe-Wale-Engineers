@@ -63,10 +63,13 @@ export interface SocratesResponses {
 
 export interface GeneralVitals {
   bloodPressureHistory?: string;
+  bpMedication?: string;
   diabetesStatus?: string;
+  diabetesMedication?: string;
   knownAllergies?: string;
   pastSurgeries?: string;
   lifestyleFactors?: string;
+  [key: string]: string | undefined;
 }
 
 export interface DynamicQuestionOption {

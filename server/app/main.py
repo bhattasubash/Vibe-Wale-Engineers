@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from app.routers import patients, sessions, prakriti, physician, documents
+from app.routers import patients, sessions, prakriti, physician, documents, tts
 
 ENV = os.getenv("ENVIRONMENT", "development").lower()
 is_dev = ENV in ("development", "dev", "local")
@@ -70,6 +70,7 @@ app.include_router(sessions.router)
 app.include_router(prakriti.router)
 app.include_router(physician.router)
 app.include_router(documents.router)
+app.include_router(tts.router)
 
 
 @app.get("/api/health", tags=["Health"])

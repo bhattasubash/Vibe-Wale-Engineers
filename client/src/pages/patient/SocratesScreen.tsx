@@ -21,64 +21,60 @@ export interface SocratesQuestion {
 const DEFAULT_SOCRATES_QUESTIONS: SocratesQuestion[] = [
   {
     key: 'site',
-    titleHindi: 'दर्द या परेशानी शरीर के किस हिस्से में सबसे ज्यादा महसूस हो रही है?',
-    titleEnglish: 'Where in your body is the discomfort primarily located?',
+    titleHindi: 'तकलीफ शरीर में कहाँ है?',
+    titleEnglish: 'Where in your body is the discomfort?',
     category: 'स्थान (Location)',
     options: [
-      { value: 'head-neck', hindi: 'सिर / गर्दन / गला', english: 'Head, Neck & Throat' },
-      { value: 'chest-abdomen', hindi: 'छाती / पेट का ऊपरी हिस्सा', english: 'Chest & Upper Abdomen' },
-      { value: 'back-spine', hindi: 'कमर / पीठ / पेट का निचला हिस्सा', english: 'Lower Back, Spine & Pelvis' },
-      { value: 'limbs-joints', hindi: 'हाथ / पैर / घुटने व जोड़', english: 'Arms, Legs, Knees & Joints' },
-      { value: 'general-skin', hindi: 'पूरे शरीर में / त्वचा पर', english: 'Generalized / Skin / Whole Body' },
+      { value: 'head-neck', hindi: 'सिर या गर्दन', english: 'Head or Neck' },
+      { value: 'chest-breathing', hindi: 'छाती या सांस नली', english: 'Chest or Breathing' },
+      { value: 'abdomen', hindi: 'पेट या पाचन तंत्र', english: 'Abdomen or Digestion' },
+      { value: 'limbs-joints', hindi: 'हाथ, पैर या जोड़', english: 'Limbs or Joints' },
+      { value: 'whole-body', hindi: 'पूरे शरीर में', english: 'All over the body' },
     ],
   },
   {
     key: 'onset',
-    titleHindi: 'यह तकलीफ कब से शुरू हुई है?',
-    titleEnglish: 'When did this problem start?',
+    titleHindi: 'यह आज से शुरू हुई, कुछ दिन पहले से, कुछ हफ्ते पहले से, या एक महीने से भी ज़्यादा समय से है?',
+    titleEnglish: 'Did this start today, a few days ago, a few weeks ago, or longer than a month ago?',
     category: 'अवधि (Duration)',
     options: [
-      { value: 'acute-few-days', hindi: 'कुछ ही दिनों से (1 से 7 दिन)', english: 'Past few days (1 to 7 days)' },
-      { value: 'subacute-few-weeks', hindi: '2 से 4 सप्ताह से', english: '2 to 4 weeks' },
-      { value: 'chronic-6-months', hindi: '6 महीने या उससे अधिक (पुराना रोग)', english: '6+ months (Chronic)' },
-      { value: 'years-recurrent', hindi: 'सालों से बार-बार होती है', english: 'Recurrent for years' },
+      { value: 'today', hindi: 'आज से', english: 'Today' },
+      { value: 'few_days_ago', hindi: 'कुछ दिन पहले से', english: 'A few days ago' },
+      { value: 'few_weeks_ago', hindi: 'कुछ हफ्ते पहले से', english: 'A few weeks ago' },
+      { value: 'longer_than_month', hindi: 'एक महीने से भी ज़्यादा समय से', english: 'Longer than a month ago' },
     ],
   },
   {
-    key: 'severity',
-    titleHindi: 'तकलीफ की तीव्रता (दर्द का स्तर) 1 से 10 के पैमाने पर कितनी है?',
-    titleEnglish: 'How severe is the discomfort on a scale of 1 to 10?',
-    category: 'तीव्रता (Severity)',
+    key: 'anger_irritation',
+    titleHindi: 'क्या यह तकलीफ आपको गुस्सा या चिड़चिड़ा महसूस कराती है?',
+    titleEnglish: 'Does this discomfort make you feel angry or irritated?',
+    category: 'मानसिक प्रभाव (Emotional Impact)',
     options: [
-      { value: 'mild-3', hindi: 'हल्का (1–3): दैनिक कार्य सामान्य रूप से संभव हैं', english: 'Mild (1-3): Normal activities manageable' },
-      { value: 'moderate-6', hindi: 'मध्यम (4–6): काम करने या उठने-बैठने में कष्ट', english: 'Moderate (4-6): Interferes with work or movement' },
-      { value: 'severe-8', hindi: 'तेज (7–8): बिना सहारे चलना या बैठना मुश्किल', english: 'Severe (7-8): Severe pain, restricts mobility' },
-      { value: 'unbearable-10', hindi: 'असहनीय (9–10): अत्यधिक कष्ट, तत्काल राहत चाहिए', english: 'Very Severe (9-10): Unbearable, urgent relief needed' },
+      { value: 'yes', hindi: 'हाँ', english: 'Yes' },
+      { value: 'no', hindi: 'नहीं', english: 'No' },
     ],
   },
   {
     key: 'timing',
-    titleHindi: 'यह तकलीफ किस समय या किस स्थिति में अधिक महसूस होती है?',
-    titleEnglish: 'When or in what situation is this trouble most noticeable?',
+    titleHindi: 'यह रात में ज़्यादा होता है, खाने के बाद ज़्यादा होता है, या हिलने-डुलने से ज़्यादा होता है?',
+    titleEnglish: 'Is it worse at night, worse after eating, or worse with movement?',
     category: 'समय व कारक (Timing & Triggers)',
     options: [
-      { value: 'morning-cold', hindi: 'सुबह उठने पर या ठंड के मौसम में', english: 'Morning time or in cold weather' },
-      { value: 'meals', hindi: 'भोजन के बाद या खाली पेट', english: 'After meals or on an empty stomach' },
-      { value: 'exertion', hindi: 'काम करने, चलने या सीढ़ी चढ़ने पर', english: 'During physical work, walking or stairs' },
-      { value: 'night-rest', hindi: 'शाम को या रात को सोते समय', english: 'In the evening or during sleep at night' },
-      { value: 'constant', hindi: 'दिनभर लगभग एक जैसी बनी रहती है', english: 'Constant throughout the day' },
+      { value: 'night_worse', hindi: 'रात में ज़्यादा', english: 'Worse at night' },
+      { value: 'after_eating_worse', hindi: 'खाने के बाद ज़्यादा', english: 'Worse after eating' },
+      { value: 'movement_worse', hindi: 'हिलने-डुलने से ज़्यादा', english: 'Worse with movement' },
+      { value: 'constant', hindi: 'दिनभर एक जैसा', english: 'Constant throughout day' },
     ],
   },
   {
     key: 'familyHistory',
-    titleHindi: 'क्या परिवार में किसी अन्य सदस्य को भी ऐसी समस्या या पुरानी बीमारी रही है?',
-    titleEnglish: 'Has anyone in your family had a similar condition or chronic illness?',
-    category: 'पारिवारिक व संबद्ध इतिहास (Family History)',
+    titleHindi: 'परिवार में किसी को ऐसी ही तकलीफ रही है — जैसे बीपी, शुगर, दिल की बीमारी, या ऐसी ही जोड़ों, पेट, या त्वचा की तकलीफ?',
+    titleEnglish: 'Has anyone in your family had similar problems — like BP, sugar, heart problems, or similar joint/stomach/skin trouble?',
+    category: 'पारिवारिक इतिहास (Family History)',
     options: [
-      { value: 'family-similar', hindi: 'हाँ, माता-पिता या भाई-बहन को यही रोग रहा है', english: 'Yes, same condition in parents or siblings' },
-      { value: 'family-chronic', hindi: 'हाँ, परिवार में मधुमेह (शुगर) या उच्च रक्तचाप (BP) है', english: 'Yes, family history of diabetes or blood pressure' },
-      { value: 'family-none', hindi: 'नहीं, परिवार में किसी को ऐसा रोग नहीं है', english: 'No, no such history in the family' },
-      { value: 'family-unsure', hindi: 'मुझे इस बारे में निश्चित जानकारी नहीं है', english: 'I am not sure / Don’t know' },
+      { value: 'yes_family', hindi: 'हाँ, परिवार में है', english: 'Yes, family history present' },
+      { value: 'no_family', hindi: 'नहीं, किसी को नहीं', english: 'No, no family history' },
+      { value: 'unsure', hindi: 'निश्चित जानकारी नहीं', english: 'Not sure / Don’t know' },
     ],
   },
 ];
@@ -260,9 +256,9 @@ export const SocratesScreen: React.FC = () => {
         {/* Top Prompter */}
         <div className="shrink-0 mb-1">
           <AudioSpeaker
+            key={`socrates-turn-${currentTurn}-${question.key}`}
             hindiText={question.titleHindi}
             englishText={question.titleEnglish}
-            bilingual={language === 'hi'}
             autoPlay={true}
           />
         </div>

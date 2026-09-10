@@ -49,8 +49,11 @@ class AudioRecorder {
       this.recordedChunks.push(new Float32Array(downsampled));
     };
 
+    const muteNode = this.audioContext.createGain();
+    muteNode.gain.value = 0;
     this.sourceNode.connect(this.processor);
-    this.processor.connect(this.audioContext.destination);
+    this.processor.connect(muteNode);
+    muteNode.connect(this.audioContext.destination);
 
     this.isRecording = true;
     this.startTime = Date.now();

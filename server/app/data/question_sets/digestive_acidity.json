@@ -1,97 +1,231 @@
 {
   "id": "digestive_acidity",
-  "title": "Digestion & Acidity (Amlapitta)",
-  "titleHindi": "पाचन, गैस व एसिडिटी (अम्लपित्त)",
-  "description": "Acidity, gas, sour belching, heartburn, stomach burning, bloating, constipation, indigestion or abdominal discomfort.",
+  "title": "Question Set B — Digestion & Acidity",
+  "titleHindi": "प्रश्न सेट B — पाचन व अम्लपित्त (एसिडिटी)",
+  "description": "Doctor-verified 9-question protocol for acidity, GERD, gas, bloating, abdominal pain, and digestive distress.",
   "keywords": [
     "acidity",
     "gas",
-    "indigestion",
-    "heartburn",
     "bloating",
-    "constipation",
+    "indigestion",
     "amlapitta",
     "stomach pain",
-    "acid reflux",
-    "belching",
-    "एसिडिटी",
-    "गैस",
+    "heartburn",
+    "sour belching",
+    "constipation",
+    "vomiting",
+    "nausea",
+    "digestive",
+    "stomach",
+    "belly",
     "पेट",
-    "जलन",
-    "खट्टी डकार",
-    "पेट में जलन",
-    "पेट दर्द",
-    "कब्ज",
-    "बदहजमी",
-    "अपच",
+    "गैस",
+    "एसिडिटी",
     "अम्लपित्त",
+    "पेट दर्द",
+    "खट्टी डकार",
+    "कब्ज",
+    "उल्टी",
+    "जी मिचलाना",
+    "बदहजमी",
     "पेट फूलना",
-    "छाती में जलन"
+    "दस्त"
   ],
   "questions": [
     {
       "id": "da-01",
-      "key": "site",
-      "category": "मुख्य लक्षण (Symptom Type)",
-      "titleHindi": "पेट या पाचन में मुख्य समस्या क्या महसूस हो रही है?",
-      "titleEnglish": "What is the primary digestive issue you are experiencing?",
+      "key": "nature",
+      "category": "लक्षण प्रकार (Type of Discomfort)",
+      "titleHindi": "पेट की तकलीफ ज़्यादा किस तरह की है — सीने या गले में जलन, पेट फूलना और गैस, या पेट में दर्द?",
+      "titleEnglish": "Is it more like burning in the chest/throat (acidity), bloating and gas, or stomach pain?",
       "options": [
-        { "hindi": "छाती व गले में जलन, खट्टी डकारें (Heartburn & Reflux)", "english": "Heartburn, sour belching & acid reflux", "value": "heartburn_reflux" },
-        { "hindi": "पेट फूलना, भारीपन व अफरा (Bloating & Gas)", "english": "Bloating, abdominal fullness & flatulence", "value": "gas_bloating" },
-        { "hindi": "पेट में मरोड़ या रुक-रुक कर दर्द (Cramps & Pain)", "english": "Stomach cramps or abdominal pain", "value": "cramps_pain" },
-        { "hindi": "कब्ज, शौच साफ न होना या अनियमित पेट", "english": "Severe constipation or irregular bowels", "value": "constipation" }
+        {
+          "hindi": "सीने या गले में जलन (एसिडिटी)",
+          "english": "Burning in chest/throat (Acidity)",
+          "value": "acidity_heartburn"
+        },
+        {
+          "hindi": "पेट फूलना और भारी गैस",
+          "english": "Bloating and gas",
+          "value": "gas_bloating"
+        },
+        {
+          "hindi": "पेट में दर्द / ऐंठन",
+          "english": "Stomach pain / cramps",
+          "value": "stomach_pain"
+        }
       ]
     },
     {
       "id": "da-02",
       "key": "onset",
       "category": "अवधि (Duration)",
-      "titleHindi": "यह पाचन की समस्या कितने समय से चल रही है?",
-      "titleEnglish": "How long have you had this digestive problem?",
+      "titleHindi": "यह तकलीफ आज से शुरू हुई, कुछ दिन पहले से, कुछ हफ्ते पहले से, या एक महीने से भी ज़्यादा समय से है?",
+      "titleEnglish": "Did this start today, a few days ago, a few weeks ago, or longer than a month ago?",
       "options": [
-        { "hindi": "कुछ ही दिनों से (अचानक शुरू हुआ)", "english": "Recent (Past 1-3 days)", "value": "acute_days" },
-        { "hindi": "2 से 4 सप्ताह से", "english": "2 to 4 weeks", "value": "subacute_weeks" },
-        { "hindi": "कई महीनों से बार-बार होता है", "english": "Several months (Recurrent)", "value": "chronic_months" },
-        { "hindi": "सालों से पुरानी समस्या है", "english": "Long standing for years", "value": "chronic_years" }
+        {
+          "hindi": "आज से",
+          "english": "Today",
+          "value": "today"
+        },
+        {
+          "hindi": "कुछ दिन पहले से",
+          "english": "A few days ago",
+          "value": "few_days_ago"
+        },
+        {
+          "hindi": "कुछ हफ्ते पहले से",
+          "english": "A few weeks ago",
+          "value": "few_weeks_ago"
+        },
+        {
+          "hindi": "एक महीने से भी ज़्यादा समय से",
+          "english": "Longer than a month ago",
+          "value": "longer_than_month"
+        }
       ]
     },
     {
       "id": "da-03",
-      "key": "triggers",
-      "category": "भोजन का संबंध (Timing with Meals)",
-      "titleHindi": "यह परेशानी किस समय या किस खान-पान से ज्यादा बढ़ती है?",
-      "titleEnglish": "When or with what food does this trouble worsen?",
+      "key": "spicy_oily_trigger",
+      "category": "खान-पान कारक (Diet Trigger)",
+      "titleHindi": "तीखा या तला हुआ खाना खाने से तकलीफ बढ़ जाती है?",
+      "titleEnglish": "Does it get worse after eating spicy or oily food?",
       "options": [
-        { "hindi": "खाना खाने के तुरंत बाद (1-2 घंटे में)", "english": "Immediately or 1-2 hours after food", "value": "post_meal" },
-        { "hindi": "खाली पेट रहने पर या सुबह उठने पर", "english": "On empty stomach or early morning", "value": "empty_stomach" },
-        { "hindi": "तला-भुना, तीखा या खट्टा खाने पर", "english": "After eating spicy, oily or sour food", "value": "spicy_oily" },
-        { "hindi": "रात को सोते समय या लेटने पर", "english": "At night or when lying down", "value": "night_bedtime" }
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
       ]
     },
     {
       "id": "da-04",
-      "key": "bowel",
-      "category": "शौच प्रवृत्ति (Bowel Habits)",
-      "titleHindi": "आपकी दैनिक शौच प्रवृत्ति कैसी रहती है?",
-      "titleEnglish": "How is your daily bowel pattern?",
+      "key": "empty_stomach_trigger",
+      "category": "खाली पेट (Empty Stomach Trigger)",
+      "titleHindi": "खाली पेट रहने पर तकलीफ बढ़ जाती है?",
+      "titleEnglish": "Does it get worse on an empty stomach?",
       "options": [
-        { "hindi": "सामान्य, दिन में एक बार साफ होता है", "english": "Normal, regular once daily", "value": "normal" },
-        { "hindi": "कड़ा, सूखा मल व जोर लगाना पड़ता है (कब्ज)", "english": "Hard, dry stools / severe straining", "value": "dry_constipated" },
-        { "hindi": "ढीला, पतला मल या दिन में 3-4 बार जाना", "english": "Loose stools / frequent urgency", "value": "loose_frequent" },
-        { "hindi": "चिपचिपा मल (आंव) व पेट भारी रहना", "english": "Sticky stools with mucus / incomplete evacuation", "value": "mucus_sticky" }
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
       ]
     },
     {
       "id": "da-05",
-      "key": "associated",
-      "category": "भूख व अन्य लक्षण (Appetite & Associated Symptoms)",
-      "titleHindi": "क्या उल्टी, मतली, भूख न लगना या वजन में कमी भी महसूस हो रही है?",
-      "titleEnglish": "Do you experience nausea, vomiting, loss of appetite, or weight loss?",
+      "key": "bowel_habit",
+      "category": "शौच क्रिया (Bowel Movements)",
+      "titleHindi": "रोज़ पेट ठीक से साफ हो जाता है, या दिक्कत होती है — जैसे मल बहुत कड़ा आना, या बहुत पतला/पानी जैसा आना?",
+      "titleEnglish": "Do you pass motion normally every day, or do you have trouble — very hard stool, or very loose/watery stool?",
       "options": [
-        { "hindi": "हाँ, बार-बार जी मिचलाना या खट्टा पानी गले में आना", "english": "Frequent nausea or sour fluid refluxing in throat", "value": "nausea_sour_fluid" },
-        { "hindi": "भूख बिल्कुल नहीं लगती या थोड़ा खाने पर पेट भारी होना", "english": "Loss of appetite or early fullness", "value": "poor_appetite_fullness" },
-        { "hindi": "हाँ, उल्टी होना या पेट में तेज जलन", "english": "Vomiting or intense burning in stomach", "value": "vomiting_intense_burning" },
-        { "hindi": "नहीं, भूख सामान्य है और कोई उल्टी नहीं", "english": "Normal appetite, no vomiting or nausea", "value": "appetite_normal" }
+        {
+          "hindi": "रोज़ सामान्य रूप से साफ होता है",
+          "english": "Normal every day",
+          "value": "normal"
+        },
+        {
+          "hindi": "कब्जियत (मल बहुत कड़ा आना)",
+          "english": "Constipation (very hard stool)",
+          "value": "hard_stool"
+        },
+        {
+          "hindi": "पतले दस्त (पानी जैसा आना)",
+          "english": "Loose motions (watery stool)",
+          "value": "loose_stool"
+        }
+      ]
+    },
+    {
+      "id": "da-06",
+      "key": "nausea",
+      "category": "जी मिचलाना (Nausea)",
+      "titleHindi": "जी मिचलाता है, ऐसा लगता है जैसे उल्टी होगी?",
+      "titleEnglish": "Do you feel nauseated (like you might vomit)?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "da-07",
+      "key": "vomiting",
+      "category": "उल्टी (Vomiting)",
+      "titleHindi": "उल्टी हुई है?",
+      "titleEnglish": "Have you actually vomited?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "da-08",
+      "key": "appetite_loss",
+      "category": "भूख (Appetite)",
+      "titleHindi": "भूख कम हो गई है?",
+      "titleEnglish": "Has your appetite reduced?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "da-09",
+      "key": "weight_loss",
+      "category": "वज़न (Weight Loss)",
+      "titleHindi": "बिना किसी कोशिश के हाल ही में वज़न कम हुआ है?",
+      "titleEnglish": "Have you lost weight recently without trying?",
+      "options": [
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        },
+        {
+          "hindi": "हाँ — पिछले 6 महीने में लगभग 3 किलो",
+          "english": "Yes — about 3 kg in the last 6 months",
+          "value": "yes_3kg_6mo"
+        },
+        {
+          "hindi": "हाँ — पिछले 12 महीने में लगभग 6 किलो",
+          "english": "Yes — about 6 kg in the last 12 months",
+          "value": "yes_6kg_12mo"
+        }
       ]
     }
   ]

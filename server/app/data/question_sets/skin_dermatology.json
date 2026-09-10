@@ -1,95 +1,194 @@
 {
   "id": "skin_dermatology",
-  "title": "Skin & Dermatology (Twak Rog)",
-  "titleHindi": "त्वचा विकार व खुजली (त्वक रोग)",
-  "description": "Skin rash, itching, redness, dry eczema, patches, hives, boils, discoloration or allergy symptoms.",
+  "title": "Question Set D — Skin & Dermatology",
+  "titleHindi": "प्रश्न सेट D — त्वचा विकार (कुष्ठ/कंडू)",
+  "description": "Doctor-verified 7-question protocol for skin rash, itching, red patches, scales, eczema, and dermatological conditions.",
   "keywords": [
-    "skin rash",
+    "skin",
+    "rash",
     "itching",
-    "eczema",
     "allergy",
-    "boils",
-    "redness",
-    "urticaria",
-    "twak rog",
     "kushtha",
-    "ringworm",
+    "kandu",
+    "eczema",
+    "fungal",
+    "patches",
+    "dry skin",
+    "scaly",
     "त्वचा",
-    "त्वचा में खुजली",
-    "चकत्ते",
-    "दाद",
-    "खाज",
     "खुजली",
-    "एक्जिमा",
-    "त्वक विकार",
-    "लाली",
-    "पित्ती उछलना",
-    "फोड़े फुंसी"
+    "दाद",
+    "चकत्ते",
+    "खाज",
+    "फोड़े",
+    "फुंसी",
+    "कुष्ठ",
+    "कंडू",
+    "लाल चकत्ते",
+    "सूखी त्वचा"
   ],
   "questions": [
     {
       "id": "sd-01",
-      "key": "character",
-      "category": "त्वचा के लक्षण (Lesion Type)",
-      "titleHindi": "त्वचा पर किस तरह का बदलाव या दाने दिखाई दे रहे हैं?",
-      "titleEnglish": "What kind of skin changes or rash do you see?",
+      "key": "rash_type",
+      "category": "त्वचा का प्रकार (Lesion Type)",
+      "titleHindi": "त्वचा पर क्या हुआ है — लाल चकत्ते, छोटे दाने, सूखी और परतदार त्वचा, या कुछ और?",
+      "titleEnglish": "Is it red patches, small bumps, dry/scaly skin, or something else?",
       "options": [
-        { "hindi": "लाल चकत्ते व तेज खुजली (पित्ती / Hives)", "english": "Red raised patches with intense itching (Hives)", "value": "itching_rash" },
-        { "hindi": "सूखी, खुरदरी त्वचा, पपड़ी जमना (एक्जिमा / Eczema)", "english": "Dry, scaly, cracked skin (Eczema)", "value": "dry_cracked_scaling" },
-        { "hindi": "गोल चकत्ते, किनारों पर दाने (दाद / Ringworm)", "english": "Circular ring-like itchy patch (Fungal/Ringworm)", "value": "ring_fungal_patch" },
-        { "hindi": "मवाद भरे फोड़े-फुंसी या पानी वाले छाले", "english": "Pus-filled boils, pimples or blisters", "value": "pus_boils_blisters" }
+        {
+          "hindi": "लाल चकत्ते",
+          "english": "Red patches",
+          "value": "red_patches"
+        },
+        {
+          "hindi": "छोटे दाने / फुंसियां",
+          "english": "Small bumps",
+          "value": "small_bumps"
+        },
+        {
+          "hindi": "सूखी और परतदार त्वचा",
+          "english": "Dry / scaly skin",
+          "value": "dry_scaly"
+        },
+        {
+          "hindi": "कुछ और",
+          "english": "Something else",
+          "value": "other"
+        }
       ]
     },
     {
       "id": "sd-02",
       "key": "site",
-      "category": "प्रभावित अंग (Affected Area)",
-      "titleHindi": "शरीर के कौन से हिस्से में यह त्वचा समस्या है?",
-      "titleEnglish": "Where on your body is the skin condition located?",
+      "category": "स्थान (Location)",
+      "titleHindi": "शरीर पर यह कहाँ है — चेहरे पर, हाथों पर, पैरों पर, पीठ पर, या पूरे शरीर पर?",
+      "titleEnglish": "Where on your body is it — face, arms, legs, back, or all over?",
       "options": [
-        { "hindi": "हाथ, पैर या जोड़ों की सिलवटों में", "english": "Hands, feet or flexures of joints", "value": "hands_feet_joints" },
-        { "hindi": "चेहरे, गर्दन या सिर की त्वचा पर", "english": "Face, neck or scalp", "value": "face_neck_scalp" },
-        { "hindi": "छाती, पेट या पीठ पर", "english": "Chest, abdomen or back", "value": "torso_back_abdomen" },
-        { "hindi": "पूरे शरीर पर जगह-जगह फैला हुआ है", "english": "Spread widely across the whole body", "value": "generalized_all_over" }
+        {
+          "hindi": "चेहरे पर",
+          "english": "Face",
+          "value": "face"
+        },
+        {
+          "hindi": "हाथों या पैरों पर",
+          "english": "Arms or legs",
+          "value": "limbs"
+        },
+        {
+          "hindi": "पीठ या पेट पर",
+          "english": "Back or abdomen",
+          "value": "torso"
+        },
+        {
+          "hindi": "पूरे शरीर पर",
+          "english": "All over",
+          "value": "all_over"
+        }
       ]
     },
     {
       "id": "sd-03",
       "key": "onset",
       "category": "अवधि (Duration)",
-      "titleHindi": "यह त्वचा की परेशानी कितने समय से है?",
-      "titleEnglish": "How long have you had this skin trouble?",
+      "titleHindi": "यह आज से शुरू हुआ, कुछ दिन पहले से, कुछ हफ्ते पहले से, या एक महीने से भी ज़्यादा समय से है?",
+      "titleEnglish": "Did this start today, a few days ago, a few weeks ago, or longer than a month ago?",
       "options": [
-        { "hindi": "कुछ ही दिनों से (अचानक उभरा है)", "english": "Recent (Past few days, acute)", "value": "few_days_acute" },
-        { "hindi": "2 से 4 सप्ताह से", "english": "2 to 4 weeks", "value": "subacute_weeks" },
-        { "hindi": "कई महीनों से ठीक नहीं हो रहा", "english": "Several months (Persistent)", "value": "months_persistent" },
-        { "hindi": "सालों से मौसम बदलने पर बार-बार उभरता है", "english": "Recurrent flare-ups for years", "value": "recurrent_flareups" }
+        {
+          "hindi": "आज से",
+          "english": "Today",
+          "value": "today"
+        },
+        {
+          "hindi": "कुछ दिन पहले से",
+          "english": "A few days ago",
+          "value": "few_days_ago"
+        },
+        {
+          "hindi": "कुछ हफ्ते पहले से",
+          "english": "A few weeks ago",
+          "value": "few_weeks_ago"
+        },
+        {
+          "hindi": "एक महीने से भी ज़्यादा समय से",
+          "english": "Longer than a month ago",
+          "value": "longer_than_month"
+        }
       ]
     },
     {
       "id": "sd-04",
-      "key": "triggers",
-      "category": "बढ़ाने वाले कारण (Triggers)",
-      "titleHindi": "खुजली या दाने किस चीज से ज्यादा बढ़ जाते हैं?",
-      "titleEnglish": "What causes the itching or rash to worsen?",
+      "key": "sweat_heat_worse",
+      "category": "गर्मी / पसीना (Aggravating Factors)",
+      "titleHindi": "पसीना आने या गर्मी से यह बढ़ जाता है?",
+      "titleEnglish": "Does it get worse with sweating or heat?",
       "options": [
-        { "hindi": "पसीना आने या गर्मी व धूप में जाने से", "english": "Heat, sweating or sun exposure", "value": "sweat_heat" },
-        { "hindi": "साबुन, डिटर्जेंट या अधिक पानी लगने से", "english": "Soap, detergents or moisture exposure", "value": "soap_detergent_water" },
-        { "hindi": "रात को सोते समय या बिस्तर की गर्मी से", "english": "At night under warm blankets", "value": "night_time" },
-        { "hindi": "खट्टा, तला हुआ या बासी खाना खाने पर", "english": "After eating sour, fermented or spicy food", "value": "sour_fermented_food" }
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
       ]
     },
     {
       "id": "sd-05",
-      "key": "associated",
-      "category": "नींद व संबद्ध प्रभाव (Sleep Impact & Complications)",
-      "titleHindi": "क्या खुजली से नींद में खलल पड़ता है या त्वचा से पानी/खून रिसता है?",
-      "titleEnglish": "Does itching disrupt sleep, or does the skin bleed or ooze fluid?",
+      "key": "food_trigger",
+      "category": "खान-पान कारक (Diet Trigger)",
+      "titleHindi": "किसी खास तरह का खाना खाने के बाद यह बढ़ जाता है?",
+      "titleEnglish": "Does it get worse after eating any particular food?",
       "options": [
-        { "hindi": "रात को इतनी तेज खुजली होती है कि नींद खुल जाती है", "english": "Severe itching that disturbs sleep at night", "value": "sleep_disturbed" },
-        { "hindi": "खुजलाने पर जलन, पानी या खून रिसने लगता है", "english": "Burning sensation, weeping fluid or bleeding", "value": "oozing_bleeding" },
-        { "hindi": "किसी नई दवा या खाने के बाद अचानक दाने निकले", "english": "Triggered right after a new medicine or specific food", "value": "drug_food_allergy" },
-        { "hindi": "मध्यम खुजली है, कोई रिसाव या नींद में खलल नहीं", "english": "Mild to moderate itching, no bleeding or sleeplessness", "value": "mild_no_oozing" }
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "sd-06",
+      "key": "itching_sleep",
+      "category": "रात में खुजली (Nocturnal Pruritus)",
+      "titleHindi": "खुजली की वजह से रात में नींद टूट जाती है?",
+      "titleEnglish": "Does the itching wake you up at night?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "sd-07",
+      "key": "bleeding_pus",
+      "category": "स्राव या खून (Bleeding / Pus Discharge)",
+      "titleHindi": "त्वचा से खून या पानी/पस निकलता है?",
+      "titleEnglish": "Does the skin bleed, or leak fluid/pus?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
       ]
     }
   ]

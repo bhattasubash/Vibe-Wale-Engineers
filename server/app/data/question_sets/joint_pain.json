@@ -1,12 +1,14 @@
 {
   "id": "joint_pain",
-  "title": "Joint & Bone Pain (Sandhivata)",
-  "titleHindi": "जोड़ों और हड्डियों का दर्द (संधिवात)",
-  "description": "Knee, back, spine, neck, shoulder, arthritis pain, joint swelling, stiffness, or musculoskeletal discomfort.",
+  "title": "Question Set A — Joint & Musculoskeletal Pain",
+  "titleHindi": "प्रश्न सेट A — जोड़ों व हड्डियों का दर्द (संधिवात)",
+  "description": "Doctor-verified 9-question protocol for joint pain, knee pain, backache, stiffness, and musculoskeletal complaints.",
   "keywords": [
+    "joint pain",
     "knee pain",
     "back pain",
-    "joint pain",
+    "shoulder pain",
+    "hip pain",
     "arthritis",
     "sandhivata",
     "stiffness",
@@ -16,7 +18,6 @@
     "knee",
     "back",
     "joints",
-    "stiffness",
     "घुटने",
     "घुटनों",
     "घुटना",
@@ -40,65 +41,196 @@
       "id": "jp-01",
       "key": "site",
       "category": "स्थान (Location)",
-      "titleHindi": "यह दर्द या जकड़न शरीर के किस हिस्से में सबसे ज्यादा है?",
-      "titleEnglish": "Where exactly is this pain or stiffness located?",
+      "titleHindi": "दर्द कहाँ हो रहा है — घुटने में, कमर में, कंधे में, कूल्हे में, या कहीं और?",
+      "titleEnglish": "Where does it hurt — knee, back, shoulder, hip, or somewhere else?",
       "options": [
-        { "hindi": "दोनों घुटने या पैर (Both Knees / Legs)", "english": "Both Knees / Legs", "value": "bilateral_knees" },
-        { "hindi": "कमर का निचला हिस्सा या रीढ़ (Lower Back / Spine)", "english": "Lower Back / Spine", "value": "lower_back" },
-        { "hindi": "गर्दन या कंधे (Neck / Shoulders)", "english": "Neck / Shoulders", "value": "neck_shoulders" },
-        { "hindi": "हाथ-पैर की छोटी उंगलियां व जोड़ (Small Joints)", "english": "Small Joints (Hands/Feet)", "value": "small_joints" }
+        {
+          "hindi": "घुटने में",
+          "english": "Knee",
+          "value": "knee"
+        },
+        {
+          "hindi": "कमर में",
+          "english": "Back / Spine",
+          "value": "back"
+        },
+        {
+          "hindi": "कंधे में",
+          "english": "Shoulder",
+          "value": "shoulder"
+        },
+        {
+          "hindi": "कूल्हे में या कहीं और",
+          "english": "Hip or somewhere else",
+          "value": "hip_or_other"
+        }
       ]
     },
     {
       "id": "jp-02",
       "key": "onset",
       "category": "अवधि (Duration)",
-      "titleHindi": "आपको यह जोड़ों का दर्द कितने समय से हो रहा है?",
-      "titleEnglish": "How long have you been experiencing this joint pain?",
+      "titleHindi": "यह दर्द आज से शुरू हुआ, कुछ दिन पहले से, कुछ हफ्ते पहले से, या एक महीने से भी ज़्यादा समय से है?",
+      "titleEnglish": "Did this start today, a few days ago, a few weeks ago, or longer than a month ago?",
       "options": [
-        { "hindi": "हाल ही में (पिछले 1-2 हफ्ते से)", "english": "Recent (Last 1-2 weeks)", "value": "acute_2_weeks" },
-        { "hindi": "1 से 3 महीने से", "english": "1 to 3 months", "value": "subacute_3_months" },
-        { "hindi": "6 महीने से अधिक समय से (पुराना)", "english": "More than 6 months (Chronic)", "value": "chronic_6_months" },
-        { "hindi": "कई सालों से बार-बार होता है", "english": "Recurrent for years", "value": "recurrent_years" }
+        {
+          "hindi": "आज से",
+          "english": "Today",
+          "value": "today"
+        },
+        {
+          "hindi": "कुछ दिन पहले से",
+          "english": "A few days ago",
+          "value": "few_days_ago"
+        },
+        {
+          "hindi": "कुछ हफ्ते पहले से",
+          "english": "A few weeks ago",
+          "value": "few_weeks_ago"
+        },
+        {
+          "hindi": "एक महीने से भी ज़्यादा समय से",
+          "english": "Longer than a month ago",
+          "value": "longer_than_month"
+        }
       ]
     },
     {
       "id": "jp-03",
-      "key": "severity",
-      "category": "तीव्रता व प्रकार (Severity & Nature)",
-      "titleHindi": "दर्द का प्रकार और तीव्रता कैसी है?",
-      "titleEnglish": "How would you describe the nature and severity of this pain?",
+      "key": "nature",
+      "category": "प्रकार (Nature of Pain)",
+      "titleHindi": "दर्द कैसा है — हल्का सा दर्द, चुभने जैसा दर्द, या जलन जैसा?",
+      "titleEnglish": "Is the pain more like a dull ache, a sharp stab, or a burning feeling?",
       "options": [
-        { "hindi": "हल्का दर्द व सुबह उठने पर जकड़न", "english": "Mild pain with morning stiffness", "value": "mild_stiffness" },
-        { "hindi": "मध्यम दर्द, चलने-फिरने या सीढ़ी चढ़ने पर कष्ट", "english": "Moderate pain, hurts while walking/stairs", "value": "moderate_walking" },
-        { "hindi": "तेज दर्द, जोड़ों में सूजन व छूने पर गर्म लगना", "english": "Severe pain with swelling and warmth", "value": "severe_swelling" },
-        { "hindi": "बिजली जैसा चुभने वाला या कमर से पैर तक जाने वाला दर्द", "english": "Sharp shooting or radiating pain (Sciatica)", "value": "radiating_sciatica" }
+        {
+          "hindi": "हल्का सा दर्द (मीठा दर्द)",
+          "english": "Dull ache",
+          "value": "dull_ache"
+        },
+        {
+          "hindi": "चुभने जैसा तेज़ दर्द",
+          "english": "Sharp stab",
+          "value": "sharp_stab"
+        },
+        {
+          "hindi": "जलन जैसा दर्द",
+          "english": "Burning feeling",
+          "value": "burning_feeling"
+        }
       ]
     },
     {
       "id": "jp-04",
-      "key": "triggers",
-      "category": "घटाने/बढ़ाने वाले कारण (Triggers & Relief)",
-      "titleHindi": "यह दर्द किस स्थिति में बढ़ता है या आराम मिलता है?",
-      "titleEnglish": "What makes this pain worse or provides relief?",
+      "key": "anger_irritation",
+      "category": "मानसिक प्रभाव (Emotional Impact)",
+      "titleHindi": "क्या यह दर्द आपको गुस्सा या चिड़चिड़ा महसूस कराता है?",
+      "titleEnglish": "Does this pain make you feel angry or irritated?",
       "options": [
-        { "hindi": "ठंड या नमी में बढ़ता है, गर्म सेंक से आराम मिलता है", "english": "Worse in cold/rain, relieved by warmth", "value": "cold_worse_heat_relief" },
-        { "hindi": "पैदल चलने या काम करने पर बढ़ता है, आराम से घटता है", "english": "Worse with exertion, relieved by rest", "value": "exertion_worse_rest_relief" },
-        { "hindi": "लगातार बना रहता है, आराम करने पर भी आराम नहीं मिलता", "english": "Constant pain, persistent even at rest", "value": "constant_no_relief" },
-        { "hindi": "सुबह उठने पर बहुत जकड़न होती है, हल्का चलने पर खुलती है", "english": "Worst in morning, eases with gentle movement", "value": "morning_stiff_eases_movement" }
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
       ]
     },
     {
       "id": "jp-05",
-      "key": "associated",
-      "category": "गतिशीलता व संबद्ध लक्षण (Mobility & Associated Symptoms)",
-      "titleHindi": "क्या जोड़ों में सूजन, चलने में भारी असमर्थता या बुखार महसूस होता है?",
-      "titleEnglish": "Do you experience joint swelling, difficulty walking, or fever?",
+      "key": "worse_movement",
+      "category": "बढ़ाने वाले कारक (Aggravating Factors)",
+      "titleHindi": "चलने-फिरने से दर्द बढ़ जाता है?",
+      "titleEnglish": "Does the pain get worse when you walk or move?",
       "options": [
-        { "hindi": "हाँ, जोड़ों में सूजन व चलने में भारी असमर्थता", "english": "Joint swelling and severe difficulty walking", "value": "swelling_mobility_loss" },
-        { "hindi": "चलने पर जोड़ों से कट-कट की आवाज (Crepitus) आना", "english": "Cracking or popping sound in joints while walking", "value": "crepitus_cracking" },
-        { "hindi": "जोड़ों के दर्द के साथ हल्का बुखार या भारी थकान", "english": "Mild fever or generalized fatigue with pain", "value": "fever_fatigue" },
-        { "hindi": "केवल दर्द है, कोई सूजन या बुखार नहीं", "english": "Pain only, no swelling or fever", "value": "pain_only" }
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "jp-06",
+      "key": "relief_factors",
+      "category": "राहत देने वाले कारक (Relieving Factors)",
+      "titleHindi": "आराम करने या सिकाई करने से आराम मिलता है?",
+      "titleEnglish": "Does resting or applying heat make it feel better?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "jp-07",
+      "key": "swelling",
+      "category": "सूजन (Swelling)",
+      "titleHindi": "जोड़ में सूजन है?",
+      "titleEnglish": "Is the joint swollen?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "jp-08",
+      "key": "mobility_difficulty",
+      "category": "गतिशीलता (Mobility)",
+      "titleHindi": "इस वजह से चलने-फिरने में दिक्कत हो रही है?",
+      "titleEnglish": "Is it hard for you to walk because of this?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "id": "jp-09",
+      "key": "fever_associated",
+      "category": "संबद्ध लक्षण (Associated Fever)",
+      "titleHindi": "इसके साथ बुखार भी है?",
+      "titleEnglish": "Do you have fever along with this pain?",
+      "options": [
+        {
+          "hindi": "हाँ",
+          "english": "Yes",
+          "value": "yes"
+        },
+        {
+          "hindi": "नहीं",
+          "english": "No",
+          "value": "no"
+        }
       ]
     }
   ]

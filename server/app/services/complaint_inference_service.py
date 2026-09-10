@@ -1,7 +1,7 @@
 """
 Complaint Inference Service.
-Analyzes patient chief complaints using Google Gemini 2.5 Flash with structured outputs.
-Matches complaints against registered question sets or generates dynamic general questions.
+Analyzes patient chief complaints using Google Gemini Flash with structured outputs.
+Matches complaints against registered question sets or dynamically generates disease-specific clinical questions.
 Includes 100% offline deterministic keyword matching fallback.
 """
 
@@ -44,11 +44,15 @@ class DynamicQuestion(BaseModel):
 class GeminiInferenceOutput(BaseModel):
     matched: bool = Field(
         ...,
-        description="True if the patient's complaint matches one of the provided question sets, False otherwise."
+        description="True if the patient's complaint matches one of the provided registered question sets, False otherwise."
     )
     matched_set_id: Optional[str] = Field(
         None,
         description="The exact ID of the matching question set if matched=True, else null."
+    )
+    detected_condition: Optional[str] = Field(
+        None,
+        description="Clinical condition or disease name identified from the complaint (e.g., 'माइग्रेन / Migraine', 'तीव्र ज्वर / Acute Fever', 'मधुमेह / Diabetes')."
     )
     confidence: str = Field(
         "high",
@@ -56,11 +60,11 @@ class GeminiInferenceOutput(BaseModel):
     )
     reasoning: str = Field(
         "",
-        description="Brief clinical reasoning for the match decision."
+        description="Brief clinical reasoning for the match or generated exploration questions."
     )
     general_questions: Optional[List[DynamicQuestion]] = Field(
         None,
-        description="Only populated when matched=False. 3-4 general questions in bilingual Hindi/English with touch options."
+        description="Only populated when matched=False. Exactly 6 to 9 targeted, disease-specific diagnostic questions tailored directly to the patient's condition."
     )
 
 
@@ -68,7 +72,7 @@ class ComplaintInferenceResult(BaseModel):
     matched: bool
     matched_set_id: Optional[str]
     matched_set_title: str
-    source: str  # "question_set" | "gemini_general" | "fallback"
+    source: str  # "question_set" | "gemini_dynamic" | "fallback"
     reasoning: Optional[str] = None
     questions: List[DynamicQuestion]
 
@@ -89,8 +93,7 @@ class ComplaintInferenceService:
 
     @property
     def model_name(self) -> str:
-        # Configurable model; defaults to gemini-2.5-flash
-        return os.getenv("GEMINI_MODEL", os.getenv("LLM_MODEL", "gemini-2.5-flash"))
+        return os.getenv("LLM_MODEL", "gemini-2.5-flash")
 
     def _get_client(self) -> Optional[Any]:
         if self._client is not None:
@@ -120,7 +123,6 @@ class ComplaintInferenceService:
         question_sets: Dict[str, Dict[str, Any]] = {}
 
         if not q_dir.exists():
-            # Try fallback search in parent directories
             fallback_dir = Path.cwd() / "server" / "app" / "data" / "question_sets"
             if fallback_dir.exists():
                 q_dir = fallback_dir
@@ -139,115 +141,154 @@ class ComplaintInferenceService:
 
         return question_sets
 
+    def _match_local_set(
+        self,
+        complaint_text: str,
+        question_sets: Dict[str, Dict[str, Any]],
+    ) -> Optional[ComplaintInferenceResult]:
+        """
+        Checks if complaint matches any of the 4 doctor-verified fixed question sets
+        (joint_pain, digestive_acidity, respiratory_cough, skin_dermatology).
+        Returns ComplaintInferenceResult if a strong match is found, else None.
+        """
+        lower_complaint = complaint_text.lower()
+        tokens = set(re.findall(r"\w+", lower_complaint))
+
+        best_match_id = None
+        highest_hits = 0
+
+        for q_id in ["joint_pain", "digestive_acidity", "respiratory_cough", "skin_dermatology"]:
+            q_data = question_sets.get(q_id)
+            if not q_data:
+                continue
+            keywords = q_data.get("keywords", [])
+            hits = 0
+            for kw in keywords:
+                kw_lower = kw.lower()
+                if kw_lower in lower_complaint:
+                    hits += 2
+                elif kw_lower in tokens:
+                    hits += 1
+
+            if hits > highest_hits:
+                highest_hits = hits
+                best_match_id = q_id
+
+        # Require at least 2 points (e.g. keyword match)
+        if best_match_id and highest_hits >= 2:
+            matched_data = question_sets[best_match_id]
+            raw_questions = matched_data.get("questions", [])
+            logger.info("Complaint locally matched fixed set '%s' (%d hits) - 0ms API latency", best_match_id, highest_hits)
+            return ComplaintInferenceResult(
+                matched=True,
+                matched_set_id=best_match_id,
+                matched_set_title=matched_data.get("title", best_match_id),
+                source="question_set",
+                reasoning=f"Matched doctor-verified fixed set {best_match_id}.",
+                questions=[DynamicQuestion(**q) for q in raw_questions],
+            )
+        return None
+
     def infer_complaint(
         self,
         complaint_text: str,
         language: str = "hi",
     ) -> ComplaintInferenceResult:
         """
-        Uses Gemini to analyze patient complaint:
-        1. Compares complaint against all loaded question sets.
-        2. If matched: selects that question set and loads its questions.
-        3. If not matched: uses Gemini to generate bilingual general health questions.
-        4. If Gemini is unavailable or errors out: uses deterministic keyword fallback.
+        Doctor-verified clinical triage routing:
+        1. 4 Fixed Local Sets (No API call): If complaint matches Sets A, B, C, or D,
+           returns the local set instantly with zero API latency and zero quota usage.
+        2. Gemini Dynamic Call (ONLY for unmatched complaints): Calls Gemini to dynamically
+           generate 6 to 9 condition-tailored questions following strict doctor rules.
+        3. Offline Fallback: If Gemini is unavailable, returns Section 6 General Fallback questions.
         """
         question_sets = self.load_all_question_sets()
         clean_complaint = complaint_text.strip()
 
-        # Build summary of available question sets for Gemini context
-        sets_summary = []
-        for q_id, q_data in question_sets.items():
-            sets_summary.append({
-                "id": q_id,
-                "title": q_data.get("title", q_id),
-                "titleHindi": q_data.get("titleHindi", ""),
-                "description": q_data.get("description", ""),
-                "keywords": q_data.get("keywords", []),
-            })
+        # 1. Check the 4 fixed local sets first (Sets A-D)
+        local_match = self._match_local_set(clean_complaint, question_sets)
+        if local_match:
+            return local_match
 
+        # 2. Unmatched complaint: Call Gemini to generate 6-9 condition-specific questions
         client = self._get_client()
 
         if client and clean_complaint and types is not None:
-            try:
-                system_instruction = (
-                    "You are a clinical triage AI assistant for an Indian public healthcare kiosk (AYUSH-Care). "
-                    "The patient has provided their chief health complaint (in Hindi, English, or Hinglish). "
-                    "You are given a list of existing clinical question sets currently registered in the hospital system.\n\n"
-                    "RULES:\n"
-                    "1. Evaluate if the patient's complaint matches one of the registered question sets based on its clinical "
-                    "nature, body systems, symptoms, and keywords.\n"
-                    "2. If it MATCHES a question set:\n"
-                    "   - Set matched = true\n"
-                    "   - Set matched_set_id to the exact ID of that question set\n"
-                    "   - Set reasoning with a concise clinical rationale\n"
-                    "   - Leave general_questions empty or null\n"
-                    "3. If it DOES NOT match any of the registered question sets:\n"
-                    "   - Set matched = false\n"
-                    "   - Set matched_set_id = null\n"
-                    "   - Generate exactly 5 relevant clinical exploration questions in 'general_questions' tailored to elicit the patient's condition thoroughly.\n"
-                    "   - Each general question must have: id ('gen-01' to 'gen-05'), key ('site', 'onset', 'severity', 'timing', 'history'), "
-                    "category, bilingual titleHindi, bilingual titleEnglish, and 3 to 4 touch options with hindi, english, and value.\n"
-                    "   - Ensure the options are easy for a patient to touch-select on a kiosk screen.\n"
-                )
+            system_instruction = (
+                "You are an expert senior physician and clinical triage specialist for an Indian hospital kiosk (AYUSH-Care). "
+                "The patient has provided a chief complaint that does not match the 4 standard local question sets (Joint Pain, Digestion, Respiratory, Skin).\n\n"
+                "YOUR TASK:\n"
+                "Generate 6 to 9 TARGETED, CONDITION-SPECIFIC DIAGNOSTIC QUESTIONS in 'general_questions'.\n"
+                "Identify the condition in 'detected_condition'. Set matched = false, matched_set_id = null.\n\n"
+                "CRITICAL CLINICAL RULES FOR GENERATED QUESTIONS (VERIFIED BY SENIOR PHYSICIANS):\n"
+                "1. NEVER ask the patient to rate pain, discomfort, or severity on a numeric scale of 1 to 10 or face scale.\n"
+                "   If assessing emotional impact or irritability, ask whether the discomfort makes them feel angry or irritated:\n"
+                "   'Does this discomfort make you feel angry or irritated?' / 'क्या यह तकलीफ आपको गुस्सा या चिड़चिड़ा महसूस कराती है?' with options 'हाँ / Yes' and 'नहीं / No'.\n"
+                "2. DURATION FORMAT: When asking how long this has been going on, options MUST strictly be:\n"
+                "   - 'Today' / 'आज से'\n"
+                "   - 'A few days ago' / 'कुछ दिन पहले से'\n"
+                "   - 'A few weeks ago' / 'कुछ हफ्ते पहले से'\n"
+                "   - 'Longer than a month ago' / 'एक महीने से भी ज़्यादा समय से'\n"
+                "3. GRADED WEIGHT LOSS: If asking about involuntary weight loss, options MUST strictly be:\n"
+                "   - 'No' / 'नहीं'\n"
+                "   - 'Yes — about 3 kg in the last 6 months' / 'हाँ — पिछले 6 महीने में लगभग 3 किलो'\n"
+                "   - 'Yes — about 6 kg in the last 12 months' / 'हाँ — पिछले 12 महीने में लगभग 6 किलो'\n"
+                "4. SPOKEN NATURAL HINDI: Hindi must be phrased naturally as a caring doctor speaks to a patient in an Indian OPD, in clean Devanagari script, alongside English.\n"
+                "5. Touch options must be closed-choice (Yes/No or 3-4 clear options) easy to tap on a touchscreen kiosk.\n"
+            )
 
-                prompt = (
-                    f"PATIENT CHIEF COMPLAINT:\n\"{clean_complaint}\"\n\n"
-                    f"REGISTERED QUESTION SETS:\n{json.dumps(sets_summary, ensure_ascii=False, indent=2)}\n\n"
-                    f"Selected Language Code: {language}\n"
-                    "Analyze the complaint against the registered question sets and return structured inference."
-                )
+            prompt = (
+                f"PATIENT CHIEF COMPLAINT:\n\"{clean_complaint}\"\n\n"
+                f"Selected Language Code: {language}\n"
+                "Generate 6 to 9 condition-tailored diagnostic questions for this patient complaint."
+            )
 
-                config = types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                    response_mime_type="application/json",
-                    response_schema=GeminiInferenceOutput,
-                    temperature=0.1,
-                )
+            config = types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                response_mime_type="application/json",
+                response_schema=GeminiInferenceOutput,
+                temperature=0.1,
+            )
 
-                logger.info("Calling Gemini model %s to infer complaint and select question set", self.model_name)
-                response = client.models.generate_content(
-                    model=self.model_name,
-                    contents=[prompt],
-                    config=config,
-                )
+            # Modern Gemini model fallback list
+            models_to_try = [
+                self.model_name,
+                "gemini-3.6-flash",
+                "gemini-2.5-flash-lite",
+                "gemini-flash-latest",
+            ]
 
-                raw_text = clean_json_markdown(response.text or "{}")
-                parsed_output = GeminiInferenceOutput.model_validate_json(raw_text)
-
-                # Case 1: Matched existing question set
-                if parsed_output.matched and parsed_output.matched_set_id and parsed_output.matched_set_id in question_sets:
-                    matched_id = parsed_output.matched_set_id
-                    matched_data = question_sets[matched_id]
-                    raw_questions = matched_data.get("questions", [])
-
-                    formatted_questions = [
-                        DynamicQuestion(**q) for q in raw_questions
-                    ]
-
-                    logger.info("Gemini matched complaint to question set '%s' (%d questions)", matched_id, len(formatted_questions))
-                    return ComplaintInferenceResult(
-                        matched=True,
-                        matched_set_id=matched_id,
-                        matched_set_title=matched_data.get("title", matched_id),
-                        source="question_set",
-                        reasoning=parsed_output.reasoning,
-                        questions=formatted_questions,
+            last_gemini_error = None
+            for candidate_model in models_to_try:
+                try:
+                    logger.info("Calling Gemini model %s to generate questions for unmatched complaint", candidate_model)
+                    response = client.models.generate_content(
+                        model=candidate_model,
+                        contents=[prompt],
+                        config=config,
                     )
 
-                # Case 2: No match -> Gemini generated general information questions
-                elif not parsed_output.matched and parsed_output.general_questions:
-                    logger.info("Gemini found no matching question set. Returning %d general questions", len(parsed_output.general_questions))
-                    return ComplaintInferenceResult(
-                        matched=False,
-                        matched_set_id=None,
-                        matched_set_title="General Health Assessment",
-                        source="gemini_general",
-                        reasoning=parsed_output.reasoning,
-                        questions=parsed_output.general_questions,
-                    )
+                    raw_text = clean_json_markdown(response.text or "{}")
+                    parsed_output = GeminiInferenceOutput.model_validate_json(raw_text)
 
-            except Exception as exc:
-                logger.warning("Error during Gemini complaint inference: %s. Using local deterministic fallback.", exc)
+                    if parsed_output.general_questions and len(parsed_output.general_questions) >= 3:
+                        condition_title = parsed_output.detected_condition or "लक्षण अन्वेषण / Clinical Exploration"
+                        logger.info("Gemini generated %d condition-specific questions for '%s'", len(parsed_output.general_questions), condition_title)
+                        return ComplaintInferenceResult(
+                            matched=False,
+                            matched_set_id=None,
+                            matched_set_title=condition_title,
+                            source="gemini_dynamic",
+                            reasoning=parsed_output.reasoning,
+                            questions=parsed_output.general_questions,
+                        )
+
+                except Exception as exc:
+                    last_gemini_error = exc
+                    logger.warning("Gemini model %s failed during complaint inference: %s", candidate_model, exc)
+                    continue
+
+            logger.warning("All Gemini models failed for complaint inference (last error: %s). Using local deterministic fallback.", last_gemini_error)
 
         # Fallback if Gemini failed, not installed, or unconfigured
         return self._local_fallback_inference(clean_complaint, question_sets)
@@ -259,7 +300,7 @@ class ComplaintInferenceService:
     ) -> ComplaintInferenceResult:
         """
         Deterministic local keyword matching fallback if Gemini is offline.
-        Checks both English and Hindi keywords using phrase and token matching.
+        Checks both English and Hindi keywords across registered question sets.
         """
         lower_complaint = complaint_text.lower()
         tokens = set(re.findall(r"\w+", lower_complaint))
@@ -272,10 +313,8 @@ class ComplaintInferenceService:
             hits = 0
             for kw in keywords:
                 kw_lower = kw.lower()
-                # Direct phrase match gives 2 points
                 if kw_lower in lower_complaint:
                     hits += 2
-                # Single token match gives 1 point
                 elif kw_lower in tokens:
                     hits += 1
 
@@ -295,70 +334,69 @@ class ComplaintInferenceService:
                 questions=[DynamicQuestion(**q) for q in raw_questions],
             )
 
-        # Default general health questions fallback with clean UTF-8 Devanagari Hindi
+        # Doctor-verified Section 6 General Fallback SOCRATES questions
         default_general_questions = [
             DynamicQuestion(
                 id="gen-01",
                 key="site",
                 category="स्थान (Location)",
-                titleHindi="यह तकलीफ शरीर के किस हिस्से में सबसे ज्यादा महसूस हो रही है?",
-                titleEnglish="Where in your body is this discomfort primarily located?",
+                titleHindi="तकलीफ शरीर में कहाँ है?",
+                titleEnglish="Where in your body is the discomfort?",
                 options=[
-                    QuestionOption(hindi="सिर या गर्दन (Head / Neck)", english="Head or Neck", value="head_neck"),
-                    QuestionOption(hindi="छाती या सांस नली (Chest / Breathing)", english="Chest or Breathing passage", value="chest"),
-                    QuestionOption(hindi="पेट या पाचन तंत्र (Abdomen / Digestion)", english="Abdomen / Digestive area", value="abdomen"),
-                    QuestionOption(hindi="हाथ-पैर या पूरे शरीर में (Limbs / Body)", english="Limbs or General body", value="limbs_body"),
+                    QuestionOption(hindi="सिर या गर्दन", english="Head or Neck", value="head_neck"),
+                    QuestionOption(hindi="छाती या सांस नली", english="Chest or Breathing", value="chest_breathing"),
+                    QuestionOption(hindi="पेट या पाचन तंत्र", english="Abdomen or Digestion", value="abdomen"),
+                    QuestionOption(hindi="हाथ, पैर या जोड़", english="Limbs or Joints", value="limbs_joints"),
+                    QuestionOption(hindi="पूरे शरीर में", english="All over the body", value="whole_body"),
                 ]
             ),
             DynamicQuestion(
                 id="gen-02",
                 key="onset",
                 category="अवधि (Duration)",
-                titleHindi="यह स्वास्थ्य समस्या कितने समय से चल रही है?",
-                titleEnglish="How long have you had this health concern?",
+                titleHindi="यह आज से शुरू हुई, कुछ दिन पहले से, कुछ हफ्ते पहले से, या एक महीने से भी ज़्यादा समय से है?",
+                titleEnglish="Did this start today, a few days ago, a few weeks ago, or longer than a month ago?",
                 options=[
-                    QuestionOption(hindi="हाल ही में (पिछले 1 से 3 दिन से)", english="Recent (1-3 days)", value="acute_days"),
-                    QuestionOption(hindi="1 से 4 सप्ताह से", english="1 to 4 weeks", value="subacute_weeks"),
-                    QuestionOption(hindi="1 से 6 महीने से", english="1 to 6 months", value="chronic_months"),
-                    QuestionOption(hindi="सालों से पुरानी समस्या है", english="Long standing / Years", value="chronic_years"),
+                    QuestionOption(hindi="आज से", english="Today", value="today"),
+                    QuestionOption(hindi="कुछ दिन पहले से", english="A few days ago", value="few_days_ago"),
+                    QuestionOption(hindi="कुछ हफ्ते पहले से", english="A few weeks ago", value="few_weeks_ago"),
+                    QuestionOption(hindi="एक महीने से भी ज़्यादा समय से", english="Longer than a month ago", value="longer_than_month"),
                 ]
             ),
             DynamicQuestion(
                 id="gen-03",
-                key="severity",
-                category="तीव्रता (Discomfort Level)",
-                titleHindi="इस परेशानी से आपकी दैनिक दिनचर्या कितनी प्रभावित हो रही है?",
-                titleEnglish="How much does this trouble affect your daily routine?",
+                key="anger_irritation",
+                category="मानसिक प्रभाव (Emotional Impact)",
+                titleHindi="क्या यह तकलीफ आपको गुस्सा या चिड़चिड़ा महसूस कराती है?",
+                titleEnglish="Does this discomfort make you feel angry or irritated?",
                 options=[
-                    QuestionOption(hindi="हल्की तकलीफ - रोजमर्रा के काम में रुकावट नहीं", english="Mild - Routine unaffected", value="mild"),
-                    QuestionOption(hindi="मध्यम तकलीफ - काम करने में परेशानी होती है", english="Moderate - Somewhat hinders tasks", value="moderate"),
-                    QuestionOption(hindi="गंभीर तकलीफ - बिस्तर पर आराम जरूरी है", english="Severe - Requires rest / Hard to function", value="severe"),
+                    QuestionOption(hindi="हाँ", english="Yes", value="yes"),
+                    QuestionOption(hindi="नहीं", english="No", value="no"),
                 ]
             ),
             DynamicQuestion(
                 id="gen-04",
-                key="timing",
-                category="समय व कारण (Timing & Triggers)",
-                titleHindi="यह तकलीफ किस समय या किस स्थिति में ज्यादा बढ़ जाती है?",
-                titleEnglish="When or under what situation does this trouble worsen?",
+                key="triggers",
+                category="बढ़ाने वाले कारक (Aggravating Factors)",
+                titleHindi="यह रात में ज़्यादा होता है, खाने के बाद ज़्यादा होता है, या हिलने-डुलने से ज़्यादा होता है?",
+                titleEnglish="Is it worse at night, worse after eating, or worse with movement?",
                 options=[
-                    QuestionOption(hindi="सुबह उठने पर या ठंड के मौसम में", english="Morning time or in cold weather", value="morning_cold"),
-                    QuestionOption(hindi="खाना खाने के बाद या खाली पेट", english="After meals or on an empty stomach", value="meals_empty"),
-                    QuestionOption(hindi="शारीरिक श्रम, चलने या काम करने पर", english="During physical work, walking or exertion", value="exertion"),
-                    QuestionOption(hindi="दिनभर लगातार एक जैसी बनी रहती है", english="Constant throughout the whole day", value="constant"),
+                    QuestionOption(hindi="रात में ज़्यादा", english="Worse at night", value="night_worse"),
+                    QuestionOption(hindi="खाने के बाद ज़्यादा", english="Worse after eating", value="after_eating_worse"),
+                    QuestionOption(hindi="हिलने-डुलने से ज़्यादा", english="Worse with movement", value="movement_worse"),
+                    QuestionOption(hindi="दिनभर एक जैसा", english="Constant throughout day", value="constant"),
                 ]
             ),
             DynamicQuestion(
                 id="gen-05",
-                key="history",
-                category="पूर्व इतिहास (Prior Medical History)",
-                titleHindi="क्या आपको पहले से कोई पुरानी बीमारी या नियमित दवा चल रही है?",
-                titleEnglish="Do you have any existing chronic condition or ongoing medications?",
+                key="family_history",
+                category="पारिवारिक इतिहास (Family History)",
+                titleHindi="परिवार में किसी को ऐसी ही तकलीफ रही है — जैसे बीपी, शुगर, दिल की बीमारी, या ऐसी ही जोड़ों, पेट, या त्वचा की तकलीफ?",
+                titleEnglish="Has anyone in your family had similar problems — like BP, sugar, heart problems, or similar joint/stomach/skin trouble?",
                 options=[
-                    QuestionOption(hindi="हाँ, शुगर (Diabetes) या बीपी (Blood Pressure)", english="Yes, Diabetes or Hypertension", value="htn_dm"),
-                    QuestionOption(hindi="हाँ, अन्य कोई पुरानी बीमारी है", english="Yes, other chronic condition", value="other_chronic"),
-                    QuestionOption(hindi="नहीं, कोई पुरानी बीमारी नहीं है", english="No existing conditions", value="none"),
-                    QuestionOption(hindi="मुझे निश्चित जानकारी नहीं है", english="Not sure / Don't know", value="unsure"),
+                    QuestionOption(hindi="हाँ, परिवार में है", english="Yes, family history present", value="yes_family"),
+                    QuestionOption(hindi="नहीं, किसी को नहीं", english="No, no family history", value="no_family"),
+                    QuestionOption(hindi="निश्चित जानकारी नहीं", english="Not sure / Don't know", value="unsure"),
                 ]
             ),
         ]

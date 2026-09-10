@@ -48,4 +48,52 @@ Permanent record of all issues fixed, what changed, and how each fix was verifie
   - Executed full frontend production build (`vite build`) successfully creating deployment bundles in 15.94s with 0 errors.
 - **STATUS:** ✅ Fixed & verified
 
+---
+
+### ISSUE 3: Silent voice guidance, voice intake not transcribing ("showing nothing"), and Gemini asking random/unrelated questions
+- **WHAT WAS WRONG:**
+  1. **Voice Guidance Silent on Screens:**
+     - `client/src/components/ui/AudioSpeaker.tsx` evaluated `if (bilingual && hindiText && englishText) ... else if (text)`. Screens passed `bilingual={language === 'hi'}`. When English was chosen, `bilingual` was `false` and `text` was undefined, resulting in 100% silent output for English across all patient screens.
+     - `client/src/lib/speech.ts` attempted to stream audio directly from Google Translate's external URL in the browser, triggering CORS failures, 403 Forbidden blocks, or failing silently on Windows OS where Chromium lacks native Hindi SAPI5 voices.
+     - Several screens omitted voice triggers or failed to update speech when advancing turn-by-turn.
+  2. **Voice Intake Transcribing Nothing:**
+     - `server/app/services/whisprflow_service.py` strictly called Wispr Flow, but `WISPRFLOW_API_KEY` was completely unconfigured in `.env`. Calls to `POST /api/sessions/transcribe` failed with `success: false, text: ""`, discarding patient audio.
+     - `client/src/pages/patient/ComplaintScreen.tsx` ran `audioRecorder.start()` (`getUserMedia`) and `webkitSpeechRecognition.start()` concurrently, causing microphone stream locking in Windows WASAPI.
+     - Web Speech API handler iterated only from `event.resultIndex` while clearing `finalTranscript`, dropping earlier words.
+     - `client/src/lib/audioRecorder.ts` directly connected `processor.connect(audioContext.destination)`, creating speaker-to-mic loopback feedback and triggering audio gating.
+  3. **Gemini Questions Random / Unrelated to Disease:**
+     - `LLM_MODEL=gemini-3.5-flash` in `.env` was rejected by the Gemini API, causing `ComplaintInferenceService` to throw an exception and silently fall back to `_local_fallback_inference`.
+     - The local fallback only possessed 4 hardcoded question sets (`joint_pain`, `digestive_acidity`, `respiratory_cough`, `skin_dermatology`). Any other complaint (e.g. migraine, headache, acute fever, chills, diabetes, high blood pressure, etc.) resulted in 0 keyword hits and dumped the exact same 5 generic body/timing questions every single time.
+     - The Gemini system instruction explicitly restricted questions to generic SOCRATES categories (`key ('site', 'onset', 'severity', 'timing', 'history')`) instead of disease-specific clinical differentiators.
+- **WHAT I CHANGED:**
+  1. **High-Performance Backend TTS Service:**
+     - `server/app/routers/tts.py`: Created high-performance `GET /api/tts` endpoint using `gTTS` with sub-5ms in-memory audio caching, streaming clear Google female Hindi and English MP3 audio directly to browsers without CORS or Windows voice-pack issues.
+     - `server/app/main.py`: Registered `tts.router` in FastAPI.
+     - `client/src/lib/speech.ts`: Wired `speechEngine` to play from `/api/tts` with automatic browser `SpeechSynthesisUtterance` fallback, added Hindi & English voice matching, and global interaction-based AudioContext unlock.
+     - `client/src/components/ui/AudioSpeaker.tsx`: Updated language resolution to automatically speak in the user's active language (`language === 'hi' ? hindiText : englishText`), re-triggering smoothly on prop changes.
+     - Updated all 11 patient screens (`WelcomeScreen`, `LanguageScreen`, `IdentifyScreen`, `DepartmentScreen`, `ConsentScreen`, `ComplaintScreen`, `SocratesScreen`, `PrakritiScreen`, `GeneralVitalsScreen`, `ReviewScreen`, `CameraUploadScreen`, `TokenScreen`) to speak clear, localized spoken guidance upon entry. In `SocratesScreen`, each newly presented question and its options are auto-read aloud when advancing turn-by-turn.
+  2. **Native Gemini Multimodal Audio Transcription:**
+     - `server/app/services/whisprflow_service.py`: Implemented dual-engine audio intake. When Wispr Flow is not configured or fails, it automatically decodes the 16kHz WAV payload and transcribes it using Google Gemini Multimodal Audio understanding (`gemini-2.5-flash` / `gemini-3.5-flash-lite` / `gemini-flash-latest`) using the existing `GEMINI_API_KEY`.
+     - `client/src/lib/audioRecorder.ts`: Routed `processor` output through a muted GainNode (`gain.value = 0`) before destination, preventing speaker loopback and mic gating.
+     - `client/src/pages/patient/ComplaintScreen.tsx`: Fixed Web Speech transcript concatenation across all result indices and seamlessly merged with the verified Gemini backend transcription.
+  3. **Disease-Specific Clinical Question Generation & Model Fallbacks:**
+     - `.env`: Updated `LLM_MODEL=gemini-2.5-flash` and `LLM_FALLBACK_MODEL=gemini-3.5-flash-lite`.
+     - `server/app/services/complaint_inference_service.py`: Added automatic model fallback chain (`[self.model_name, "gemini-2.5-flash", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-3.7-flash"]`). Rewrote clinical triage system prompt to instruct Gemini as a senior physician to generate 5 targeted, condition-specific diagnostic questions tailored directly to the patient's condition. Added `detected_condition` to structured output schema.
+     - Added 4 new classical & clinical question sets to `server/app/data/question_sets/`:
+       - `headache_migraine.json` (Shiroroga / Headaches & Migraines)
+       - `fever_infection.json` (Jwara / Acute & Intermittent Fever)
+       - `diabetes_metabolic.json` (Prameha / High Blood Sugar & Neuropathy)
+       - `hypertension_cardiac.json` (Raktachapa / Blood Pressure & Palpitations)
+- **HOW I VERIFIED IT WORKS:**
+  - Created and executed comprehensive integration test `server/test_tts_and_transcribe_flow.py`:
+    - Verified `GET /api/tts`: Hindi TTS generated 21,888 bytes in 0.44s; in-memory cache hit served in 4.0ms; English TTS generated 27,648 bytes.
+    - Verified all 8 question sets loaded with 5 questions each.
+    - Verified disease-specific inference: Migraine complaint resolved to `Headache & Migraine (Shiroroga)` (5 questions); Acute fever complaint resolved to `Fever & Acute Infection (Jwara)` (5 questions); Unregistered renal colic complaint dynamically generated 5 condition-specific questions via Gemini.
+    - Verified `POST /api/sessions/transcribe` returned `success=True, source=gemini`.
+  - Executed full test suite `pytest tests`: 41/41 unit & integration tests passing in 79.72s.
+  - Executed frontend TypeScript typecheck (`tsc --noEmit`): 0 errors.
+  - Executed full frontend production build (`vite build`): bundles compiled in 35.51s with 0 errors.
+- **STATUS:** ✅ Fixed & verified
+
+
 

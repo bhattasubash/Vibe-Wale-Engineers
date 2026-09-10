@@ -189,7 +189,6 @@ export const TokenScreen: React.FC = () => {
           <AudioSpeaker
             hindiText={promptHindi}
             englishText={promptEnglish}
-            bilingual={language === 'hi'}
             autoPlay={true}
           />
         </div>

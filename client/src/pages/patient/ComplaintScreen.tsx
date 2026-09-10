@@ -208,8 +208,14 @@ export const ComplaintScreen: React.FC = () => {
               if (res.ok) {
                 const data = await res.json();
                 if (data.success && data.text && data.text.trim()) {
-                  setInputText((prev) => (prev ? `${prev}, ${data.text.trim()}` : data.text.trim()));
-                  checkRedFlags(data.text.trim());
+                  const verifiedText = data.text.trim();
+                  setInputText(verifiedText);
+                  checkRedFlags(verifiedText);
+                  setTranscriptionNotice(
+                    language === 'hi'
+                      ? `सत्यापित आवाज़: "${verifiedText}"`
+                      : `Transcribed: "${verifiedText}"`
+                  );
                 }
               }
             } catch (apiErr) {
@@ -220,7 +226,6 @@ export const ComplaintScreen: React.FC = () => {
           console.warn('Audio recorder stop error:', err);
         } finally {
           setIsTranscribing(false);
-          setTranscriptionNotice(null);
         }
       }
       return;
@@ -259,28 +264,25 @@ export const ComplaintScreen: React.FC = () => {
         };
 
         recognition.onresult = (event: any) => {
-          let interimTranscript = '';
-          let finalTranscript = '';
-
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-              finalTranscript += event.results[i][0].transcript;
-            } else {
-              interimTranscript += event.results[i][0].transcript;
-            }
+          let accumulated = '';
+          for (let i = 0; i < event.results.length; ++i) {
+            accumulated += event.results[i][0].transcript;
           }
 
-          const currentText = finalTranscript || interimTranscript;
-          if (currentText.trim()) {
-            setInputText(currentText);
-            checkRedFlags(currentText);
+          if (accumulated.trim()) {
+            setInputText(accumulated.trim());
+            checkRedFlags(accumulated.trim());
           }
         };
 
         recognition.onerror = (event: any) => {
           console.warn('SpeechRecognition warning:', event.error);
           if (event.error === 'not-allowed') {
-            setMicError('माइक अनुमति अस्वीकृत है। कृपया सेटिंग्स में अनुमति दें।');
+            setMicError(
+              language === 'hi'
+                ? 'माइक अनुमति अस्वीकृत है। कृपया सेटिंग्स में अनुमति दें।'
+                : 'Microphone permission denied. Please allow mic in browser settings.'
+            );
             setIsRecording(false);
           }
         };

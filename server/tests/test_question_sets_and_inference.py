@@ -28,14 +28,34 @@ def test_question_sets_loaded():
     assert "respiratory_cough" in sets
     assert "skin_dermatology" in sets
 
-    # Verify joint_pain schema
+    # Verify joint_pain (Set A: 9 questions, anger/irritation at Q4, no 1-10 pain scale)
     jp = sets["joint_pain"]
     assert jp["id"] == "joint_pain"
     assert "title" in jp
     assert "questions" in jp
-    assert len(jp["questions"]) == 5
-    assert "options" in jp["questions"][0]
-    assert len(jp["questions"][0]["options"]) >= 3
+    assert len(jp["questions"]) == 9
+    assert jp["questions"][3]["key"] == "anger_irritation"
+    assert "गुस्सा या चिड़चिड़ा" in jp["questions"][3]["titleHindi"]
+
+    # Verify digestive_acidity (Set B: 9 questions, graded weight loss at Q9)
+    da = sets["digestive_acidity"]
+    assert len(da["questions"]) == 9
+    assert da["questions"][8]["key"] == "weight_loss"
+    da_opt_vals = [opt["value"] for opt in da["questions"][8]["options"]]
+    assert "yes_3kg_6mo" in da_opt_vals
+    assert "yes_6kg_12mo" in da_opt_vals
+
+    # Verify respiratory_cough (Set C: 10 questions, graded weight loss at Q8)
+    rc = sets["respiratory_cough"]
+    assert len(rc["questions"]) == 10
+    assert rc["questions"][7]["key"] == "weight_loss"
+    rc_opt_vals = [opt["value"] for opt in rc["questions"][7]["options"]]
+    assert "yes_3kg_6mo" in rc_opt_vals
+    assert "yes_6kg_12mo" in rc_opt_vals
+
+    # Verify skin_dermatology (Set D: 7 questions)
+    sd = sets["skin_dermatology"]
+    assert len(sd["questions"]) == 7
 
 
 def test_infer_complaint_matching_joint_pain():

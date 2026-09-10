@@ -1,22 +1,21 @@
 /**
  * Universal Speech & Audio Engine for AYUSH-Care Kiosk
  * 
- * Explaining Windows TTS vs Browser TTS:
- * On Windows OS, Chromium's Web Speech API directly uses Windows SAPI5 (Microsoft David Desktop - Male).
- * Because standard Windows does NOT install the Hindi voice pack, Windows SAPI5 cannot pronounce Devanagari Hindi
- * and only speaks English with the Windows male voice.
- * 
- * The Universal Solution:
- * We use the high-clarity Google Female Hindi Audio Stream for Hindi playback.
- * 1. Step 1: Plays authentic, clear Female Hindi Audio stream (Works on 100% of Windows Chrome/Brave/Edge).
- * 2. Step 2: Once Hindi speech ends -> Plays English speech.
+ * Provides 100% reliable voice playback in Hindi and English:
+ * 1. Primary: High-fidelity Server-side TTS stream via /api/tts (gTTS cached MP3).
+ *    Works on all browsers, bypasses CORS, zero missing-voice issues on Windows.
+ * 2. Secondary Fallback: Browser Web Speech Synthesis with dedicated Hindi/English voice matching.
+ * 3. Automatic Autoplay unlock on first user tap/key.
  */
+
+import { API_BASE_URL } from '@/lib/config';
 
 class SpeechEngine {
   private synth: SpeechSynthesis | null = null;
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private currentAudio: HTMLAudioElement | null = null;
   private voices: SpeechSynthesisVoice[] = [];
+  private isUnlocked: boolean = false;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -29,6 +28,22 @@ class SpeechEngine {
           };
         }
       }
+
+      // Automatically unlock audio on first interaction
+      const unlockHandler = () => {
+        this.unlockAudio();
+        window.removeEventListener('pointerdown', unlockHandler);
+        window.removeEventListener('keydown', unlockHandler);
+      };
+      window.addEventListener('pointerdown', unlockHandler, { passive: true });
+      window.addEventListener('keydown', unlockHandler, { passive: true });
+    }
+  }
+
+  public unlockAudio() {
+    this.isUnlocked = true;
+    if (this.synth && this.synth.paused) {
+      this.synth.resume();
     }
   }
 
@@ -41,27 +56,54 @@ class SpeechEngine {
     return this.voices;
   }
 
+  public getHindiVoice(): SpeechSynthesisVoice | undefined {
+    const vList = this.voices.length > 0 ? this.voices : (this.synth?.getVoices() || []);
+    return (
+      vList.find((v) => v.lang === 'hi-IN' || v.lang === 'hi_IN' || v.lang.startsWith('hi')) ||
+      vList.find(
+        (v) =>
+          v.name.toLowerCase().includes('hindi') ||
+          v.name.toLowerCase().includes('swara') ||
+          v.name.toLowerCase().includes('kalpana') ||
+          v.name.toLowerCase().includes('madhur') ||
+          v.name.toLowerCase().includes('hemant')
+      )
+    );
+  }
+
   public getEnglishVoice(): SpeechSynthesisVoice | undefined {
     const vList = this.voices.length > 0 ? this.voices : (this.synth?.getVoices() || []);
     return (
-      vList.find(v => v.lang === 'en-IN' || v.lang === 'en_IN') ||
-      vList.find(v => v.name.toLowerCase().includes('india') || v.name.toLowerCase().includes('heera') || v.name.toLowerCase().includes('neerja')) ||
-      vList.find(v => v.lang === 'en-GB') ||
-      vList.find(v => v.lang === 'en-US') ||
-      vList.find(v => v.lang.startsWith('en'))
+      vList.find((v) => v.lang === 'en-IN' || v.lang === 'en_IN') ||
+      vList.find(
+        (v) =>
+          v.name.toLowerCase().includes('india') ||
+          v.name.toLowerCase().includes('heera') ||
+          v.name.toLowerCase().includes('neerja')
+      ) ||
+      vList.find((v) => v.lang === 'en-GB') ||
+      vList.find((v) => v.lang === 'en-US') ||
+      vList.find((v) => v.lang.startsWith('en'))
     );
   }
 
   /**
-   * Play high-quality Female Hindi Audio Stream directly.
+   * Play speech using the backend TTS endpoint (/api/tts), falling back to native SpeechSynthesis.
    */
-  public playHindiAudio(text: string, onEnd?: () => void) {
+  public playAudioStream(text: string, lang: string = 'hi', onEnd?: () => void) {
     this.stop();
 
+    const cleanText = text.trim();
+    if (!cleanText) {
+      if (onEnd) onEnd();
+      return;
+    }
+
+    const cleanLang = lang.startsWith('hi') ? 'hi' : 'en';
+
     try {
-      const cleanText = text.trim();
       const encoded = encodeURIComponent(cleanText);
-      const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=hi&client=tw-ob&q=${encoded}`;
+      const audioUrl = `${API_BASE_URL}/api/tts?lang=${cleanLang}&text=${encoded}`;
 
       const audio = new Audio(audioUrl);
       this.currentAudio = audio;
@@ -72,28 +114,28 @@ class SpeechEngine {
       };
 
       audio.onerror = (e) => {
-        console.warn('Hindi audio stream error, falling back to synth:', e);
+        console.warn('Backend TTS stream failed, using native synth fallback:', e);
         this.currentAudio = null;
-        this.speakNativeSynth(text, 'hi', onEnd);
+        this.speakNativeSynth(cleanText, cleanLang as 'hi' | 'en', onEnd);
       };
 
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
-          console.warn('Autoplay prevented, fallback to synth:', err);
-          this.speakNativeSynth(text, 'hi', onEnd);
+          console.warn('Audio play prevented (Autoplay), attempting native synth fallback:', err);
+          this.speakNativeSynth(cleanText, cleanLang as 'hi' | 'en', onEnd);
         });
       }
     } catch (err) {
-      console.warn('Audio stream error:', err);
-      this.speakNativeSynth(text, 'hi', onEnd);
+      console.warn('Audio initialization error:', err);
+      this.speakNativeSynth(cleanText, cleanLang as 'hi' | 'en', onEnd);
     }
   }
 
   /**
    * Native Speech Synthesis Fallback.
    */
-  private speakNativeSynth(text: string, lang: 'hi' | 'en', onEnd?: () => void) {
+  public speakNativeSynth(text: string, lang: 'hi' | 'en', onEnd?: () => void) {
     if (!this.synth) {
       if (onEnd) onEnd();
       return;
@@ -105,13 +147,18 @@ class SpeechEngine {
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
-    utterance.rate = 0.88;
+    utterance.rate = 0.90;
     utterance.pitch = 1.0;
 
-    if (lang === 'en') {
-      const voice = this.getEnglishVoice();
-      if (voice) {
-        utterance.voice = voice;
+    if (lang === 'hi') {
+      const hVoice = this.getHindiVoice();
+      if (hVoice) {
+        utterance.voice = hVoice;
+      }
+    } else {
+      const eVoice = this.getEnglishVoice();
+      if (eVoice) {
+        utterance.voice = eVoice;
       }
     }
 
@@ -137,20 +184,15 @@ class SpeechEngine {
   }
 
   /**
-   * Speak single utterance: If Hindi -> uses Female Hindi Audio stream; If English -> uses English voice.
+   * Speak single utterance in specified language ('hi' or 'en').
    */
   public speak(text: string, lang: string = 'hi', onEnd?: () => void) {
     this.stop();
-
-    if (lang === 'hi') {
-      this.playHindiAudio(text, onEnd);
-    } else {
-      this.speakNativeSynth(text, 'en', onEnd);
-    }
+    this.playAudioStream(text, lang, onEnd);
   }
 
   /**
-   * Sequential Bilingual Speech: Plays Female Hindi Audio FIRST -> then English Audio SECOND.
+   * Sequential Bilingual Speech: Plays Hindi first, then English second.
    */
   public speakBilingual(
     hindiText: string,
@@ -159,12 +201,12 @@ class SpeechEngine {
   ) {
     this.stop();
 
-    // Step 1: Play Female Hindi Audio Stream FIRST
-    this.playHindiAudio(hindiText, () => {
-      // Step 2: Once Hindi finishes -> Play English voice SECOND
+    // Step 1: Hindi voice prompt
+    this.playAudioStream(hindiText, 'hi', () => {
+      // Step 2: Once Hindi finishes -> English voice prompt
       setTimeout(() => {
-        this.speakNativeSynth(englishText, 'en', onEnd);
-      }, 200);
+        this.playAudioStream(englishText, 'en', onEnd);
+      }, 250);
     });
   }
 
