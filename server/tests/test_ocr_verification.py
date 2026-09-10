@@ -1,4 +1,12 @@
+import os
+import sys
+from pathlib import Path
 import pytest
+
+server_root = Path(__file__).resolve().parent.parent
+if str(server_root) not in sys.path:
+    sys.path.insert(0, str(server_root))
+
 from app.models.schemas import VerificationStatus
 from app.services.ocr_verification import OCRVerificationService
 from app.utils.aliases import are_values_consistent, get_aliases_for_test, normalize_numeric_string

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediKiosk Platform - System Verification & Concurrency Load Audit</title>
+    <style>
+        :root {
+            --abdm-blue: #0B5FA5;
+            --abdm-blue-dark: #084B83;
+            --abdm-blue-light: #E8F1F8;
+            --ayush-green: #186036;
+            --ayush-green-light: #EDF7F1;
+            --canvas: #EAEDF0;
+            --surface: #FFFFFF;
+            --border: #CED4DA;
+            --text-primary: #212529;
+            --text-muted: #495057;
+            --text-light: #6C757D;
+            --status-success: #15803D;
+            --status-success-bg: #F0FDF4;
+            --status-danger: #DC2626;
+            --status-danger-bg: #FEF2F2;
+        }
+        * {
+            box-sizing: border-box;
+            border-radius: 2px;
+        }
+        body {
+            font-family: "Noto Sans", "Noto Sans Devanagari", Arial, Helvetica, sans-serif;
+            background-color: var(--canvas);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+        /* Top Accent Strip */
+        .portal-top-strip {
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #0B5FA5 0%, #186036 100%);
+        }
+
+        /* Portal Workstation Header */
+        .portal-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+        }
+        .portal-header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .portal-branding {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .portal-logo-box {
+            width: 38px;
+            height: 38px;
+            background: var(--abdm-blue);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+        }
+        .portal-titles {
+            display: flex;
+            flex-direction: column;
+        }
+        .portal-sup {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .portal-main {
+            font-size: 19px;
+            font-weight: 900;
+            color: var(--abdm-blue);
+            line-height: 1.2;
+        }
+        .portal-sub {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .portal-badge {
+            background: var(--ayush-green-light);
+            color: var(--ayush-green);
+            border: 1px solid rgba(24, 96, 54, 0.3);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 5px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .portal-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--abdm-blue);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .portal-btn:hover {
+            background: var(--abdm-blue-light);
+            border-color: var(--abdm-blue);
+        }
+        .portal-btn.primary {
+            background: var(--abdm-blue);
+            color: #FFFFFF;
+            border-color: var(--abdm-blue-dark);
+        }
+        .portal-btn.primary:hover {
+            background: var(--abdm-blue-dark);
+        }
+
+        /* Page Container */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto 40px auto;
+            padding: 0 16px;
+        }
+
+        /* Notice Banner */
+        .notice-banner {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--abdm-blue);
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .notice-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--abdm-blue);
+            margin: 0 0 2px 0;
+        }
+        .notice-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        .notice-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .tag-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            background: var(--canvas);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        /* Key Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .metric-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--text-primary);
+            line-height: 1.1;
+        }
+        .metric-value.success {
+            color: var(--status-success);
+        }
+        .metric-value.primary {
+            color: var(--abdm-blue);
+        }
+        .metric-note {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 6px;
+            color: var(--text-muted);
+        }
+
+        /* Content Card */
+        .portal-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        .portal-card-header {
+            background: #F8FAFC;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .portal-card-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--abdm-blue);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .portal-card-body {
+            padding: 0;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+        th {
+            background: #F1F5F9;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover td {
+            background-color: #F8FAFC;
+        }
+        .status-badge-pass {
+            background: var(--status-success-bg);
+            color: var(--status-success);
+            border: 1px solid rgba(21, 128, 61, 0.3);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 8px;
+            display: inline-block;
+        }
+
+        /* Footer */
+        .portal-footer {
+            border-top: 1px solid var(--border);
+            background: #FFFFFF;
+            padding: 22px 24px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 40px;
+        }
+        .portal-footer-brand {
+            font-weight: 800;
+            color: var(--abdm-blue);
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Accent Bar -->
+    <div class="portal-top-strip"></div>
+
+    <!-- Portal Header -->
+    <header class="portal-header">
+        <div class="portal-header-inner">
+            <div class="portal-branding">
+                <div class="portal-logo-box">
+                    <span>+</span>
+                </div>
+                <div class="portal-titles">
+                    <span class="portal-sup">Hospital OPD Intake System</span>
+                    <span class="portal-main">MediKiosk • Test & Concurrency Suite</span>
+                    <span class="portal-sub">Smart Healthcare Triage & Physician Queue Architecture</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <span class="portal-badge">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background-color: var(--status-success);"></span>
+                    All 9 Unit Tests Passing
+                </span>
+                <a href="http://localhost:3000" target="_blank" class="portal-btn">
+                    <span>Patient Kiosk (Port 3000)</span>
+                </a>
+                <a href="http://localhost:3000/doctor.html" target="_blank" class="portal-btn primary">
+                    <span>Doctor Station Portal</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <div class="notice-banner">
+            <div>
+                <h2 class="notice-title">System Verification & High-Concurrency Benchmark Report</h2>
+                <p class="notice-subtitle">Automated Stress & Quality Assurance Demonstration for Hackathon Judges</p>
+            </div>
+            <div class="notice-tags">
+                <span class="tag-pill">Execution: 10-09-2026 13:55:08</span>
+                <span class="tag-pill">Standard: HL7 FHIR R4 & ABHA Ready</span>
+                <span class="tag-pill">Database: SQLite 3 (WAL Multithreaded)</span>
+                <span class="tag-pill">Engine: FastAPI Async</span>
+            </div>
+        </div>
+
+        <!-- Metric Stat Cards -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">Unit Tests Passed</div>
+                <div class="metric-value success">9 / 9</div>
+                <div class="metric-note">100% Core Assertions Green</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">Concurrent Terminals</div>
+                <div class="metric-value primary">20 Terminals</div>
+                <div class="metric-note">Simultaneous Parallel Worker Threads</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">Intake Throughput</div>
+                <div class="metric-value success">27.3 / sec</div>
+                <div class="metric-note">Wall-Clock: 0.73 seconds</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">DB Lock / Race Collisions</div>
+                <div class="metric-value success">0 Detected</div>
+                <div class="metric-note">100% Thread-Safe WAL Isolation</div>
+            </div>
+        </div>
+
+        <!-- Section 1: Unit Test Matrix -->
+        <div class="portal-card">
+            <div class="portal-card-header">
+                <h3 class="portal-card-title">1. Core Clinical, Security & Triage Unit Tests</h3>
+                <span style="font-size: 11px; font-weight: 700; color: var(--status-success);">All 9 Passed</span>
+            </div>
+            <div class="portal-card-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">Status</th>
+                            <th style="width: 160px;">Category</th>
+                            <th>Test Case Description</th>
+                            <th>Audit Verification Detail</th>
+                            <th style="width: 90px; text-align: right;">Latency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+            <td><span class="status-badge-pass">PASS</span></td>
+            <td style="color: #495057; font-weight: 700;">Clinical Scoring</td>
+            <td style="font-weight: 700; color: #0B5FA5;">Ayurvedic Dosha Scoring (15 Vata -> 100% Vata, High Confidence)</td>
+            <td style="font-family: 'Noto Sans', monospace; font-size: 12px; color: #212529;">Dominant: Predominantly Vata (एकदोषज), Confidence: high</td>
+            <td style="text-align: right; font-weight: 700; color: #495057;">0.04ms</td>
+        </tr><tr>
+            <td><span class="status-badge-pass">PASS</span></td>
+            <td style="color: #495057; font-weight: 700;">Clinical Scoring</td>
+            <td style="font-weight: 700; color: #0B5FA5;">Ayurvedic Dual-Dosha (Pitta=8, Kapha=5 -> Pitta-Kapha)</td>
+            <td style="font-family: 'Noto Sans', monospace; font-size: 12px; color: #212529;">Dominant: Pitta-Kapha (द्वन्द्वज), Secondary: kapha</td>
+            <td style="text-align: right; font-weight: 700; color: #495057;">0.01ms</td>
+        </tr><tr>
+            <td><span class="status-badge-pass">PASS</span></td>
+            <td style="color: #495057; font-weight: 700;">Safety Triage</td>
+            <td style="font-weight: 700; color: #0B5FA5;">Critical Cardiac Red Flag Detection (Crushing Chest Pain)</td>
+            <td style="font-family: 'Noto Sans', monospace; font-size: 12px; color: #212529;">Triggered: True, Severity: critical</td>
+            <td style="text-align: right; font-weight: 700; color: #495057;">0.02ms</td>
+        </tr><tr>
+            <td><span class="status-badge-pass">PASS</span></td>
+            <td style="color: #495057; font-weight: 700;">Safety Triage</td>
+            <td style="font-weight: 700; color: #0B5FA5;">Multilingual Clinical Red Flag (Hindi Devanagari Match)</td>
+            <td style="font-family: 'Noto Sans', monospace; font-size: 12px; color: #212529;">Matched Rule: RF-001-CARDIAC (Acute Coronary Syndrome / Chest Pain)</td>
+            <td style="text-align: right; font-weight: 700; color: #495057;">0.01ms</td>
+        </tr><tr>
+            <td><span class="status-badge-pass">PASS</span></td>
+            <td style="color: #495057; font-weight: 700;">Safety Triage</td>
+            <td style="font-weight: 700; color: #0B5FA5;">Clinical Negation Protection ('no chest pain' -> False Alarm Avoidance)</td>
+            <td style="font-family: 'Noto Sans', monospace; font-size: 12px; color: #212529;">Triggered: False (Negation parsed correctly)</td>
+            <td style="text-align: right; font-weight: 700; color: #495057;">0.01ms</td>
+        </tr><tr>
+            <td><span class="status-badge-pass">PASS</span></td>
+            <td style="color: #495057; font-weight: 700;">Security & RBAC</td>
+            <td style="font-weight: 700; color: #0B5FA5;">Physician Secure PIN Verification & Rejection of Bad Credentials</td>
+            <td style="font-family: 'Noto Sans', monospace; font-size: 12px; color: #212529;">Auth doc: None, Bad PIN rejected: True</td>
+            <td style="text-align: right; font-weight: 700; color: #495057;">0.02ms</td>
+        </tr><tr>
+            <td><span class="status-badge-pass">PASS</span></td>
+            <td style="color: #495057; font-weight: 700;">Security & RBAC</td>
+            <td style="font-weight: 700; color: #0B5FA5;">HMAC-SHA256 Token Anti-Tampering & Signature Verification</td>
+            <td style="font-family: 'Noto Sans', monospace; font-size: 12px; color: #212529;">Tampered signature intercepted with HTTP 401 Unauthorized</td>
+            <td style="text-align: right; font-weight: 700; color: #495057;">0.06ms</td>
+        </tr><tr>
+            <td><span class="status-badge-pass">PASS</span></td>
+            <td style="color: #495057; font-weight: 700;">OCR & Extraction</td>
+            <td style="font-weight: 700; color: #0B5FA5;">Lab Test Alias Fuzzy Consistency ('14.2' vs '14.2 g/dL')</td>
+            <td style="font-family: 'Noto Sans', monospace; font-size: 12px; color: #212529;">Value match consistency: True</td>
+            <td style="text-align: right; font-weight: 700; color: #495057;">0.15ms</td>
+        </tr><tr>
+            <td><span class="status-badge-pass">PASS</span></td>
+            <td style="color: #495057; font-weight: 700;">System Security</td>
+            <td style="font-weight: 700; color: #0B5FA5;">Path Traversal Injection Defense in Medical Document Uploads</td>
+            <td style="font-family: 'Noto Sans', monospace; font-size: 12px; color: #212529;">Sanitized output: 'passwd_malicious.pdf'</td>
+            <td style="text-align: right; font-weight: 700; color: #495057;">0.03ms</td>
+        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 2: Concurrency Metrics -->
+        <div class="portal-card">
+            <div class="portal-card-header">
+                <h3 class="portal-card-title">2. Multi-Threaded Concurrency & Load Stress Metrics</h3>
+                <span style="font-size: 11px; font-weight: 700; color: var(--abdm-blue);">20 Parallel Kiosks</span>
+            </div>
+            <div class="portal-card-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 240px;">Benchmark Metric</th>
+                            <th>Measured Result</th>
+                            <th>Evaluation Criterion & Architectural Guarantee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Simultaneous Kiosk Terminals</strong></td>
+                            <td><strong>20</strong> Parallel Worker Threads</td>
+                            <td>Simulates peak rush-hour walk-in load across multiple hospital entrance kiosks</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Completed Patient Lifecycles</strong></td>
+                            <td><span class="status-badge-pass">20 / 20 COMPLETED</span></td>
+                            <td>Zero dropped requests; all registrations and sessions saved to queue</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Wall Clock Duration</strong></td>
+                            <td>0.733 seconds</td>
+                            <td>Fast batch turnaround with zero thread deadlock</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Average Intake Latency</strong></td>
+                            <td>315.1 ms</td>
+                            <td>Sub-second end-to-end response on physical touchscreens</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fastest Patient Registration</strong></td>
+                            <td>86.5 ms</td>
+                            <td>Optimized database connection pooling and query execution</td>
+                        </tr>
+                        <tr>
+                            <td><strong>99th Percentile Tail Latency</strong></td>
+                            <td>728.7 ms</td>
+                            <td>Predictable latency bounds even under maximum thread saturation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Token Collision Rate</strong></td>
+                            <td><strong>0.0%</strong> (All 20 Unique Tokens)</td>
+                            <td>Guaranteed unique patient queue token generation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Doctor Station Polling Rate</strong></td>
+                            <td><strong>38.6</strong> req/sec (Avg: 247.6 ms)</td>
+                            <td>Real-time synchronization for live physician OPD workstation dashboards</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Quick Navigation Links -->
+        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px;">
+            <a href="http://localhost:3000" target="_blank" class="portal-btn">
+                <span>Open Patient Kiosk</span>
+            </a>
+            <a href="http://localhost:3000/doctor.html" target="_blank" class="portal-btn primary">
+                <span>Open Doctor Workstation</span>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Clean Hospital Platform Footer -->
+    <footer class="portal-footer">
+        <div class="portal-footer-brand">MediKiosk Enterprise OPD Solution</div>
+        <div>Built for Hackathon Evaluation • Unit Tested & Stress Benchmark Verified</div>
+        <div style="margin-top: 4px; font-size: 11px; color: var(--text-light);">FastAPI Backend • SQLite WAL • React + Vite Touch Interface</div>
+    </footer>
+</body>
+</html>

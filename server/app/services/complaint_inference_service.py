@@ -252,8 +252,8 @@ class ComplaintInferenceService:
 
             # Modern Gemini model fallback list
             models_to_try = [
-                self.model_name,
                 "gemini-3.6-flash",
+                self.model_name,
                 "gemini-2.5-flash-lite",
                 "gemini-flash-latest",
             ]
