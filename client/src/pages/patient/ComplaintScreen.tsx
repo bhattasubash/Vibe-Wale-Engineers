@@ -8,7 +8,6 @@ import {
   AlertTriangle,
   Check,
   RotateCcw,
-  Activity,
   AlertCircle,
   Loader2,
   Sparkles,
@@ -392,7 +391,7 @@ export const ComplaintScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-transparent text-[#212529] justify-between font-sans select-none overflow-hidden">
       
       {/* Non-Scrollable Centered Main Container */}
       <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-2 flex-1 flex flex-col justify-evenly items-center">
@@ -409,18 +408,6 @@ export const ComplaintScreen: React.FC = () => {
 
         {/* Title Area */}
         <div className="text-center shrink-0">
-          <div
-            className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[3px] border text-[11px] font-bold uppercase tracking-wider mb-1"
-            style={{
-              backgroundColor: '#E8F1F8',
-              borderColor: 'rgba(11, 95, 165, 0.3)',
-              color: '#0B5FA5',
-            }}
-          >
-            <Activity className="w-3.5 h-3.5" />
-            <span>{language === 'hi' ? 'मुख्य स्वास्थ्य समस्या' : 'Primary Symptoms'}</span>
-          </div>
-
           <h1
             className="text-2xl sm:text-3xl font-black tracking-tight"
             style={{ color: '#0B5FA5' }}
@@ -700,7 +687,7 @@ export const ComplaintScreen: React.FC = () => {
       )}
 
       {/* Persistent Single-Line Clean Footer */}
-      <footer className="w-full bg-white border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
+      <footer className="w-full bg-white/90 backdrop-blur-sm border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>

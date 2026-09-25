@@ -185,7 +185,7 @@ export const GeneralVitalsScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-transparent text-[#212529] justify-between font-sans select-none overflow-hidden">
       
       {/* Non-Scrollable Centered Main Container */}
       <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-2 flex-1 flex flex-col justify-evenly items-center">
@@ -202,7 +202,7 @@ export const GeneralVitalsScreen: React.FC = () => {
 
         {/* Header & Progress Indicator */}
         <div className="text-center shrink-0">
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[3px] border border-[#0B5FA5]/30 bg-[#E8F1F8] text-[11px] font-bold uppercase tracking-wider text-[#0B5FA5] mb-1">
+          <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[#0B5FA5] mb-1">
             <Activity className="w-3.5 h-3.5" />
             <span>
               {language === 'hi'
@@ -349,7 +349,7 @@ export const GeneralVitalsScreen: React.FC = () => {
       </main>
 
       {/* Persistent Single-Line Clean Footer */}
-      <footer className="w-full bg-white border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
+      <footer className="w-full bg-white/90 backdrop-blur-sm border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
           <div className="flex items-center gap-2 font-bold text-[#0B5FA5]">
             <span>सामान्य चिकित्सा ओपीडी (General Medicine OPD)</span>

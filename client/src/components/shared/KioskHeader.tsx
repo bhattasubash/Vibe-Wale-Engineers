@@ -22,7 +22,7 @@ export const KioskHeader: React.FC = () => {
 
   return (
     <>
-      <header className="w-full bg-white border-b border-[#CED4DA] select-none sticky top-0 z-40">
+      <header className="w-full bg-white/95 backdrop-blur-sm border-b border-[#CED4DA] select-none sticky top-0 z-40">
         
         {/* 1. Indian National Tricolor Continuous Strip */}
         <div className="w-full h-1.5 flex flex-row">
@@ -66,24 +66,33 @@ export const KioskHeader: React.FC = () => {
 
             <div className="flex flex-col border-l border-[#CED4DA] pl-2.5 py-0.5">
               <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-[#495057] leading-none">
-                भारत सरकार / Government of India
+                Project for Government of India
               </span>
               <span
                 className="text-xs sm:text-base font-black tracking-tight leading-tight mt-0.5"
                 style={{ color: '#0B5FA5' }}
               >
-                {language === 'hi' ? 'आयुष मंत्रालय' : 'Ministry of Ayush'}
+                {language === 'hi' ? 'आयुष केयर' : 'Ayush Care'}
               </span>
               <span className="text-[9px] sm:text-[10px] font-bold text-[#495057] leading-none mt-0.5">
-                {language === 'hi'
-                  ? 'अखिल भारतीय आयुर्वेद संस्थान (AIIA), नई दिल्ली'
-                  : 'All India Institute of Ayurveda (AIIA), New Delhi'}
+                Vibe Wale Engineers
               </span>
             </div>
           </div>
 
-          {/* Right: Language Switcher & Operational Help Button (No Doctor Login!) */}
+          {/* Right: Doctor Portal, Language Switcher & Operational Help */}
           <div className="flex items-center gap-2 sm:gap-3">
+
+            {/* Doctor's Portal Access Button */}
+            <button
+              type="button"
+              onClick={() => navigate('/doctor/login')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] border border-[#0B5FA5] bg-[#E8F1F8] hover:bg-[#0B5FA5] hover:text-white text-xs font-bold text-[#0B5FA5] transition-all cursor-pointer shadow-xs"
+              title="चिकित्सक पोर्टल • Doctor's Workstation Portal"
+            >
+              <Stethoscope className="w-3.5 h-3.5 text-[#0B5FA5] group-hover:text-white" />
+              <span>{language === 'hi' ? 'चिकित्सक पोर्टल' : "Doctor's Portal"}</span>
+            </button>
             
             {/* Simple Language Switcher */}
             <button

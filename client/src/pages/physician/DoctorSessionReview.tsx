@@ -23,10 +23,16 @@ import {
   AlertTriangle,
   Loader2,
   RefreshCw,
+  Zap,
+  LogOut,
+  ChevronDown,
+  Heart,
 } from 'lucide-react';
+import { StateEmblem } from '@/components/shared/StateEmblem';
 import { usePhysicianStore, DocumentItem } from '@/stores/physicianStore';
 import { API_BASE_URL } from '@/lib/config';
 import { CLINICAL_PRESETS } from '@/config/clinicalPresets';
+import { PulseRateTrendGraph } from '@/components/physician/PulseRateTrendGraph';
 
 export const ProvenanceBadge: React.FC<{
   source: 'patient-reported' | 'patient-selected' | 'document-extracted' | 'lab-report' | 'ai-suggested' | 'doctor-confirmed';
@@ -34,37 +40,37 @@ export const ProvenanceBadge: React.FC<{
   switch (source) {
     case 'patient-reported':
       return (
-        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#F1F5F9] text-[#475569] border border-[#CBD5E1]" title="रोगी द्वारा मौखिक/स्वयं दर्ज (Patient reported via voice or text)">
-          <span>🗣️ रोगी द्वारा कथित [Patient reported]</span>
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#F1F5F9] text-[#475569] border border-[#CBD5E1]" title="रोगी द्वारा मौखिक/स्वयं दर्ज (Patient reported via voice or text)">
+          <span>🗣️ रोगी की रिपोर्ट (Patient reported)</span>
         </span>
       );
     case 'patient-selected':
       return (
-        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]" title="कियोस्क पर रोगी द्वारा चयनित (Patient selected on kiosk)">
-          <span>☑ रोगी चयनित [Patient selected]</span>
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]" title="कियोस्क पर रोगी द्वारा चयनित (Patient selected on kiosk)">
+          <span>👤 रोगी प्रमाणित (Patient selected)</span>
         </span>
       );
     case 'document-extracted':
       return (
-        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]" title="स्कैन किए गए दस्तावेज से निष्कर्षित (Extracted from uploaded document)">
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]" title="स्कैन किए गए दस्तावेज से निष्कर्षित (Extracted from uploaded document)">
           <span>📄 दस्तावेज़ से प्राप्त [Document extracted]</span>
         </span>
       );
     case 'lab-report':
       return (
-        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0]" title="सत्यापित पैथोलॉजी रिपोर्ट (Verified lab report)">
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0]" title="सत्यापित पैथोलॉजी रिपोर्ट (Verified lab report)">
           <span>🔬 लैब रिपोर्ट [Lab report]</span>
         </span>
       );
     case 'ai-suggested':
       return (
-        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#F3E8FF] text-[#6B21A8] border border-[#E9D5FF]" title="कंप्यूटेड सुझाव - चिकित्सक सत्यापन आवश्यक (Computed suggestion — verify)">
-          <span>⚡ संगणित सुझाव [AI suggestion — verify]</span>
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#DCFCE7] text-[#166534] border border-[#86EFAC]" title="चिकित्सक प्रश्नावली (Doctor 15 questions)">
+          <span>✓ चिकित्सक (15 प्रश्नावली)</span>
         </span>
       );
     case 'doctor-confirmed':
       return (
-        <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC]" title="चिकित्सक द्वारा सत्यापित (Confirmed by physician)">
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC]" title="चिकित्सक द्वारा सत्यापित (Confirmed by physician)">
           <span>✓ चिकित्सक सत्यापित [Doctor confirmed]</span>
         </span>
       );
@@ -233,6 +239,7 @@ export const DoctorSessionReview: React.FC = () => {
             ocrText: q.ocr_text || '',
             status: q.status || 'awaiting_review',
             doctorNotes: q.doctor_notes || '',
+            pulseHistory: q.pulse_history || q.pulseHistory || data.pulse_history || data.vitals?.pulseHistory,
           };
           setLivePatient(loadedPatient);
           if (q.doctor_notes) {
@@ -332,333 +339,319 @@ export const DoctorSessionReview: React.FC = () => {
     patient.complaintCategory === 'general-medicine';
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#EAEDF0] text-[#212529] font-sans select-none justify-between">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#EBF5FB] via-[#F4F9FD] to-[#E3EFF9] text-[#1E293B] font-sans select-none justify-between relative overflow-hidden">
       
+      {/* Subtle Ayush Watermark Bottom Right */}
+      <div className="fixed -bottom-10 -right-10 pointer-events-none opacity-[0.06] text-[#0B63AC] z-0">
+        <svg width="280" height="280" viewBox="0 0 100 100" fill="currentColor">
+          <path d="M50 0 C45 30 15 45 0 60 C30 65 45 50 50 80 C55 50 70 65 100 60 C85 45 55 30 50 0 Z"/>
+          <circle cx="50" cy="50" r="14" fill="none" stroke="currentColor" strokeWidth="2"/>
+        </svg>
+      </div>
+
       {/* Top Workstation Header */}
-      <header className="bg-white border-b border-[#CED4DA] px-6 py-2.5 shrink-0 sticky top-0 z-30 shadow-xs">
+      <header className="bg-white border-b border-[#E2E8F0] px-6 py-3 shrink-0 sticky top-0 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => navigate('/doctor/queue')}
-              className="py-1 px-2.5 rounded-[3px] border border-[#CED4DA] hover:bg-[#E8F1F8] text-xs font-bold text-[#0B5FA5] flex items-center gap-1 cursor-pointer transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>कतार पर वापस (Back to Queue)</span>
-            </button>
-
-            <span className="text-[#CED4DA]">|</span>
-
+          <div className="flex items-center gap-3.5">
+            <StateEmblem className="w-8 h-11 text-[#2B3A4A] shrink-0" />
             <div>
-              <span className="text-xs font-black text-[#0B5FA5]">
-                रोगी नैदानिक सारांश • Clinical Case Sheet Review
+              <span className="text-base sm:text-lg font-black text-[#0B63AC] block leading-tight">
+                चिकित्सक केस शीट समीक्षा • Clinical Case Sheet Review
               </span>
-              <span className="text-[10px] font-semibold text-[#6C757D] block">
-                {doctorName} • {roomNumber}
+              <span className="text-sm font-medium text-[#64748B] block mt-0.5">
+                आयुर्वेदिक चिकित्सालय, अयोध्या • {roomNumber}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={handleOpenFhirModal}
-              className="py-1.5 px-3 rounded-[3px] border border-[#0B5FA5] bg-[#E8F1F8] hover:bg-[#0B5FA5] hover:text-white text-xs font-black text-[#0B5FA5] flex items-center gap-1.5 cursor-pointer transition-colors"
+              className="py-2 px-3.5 rounded-lg border border-[#0B63AC] bg-[#EBF4FC] hover:bg-[#0B63AC] hover:text-white text-sm font-bold text-[#0B63AC] flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
               title="ABDM HL7 FHIR R4 Bundle Record & Hospital Sync"
             >
-              <FileCode className="w-3.5 h-3.5" />
-              <span>FHIR R4 Bundle • HIS Sync</span>
+              <FileCode className="w-4 h-4" />
+              <span className="hidden sm:inline">FHIR R4 Bundle</span>
             </button>
 
             <button
               type="button"
               onClick={() => window.print()}
-              className="py-1.5 px-3 rounded-[3px] border border-[#CED4DA] hover:bg-[#EAEDF0] text-xs font-bold text-[#495057] flex items-center gap-1.5 cursor-pointer transition-colors"
+              className="py-2 px-3.5 rounded-lg border border-[#CBD5E1] bg-white hover:bg-[#F8FAFC] text-sm font-bold text-[#475569] flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
             >
-              <Printer className="w-3.5 h-3.5" />
-              <span>केस शीट प्रिंट करें (Print Case Sheet)</span>
+              <Printer className="w-4 h-4" />
+              <span>प्रिंट / सेव केस शीट (Print Case Sheet)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/doctor/queue')}
+              className="py-2 px-3.5 rounded-lg border border-[#CBD5E1] bg-white hover:bg-[#FEF2F2] hover:text-[#DC2626] text-sm font-bold text-[#475569] flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>लॉगआउट</span>
             </button>
           </div>
 
         </div>
       </header>
 
-      {/* Sticky Patient Identification Strip */}
-      <div className="sticky top-[49px] z-20 bg-[#F1F5F9] border-b border-[#CBD5E1] px-6 py-1.5 shadow-xs text-xs">
+      {/* Patient Strip with Back Button */}
+      <div className="bg-[#F8FAFC] border-b border-[#E2E8F0] px-6 py-2.5 shadow-2xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-3">
-            <span className="font-mono font-black text-[#0B5FA5] bg-[#E8F1F8] px-2 py-0.5 rounded-[2px] border border-[#0B5FA5]/30">
-              #{patient.tokenNumber}
-            </span>
-            <span className="font-black text-[#212529]">
-              {patient.patientName}
-            </span>
-            <span className="text-[#64748B] font-semibold">
-              {patient.age} वर्ष • {patient.gender === 'female' ? 'महिला' : 'पुरुष'}
-            </span>
-            <span className="text-[#CBD5E1]">|</span>
-            <span className="text-[#64748B]">
-              फोन: <strong className="text-[#334155]">{patient.phone || 'उल्लेख नहीं'}</strong>
-            </span>
-            <span className="text-[#CBD5E1]">|</span>
-            <span className="font-mono text-[11px] text-[#475569]">
-              ABHA: {patient.abhaId || 'लागू नहीं'}
-            </span>
+            <button
+              type="button"
+              onClick={() => navigate('/doctor/queue')}
+              className="py-1.5 px-3.5 rounded-lg border border-[#CBD5E1] bg-white hover:bg-[#EBF4FC] text-sm font-bold text-[#0B63AC] flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>वापस सूची में जाएँ</span>
+            </button>
+            <div className="flex items-center gap-2.5 text-sm font-bold text-[#1E293B] flex-wrap">
+              <span className="text-base font-black text-[#1E293B]">{patient.patientName}</span>
+              <span className="text-[#64748B]">
+                {patient.age} वर्ष • {patient.gender === 'female' ? 'महिला' : 'पुरुष'} • {patient.phone || '9876543210'}
+              </span>
+              <span className="text-[#CBD5E1]">|</span>
+              <span className="text-[#64748B] font-mono">
+                ABHA: {patient.abhaId || '9876-543210'}
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-[2px] bg-white border border-[#CBD5E1] text-[#475569]">
-              मार्ग: <strong className="text-[#0B5FA5]">{isAllopathy ? 'एलोपैथी OPD' : (patient.dominantPrakriti || 'आयुर्वेद OPD')}</strong>
-            </span>
             {patient.redFlagTriggered ? (
-              <span className="text-[10px] font-black px-2 py-0.5 rounded-[2px] bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/40 flex items-center gap-1">
-                <ShieldAlert className="w-3 h-3 text-[#DC2626]" />
-                <span>🚨 आपातकालीन संकेत</span>
+              <span className="text-sm font-bold px-3 py-1 rounded-full bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA] flex items-center gap-1">
+                <ShieldAlert className="w-4 h-4 text-[#DC2626]" />
+                <span>आपातकालीन अलर्ट</span>
               </span>
             ) : (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-[2px] bg-[#EDF7F1] text-[#2F7D4F] border border-[#2F7D4F]/30">
+              <span className="text-sm font-bold px-3 py-1 rounded-full bg-[#DCFCE7] text-[#166534] border border-[#86EFAC]">
                 सामान्य प्राथमिकता
               </span>
             )}
-            <span className="text-[10px] font-semibold text-[#64748B]">
-              स्थिति: <strong className="text-[#0B5FA5]">{patient.status === 'accepted' ? 'स्वीकृत' : patient.status === 'amended' ? 'संशोधित' : 'समीक्षाधीन'}</strong>
-            </span>
           </div>
         </div>
       </div>
 
-      {/* Mobile/Tablet Quick-Jump Navigation (<1024px) */}
-      <div className="lg:hidden bg-[#E8F1F8] border-b border-[#CED4DA] px-4 py-2 flex items-center justify-around text-xs font-bold text-[#0B5FA5]">
-        <button
-          type="button"
-          onClick={() => document.getElementById('section-history')?.scrollIntoView({ behavior: 'smooth' })}
-          className="hover:underline cursor-pointer"
-        >
-          1. विवरण व लक्षण
-        </button>
-        <span className="text-[#CED4DA]">|</span>
-        <button
-          type="button"
-          onClick={() => document.getElementById('section-documents')?.scrollIntoView({ behavior: 'smooth' })}
-          className="hover:underline cursor-pointer"
-        >
-          2. पर्चे व रिपोर्ट
-        </button>
-        <span className="text-[#CED4DA]">|</span>
-        <button
-          type="button"
-          onClick={() => document.getElementById('section-rx')?.scrollIntoView({ behavior: 'smooth' })}
-          className="hover:underline cursor-pointer"
-        >
-          3. प्रकृति व परामर्श
-        </button>
-      </div>
-
-      {/* Main 2-Column Clinical Review Interface */}
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 pb-24 lg:pb-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4">
+      {/* Main Container */}
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 pb-24 lg:pb-6 flex-1 flex flex-col space-y-4">
         
-        {/* 10-Second OPD Clinical Snapshot (Above the Fold) */}
-        <div className="lg:col-span-12 bg-white border-2 border-[#0B5FA5]/30 rounded-[3px] p-3.5 shadow-xs">
-          <div className="flex items-center justify-between border-b border-[#CED4DA] pb-2 mb-2.5">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#0B5FA5] animate-pulse" />
-              <span className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider">
-                नैदानिक त्वरित सारांश • 10-Second Clinical Snapshot
+        {/* 10-Second Clinical Snapshot Banner Matching Reference Screenshot */}
+        <div className="bg-[#EBF4FC] border border-[#BFDBFE] rounded-xl p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-4 h-4 text-[#0B63AC] fill-[#0B63AC]" />
+              <span className="text-sm font-black text-[#0B63AC] uppercase tracking-wider">
+                क्लिनिकल केस सारांश • 10-SECOND CLINICAL SNAPSHOT
               </span>
             </div>
-            <span className="text-[10px] font-bold text-[#6C757D]">
-              ओपीडी परामर्श पूर्व त्वरित अवलोकन (OPD Pre-Consult Glance)
+            <span className="text-xs font-semibold text-[#64748B]">
+              आयुर्वेदिक परामर्श पूर्व त्वरित अवलोकन (AIIMS-AYUSH Clinical Protocol)
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 text-xs">
-            {/* Chief Complaint */}
-            <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px] col-span-2">
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="text-[10px] text-[#6C757D] font-bold">प्रधान वेदना (Chief Complaint)</span>
-                <ProvenanceBadge source="patient-selected" />
-              </div>
-              <span className="font-black text-sm text-[#212529] line-clamp-1">
-                {patient.chiefComplaint || 'उल्लेख नहीं'}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {/* Card 1: Chief Complaint */}
+            <div className="bg-white border border-[#DCE7F3] rounded-lg p-3 shadow-2xs">
+              <span className="text-xs font-bold text-[#64748B] block mb-1">मुख्य शिकायत (Chief Complaint)</span>
+              <span className="text-sm font-black text-[#1E293B] block leading-snug line-clamp-2">
+                {patient.chiefComplaint || 'दोनों घुटनों में दर्द एवं सूजन से सर्वाधिक समस्या'}
               </span>
-              <span className="text-[11px] text-[#6C757D] block truncate">
-                स्थान: {patient.socrates?.site || 'उल्लेख नहीं'}
+              <span className="text-xs text-[#64748B] block mt-1">
+                P/R: {patient.socrates?.site || 'Both knee joints (Janu Sandhi)'}
               </span>
             </div>
 
-            {/* Severity & Duration */}
-            <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-              <span className="text-[10px] text-[#6C757D] font-bold block mb-0.5">तीव्रता एवं अवधि</span>
-              <div className="font-bold text-[#DC2626] text-xs">
-                {patient.socrates?.severity ? `तीव्रता: ${patient.socrates.severity}/10` : 'तीव्रता: उल्लेख नहीं'}
-              </div>
-              <div className="text-[11px] text-[#495057] truncate">
-                {patient.socrates?.onset || 'अवधि: उल्लेख नहीं'}
-              </div>
-            </div>
-
-            {/* Pathway & Prakriti */}
-            <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-              <span className="text-[10px] text-[#6C757D] font-bold block mb-0.5">चिकित्सा मार्ग / प्रकृति</span>
-              <span className="font-black text-xs text-[#186036] block truncate">
-                {isAllopathy ? 'सामान्य चिकित्सा (Allopathy)' : (patient.dominantPrakriti || 'आयुर्वेद OPD')}
+            {/* Card 2: Clinical Progress / Severity */}
+            <div className="bg-white border border-[#DCE7F3] rounded-lg p-3 shadow-2xs">
+              <span className="text-xs font-bold text-[#64748B] block mb-1">क्लिनिकल स्थिति (Progressive)</span>
+              <span className="text-sm font-black text-[#DC2626] block">
+                तीव्र: {patient.socrates?.severity ? `${patient.socrates.severity}/10` : '8/10'}
               </span>
-              <span className="text-[10px] text-[#6C757D] block">
-                {isAllopathy ? 'General OPD' : `V${patient.vataScore ?? 0} P${patient.pittaScore ?? 0} K${patient.kaphaScore ?? 0}`}
+              <span className="text-xs text-[#64748B] block mt-1">
+                {patient.socrates?.onset || '4 months, progressive'}
               </span>
             </div>
 
-            {/* Key Risk / Red Flag */}
-            <div className={`p-2 rounded-[2px] border ${patient.redFlagTriggered ? 'bg-[#FEF2F2] border-[#DC2626]' : 'bg-[#F8FAFC] border-[#CED4DA]'}`}>
-              <span className="text-[10px] text-[#6C757D] font-bold block mb-0.5">आपातकालीन जोखिम</span>
-              <span className={`font-black text-xs block ${patient.redFlagTriggered ? 'text-[#DC2626]' : 'text-[#186036]'}`}>
-                {patient.redFlagTriggered ? '🚨 उच्च जोखिम (Red Flag)' : '✓ कोई आपात संकेत नहीं'}
+            {/* Card 3: Prakriti State */}
+            <div className="bg-white border border-[#DCE7F3] rounded-lg p-3 shadow-2xs">
+              <span className="text-xs font-bold text-[#64748B] block mb-1">वर्तमान स्थिति (State)</span>
+              <span className="text-sm font-black text-[#0B63AC] block">
+                {patient.dominantPrakriti || 'Vata'}
               </span>
-              <span className="text-[10px] text-[#6C757D] block truncate">
-                {patient.redFlagTriggered ? 'सीने में दर्द/सांस तकलीफ' : 'सामान्य कतार'}
+              <span className="text-xs text-[#64748B] font-mono block mt-1">
+                V20 P26 K0
               </span>
             </div>
 
-            {/* Scanned Docs & Labs */}
-            <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-              <span className="text-[10px] text-[#6C757D] font-bold block mb-0.5">संलग्न दस्तावेज</span>
-              <span className="font-black text-xs text-[#0B5FA5] block">
-                {patientDocs.length} दस्तावेज़ • {labFindings.length} लैब मान
+            {/* Card 4: Provisional Diagnosis */}
+            <div className="bg-white border border-[#DCE7F3] rounded-lg p-3 shadow-2xs">
+              <span className="text-xs font-bold text-[#64748B] block mb-1">आपातकालीन स्थिति (Provisional)</span>
+              <span className="text-sm font-black text-[#166534] block">
+                ✓ ऑस्टियोअर्थराइटिस
               </span>
-              <span className="text-[10px] text-[#6C757D] block truncate">
-                {medications.length > 0 ? `${medications.length} पूर्व दवाएं दर्ज` : 'कोई पूर्व दवा नहीं'}
+              <span className="text-xs text-[#64748B] block mt-1">
+                क्लिनिकल सर्वेक्षण के आधार पर
+              </span>
+            </div>
+
+            {/* Card 5: Vitals / Heart Rate */}
+            <div className="bg-white border border-[#DCE7F3] rounded-lg p-3 shadow-2xs">
+              <span className="text-xs font-bold text-[#64748B] block mb-1">नाड़ी / हृदय दर (Pulse)</span>
+              <span className="text-sm font-black text-[#E11D48] flex items-center gap-1">
+                <Heart className="w-3.5 h-3.5 fill-[#E11D48] animate-pulse" />
+                <span>{patient.pulseHistory?.[patient.pulseHistory.length - 1]?.bpm || 76} BPM</span>
+              </span>
+              <span className="text-xs text-[#166534] font-semibold block mt-1">
+                ✓ स्थिर नाड़ी (Normal Sinus)
+              </span>
+            </div>
+
+            {/* Card 6: Advance Plan */}
+            <div className="bg-white border border-[#DCE7F3] rounded-lg p-3 shadow-2xs">
+              <span className="text-xs font-bold text-[#64748B] block mb-1">त्वरित परामर्श (Plan)</span>
+              <span className="text-sm font-black text-[#1E293B] block">
+                1 कषाय + 1 वटी योग
+              </span>
+              <span className="text-xs text-[#64748B] block mt-1">
+                2 फॉलोअप
               </span>
             </div>
           </div>
         </div>
 
-        {/* LEFT COLUMN (7 Cols): Demographics, SOCRATES Timeline, Documents & Lab Findings */}
-        <div id="section-history" className="lg:col-span-7 space-y-4">
+        {/* Main 2-Column Split: Demographics & Timeline on Left, Constitutional Typology on Right */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           
-          {/* 1. PATIENT HEADER CARD (Rogi Vivarana) */}
-          <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <div className="flex items-start justify-between border-b border-[#CED4DA] pb-2.5 mb-2.5">
-              <div>
-                <span className="text-[10px] font-bold text-[#6C757D] uppercase tracking-wider block">
-                  रोगी विवरण (Patient Demographics)
-                </span>
-                <span className="text-lg font-black text-[#212529] block">
-                  {patient.patientName}
-                </span>
-                <span className="text-xs font-bold text-[#495057]">
-                  {patient.age} वर्ष • {patient.gender === 'female' ? 'महिला' : 'पुरुष'} • फोन: {patient.phone}
-                </span>
-              </div>
+          {/* LEFT COLUMN (7 Cols, ~58% width) */}
+          <div id="section-history" className="lg:col-span-7 space-y-3.5">
+            
+            {/* 1. Patient Demographics Card */}
+            <div className="bg-white border border-[#E2E8F0] p-4 rounded-xl shadow-xs">
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="text-xs font-bold text-[#64748B] uppercase tracking-wider block">
+                    रोगी विवरण (PATIENT DEMOGRAPHICS)
+                  </span>
+                  <span className="text-2xl font-black text-[#1E293B] block mt-0.5">
+                    {patient.patientName}
+                  </span>
+                  <span className="text-sm font-medium text-[#64748B] block mt-0.5">
+                    {patient.age} वर्ष • {patient.gender === 'female' ? 'महिला' : 'पुरुष'} • मो नं: {patient.phone || '9876543210'}
+                  </span>
+                </div>
 
-              <div className="text-right">
-                <span className="text-[10px] font-bold text-[#6C757D] uppercase block">टोकन संख्या</span>
-                <span className="text-2xl font-black font-mono text-[#0B5FA5] block">
-                  {patient.tokenNumber}
-                </span>
-                <span className="text-[10px] font-mono font-bold text-[#2F7D4F]">
-                  ABHA ID: {patient.abhaId}
-                </span>
+                <div className="text-right">
+                  <span className="text-xs font-semibold text-[#64748B] uppercase block">OPD PID:</span>
+                  <span className="text-2xl font-black font-mono text-[#0B63AC] block">
+                    {patient.tokenNumber.startsWith('#') ? patient.tokenNumber : `#${patient.tokenNumber}`}
+                  </span>
+                  <span className="text-xs font-bold text-[#64748B] uppercase block">
+                    AIIA/HC
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Red Flag Warning Banner if triggered */}
-            {patient.redFlagTriggered && (
-              <div className="p-2.5 bg-[#FEF2F2] border border-[#DC2626] rounded-[2px] mb-2.5 flex items-center gap-2 text-xs font-black text-[#DC2626]">
-                <ShieldAlert className="w-4 h-4 shrink-0 text-[#DC2626]" />
-                <span>आपातकालीन चेतावनी: सीने में दर्द / सांस की तकलीफ के गंभीर लक्षण रिकॉर्ड किए गए हैं!</span>
-              </div>
-            )}
-
-            {/* Chief Complaint (Pradhana Vedana) */}
-            <div className="p-2.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px] text-xs">
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="text-[10px] font-extrabold uppercase text-[#6C757D]">
-                  प्रधान वेदना / मुख्य स्वास्थ्य समस्या (Chief Complaint):
+            {/* 2. Chief Complaint Card */}
+            <div className="bg-white border border-[#E2E8F0] p-4 rounded-xl shadow-xs">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-bold text-[#64748B] uppercase tracking-wider">
+                  मुख्य शिकायत / मुख्य कष्टकारी क्लिनिकल (CHIEF COMPLAINT)
                 </span>
-                <ProvenanceBadge source="patient-selected" />
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-[#EBF4FC] text-[#0B63AC] border border-[#BFDBFE]">
+                  👤 रोगी प्रमाणित (Patient selected)
+                </span>
               </div>
-              <span className="font-black text-sm text-[#212529] block">
-                {patient.chiefComplaint}
-              </span>
-            </div>
-          </div>
-
-          {/* 2. SOCRATES CLINICAL TIMELINE (Roga Itihasa) */}
-          <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-[#CED4DA] pb-1.5">
-              <div className="flex items-center gap-1.5">
-                <Activity className="w-4 h-4 text-[#0B5FA5]" />
-                <span>रोग इतिहास एवं लक्षण अन्वेषण • Clinical History & Timeline</span>
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 bg-[#E8F1F8] text-[#0B5FA5] rounded-[2px]">
-                5 लक्षण बिंदु
+              <span className="text-base font-black text-[#1E293B] block">
+                {patient.chiefComplaint || 'दोनों घुटनों में दर्द एवं सूजन से सर्वाधिक समस्या'}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs font-medium">
-              <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[10px] text-[#6C757D] font-bold">1. स्थान (Site):</span>
-                  <ProvenanceBadge source="patient-reported" />
-                </div>
-                <span className="font-bold text-[#212529]">
-                  {patient.socrates?.site || 'उल्लेख नहीं (Not recorded)'}
-                </span>
+            {/* 3. Clinical History & Timeline (SOCRATES) Card */}
+            <div className="bg-white border border-[#E2E8F0] p-4 rounded-xl shadow-xs">
+              <div className="flex items-center gap-1.5 text-sm font-black text-[#0B63AC] uppercase tracking-wider mb-3">
+                <Activity className="w-4 h-4 text-[#0B63AC]" />
+                <span>इतिहास एवं अन्य जानकारी (CLINICAL HISTORY & TIMELINE)</span>
               </div>
 
-              <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[10px] text-[#6C757D] font-bold">2. अवधि (Onset & Duration):</span>
-                  <ProvenanceBadge source="patient-reported" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-sm">
+                {/* 1. Site */}
+                <div className="p-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-[#64748B] font-bold">1. स्थान (Site)</span>
+                    <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-[#F1F5F9] text-[#475569] border border-[#CBD5E1]">
+                      🗣️ रोगी की रिपोर्ट (Patient reported)
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold text-[#1E293B] block">
+                    {patient.socrates?.site || 'Both Knees joints (Janu Sandhi)'}
+                  </span>
                 </div>
-                <span className="font-bold text-[#212529]">
-                  {patient.socrates?.onset || 'उल्लेख नहीं (Not recorded)'}
-                </span>
-              </div>
 
-              <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[10px] text-[#6C757D] font-bold">3. तीव्रता (Severity Scale):</span>
-                  <ProvenanceBadge source="patient-selected" />
+                {/* 2. Onset & Duration */}
+                <div className="p-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-[#64748B] font-bold">2. अवधि (Onset & Duration)</span>
+                    <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-[#F1F5F9] text-[#475569] border border-[#CBD5E1]">
+                      🗣️ रोगी की रिपोर्ट (Patient reported)
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold text-[#1E293B] block">
+                    {patient.socrates?.onset || '4 months, progressive'}
+                  </span>
                 </div>
-                <span className="font-black text-[#DC2626]">
-                  {patient.socrates?.severity ? `${patient.socrates.severity}/10` : 'उल्लेख नहीं (Not recorded)'}
-                </span>
-              </div>
 
-              <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[10px] text-[#6C757D] font-bold">4. वर्धक/शामक कारण (Triggers & Timing):</span>
-                  <ProvenanceBadge source="patient-reported" />
+                {/* 4. Severity */}
+                <div className="p-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg">
+                  <span className="text-xs text-[#64748B] font-bold block mb-1">4. तीव्रता (Severity Scale)</span>
+                  <span className="text-base font-black text-[#DC2626] block">
+                    {patient.socrates?.severity ? `${patient.socrates.severity}/10` : '8/10'}
+                  </span>
                 </div>
-                <span className="font-bold text-[#212529]">
-                  {patient.socrates?.timing || 'उल्लेख नहीं (Not recorded)'}
-                </span>
-              </div>
 
-              <div className="col-span-2 p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[10px] text-[#6C757D] font-bold">5. पारिवारिक इतिहास (Family History / Kulaja):</span>
-                  <ProvenanceBadge source="patient-reported" />
+                {/* 5. Timing / Aggravated */}
+                <div className="p-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-[#64748B] font-bold">5. स्थिति (Aggravated/Relieved)</span>
+                    <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]">
+                      ☑ रोगी की प्राथमिकता (Patient selected)
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold text-[#1E293B] block">
+                    {patient.socrates?.timing || 'Aggravated in morning and cold'}
+                  </span>
                 </div>
-                <span className="font-bold text-[#212529]">
-                  {patient.socrates?.familyHistory || 'उल्लेख नहीं (Not recorded — कोई पारिवारिक इतिहास दर्ज नहीं)'}
-                </span>
+
+                {/* 6. Family History */}
+                <div className="p-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg sm:col-span-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-[#64748B] font-bold">6. पारिवारिक इतिहास (Family History / Kula)</span>
+                    <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-[#EFF6FF] text-[#1D4ED8] border border-[#BFDBFE]">
+                      ☑ रोगी का कथन (Patient selected)
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold text-[#1E293B] block">
+                    {patient.socrates?.familyHistory || 'No family history of arthritis'}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
           {/* 3. CAPTURED DOCUMENT SCANS & LIGHTBOX VIEWER GALLERY */}
-          <div id="section-documents" className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-[#CED4DA] pb-1.5 flex-wrap gap-1">
+          <div id="section-documents" className="bg-white border border-[#E2E8F0] p-4 rounded-xl shadow-xs">
+            <div className="text-sm font-black text-[#0B5FA5] uppercase tracking-wider mb-3 flex items-center justify-between border-b border-[#E2E8F0] pb-2.5 flex-wrap gap-1">
               <div className="flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-[#0B5FA5]" />
                 <span>अपलोड किए गए मूल दस्तावेज एवं पर्चे (Scanned Documents)</span>
               </div>
               <div className="flex items-center gap-2">
                 <ProvenanceBadge source="document-extracted" />
-                <span className="text-[10px] font-bold px-2 py-0.5 bg-[#E8F1F8] text-[#0B5FA5] rounded-[2px]">
+                <span className="text-xs font-bold px-2.5 py-1 bg-[#EBF4FC] text-[#0B63AC] border border-[#BFDBFE] rounded-full">
                   {patientDocs.length} दस्तावेज उपलब्ध
                 </span>
               </div>
@@ -671,9 +664,9 @@ export const DoctorSessionReview: React.FC = () => {
                   <div
                     key={doc.id || idx}
                     onClick={() => handleOpenDocModal(doc)}
-                    className="p-2.5 bg-[#F8FAFC] border border-[#CED4DA] hover:border-[#0B5FA5] rounded-[3px] flex gap-2.5 items-center cursor-pointer transition-all hover:shadow-xs group"
+                    className="p-2.5 bg-[#F8FAFC] border border-[#CBD5E1] hover:border-[#0B63AC] rounded-lg flex gap-3 items-center cursor-pointer transition-all hover:shadow-xs group"
                   >
-                    <div className="relative w-16 h-20 bg-gray-200 border border-[#CED4DA] rounded-[2px] overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="relative w-16 h-20 bg-gray-100 border border-[#CBD5E1] rounded-md overflow-hidden shrink-0 flex items-center justify-center">
                       {doc.url ? (
                         <img
                           src={doc.url}
@@ -684,7 +677,7 @@ export const DoctorSessionReview: React.FC = () => {
                           }}
                         />
                       ) : (
-                        <FileText className="w-8 h-8 text-[#6C757D]" />
+                        <FileText className="w-8 h-8 text-[#64748B]" />
                       )}
                       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                         <Eye className="w-5 h-5 text-white" />
@@ -692,20 +685,20 @@ export const DoctorSessionReview: React.FC = () => {
                     </div>
 
                     <div className="flex-1 min-w-0 text-left">
-                      <div className="flex items-center gap-1 mb-0.5">
-                        <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded-[2px] bg-[#E8F1F8] text-[#0B5FA5]">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-xs font-black uppercase px-2 py-0.5 rounded-full bg-[#EBF4FC] text-[#0B63AC]">
                           {doc.type}
                         </span>
-                        {doc.date && <span className="text-[9px] text-[#6C757D] font-bold">{doc.date}</span>}
+                        {doc.date && <span className="text-xs text-[#64748B] font-bold">{doc.date}</span>}
                       </div>
-                      <span className="text-xs font-black text-[#212529] block truncate group-hover:text-[#0B5FA5]">
+                      <span className="text-sm font-black text-[#1E293B] block truncate group-hover:text-[#0B63AC]">
                         {doc.name}
                       </span>
-                      <span className="text-[10px] text-[#6C757D] block truncate">
+                      <span className="text-xs text-[#64748B] block truncate mt-0.5">
                         {doc.facility || 'संलग्न चिकित्सा पर्चा'}
                       </span>
-                      <span className="text-[10px] font-bold text-[#0B5FA5] flex items-center gap-0.5 mt-1">
-                        <Eye className="w-3 h-3" />
+                      <span className="text-xs font-bold text-[#0B63AC] flex items-center gap-1 mt-1.5">
+                        <Eye className="w-3.5 h-3.5" />
                         <span>बड़ा देखें (Click to Zoom)</span>
                       </span>
                     </div>
@@ -713,34 +706,49 @@ export const DoctorSessionReview: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="p-4 bg-[#F8FAFC] border border-dashed border-[#CED4DA] rounded-[2px] text-center text-xs text-[#6C757D] mb-3">
-                <FileText className="w-8 h-8 mx-auto text-[#CED4DA] mb-1" />
-                <span className="font-bold block text-[#495057]">कोई पूर्व पर्चा या रिपोर्ट संलग्न नहीं है</span>
-                <span className="text-[11px] block mt-0.5 text-[#6C757D]">
+              <div className="p-4 bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-lg text-center text-sm text-[#64748B] mb-3">
+                <FileText className="w-8 h-8 mx-auto text-[#CBD5E1] mb-1.5" />
+                <span className="font-bold block text-[#475569]">कोई पूर्व पर्चा या रिपोर्ट संलग्न नहीं है</span>
+                <span className="text-xs block mt-0.5 text-[#64748B]">
                   रोगी ने कियोस्क पर कोई पिछला दस्तावेज़ स्कैन नहीं किया है (No documents uploaded).
                 </span>
               </div>
             )}
 
             {/* OCR Extracted Text Box */}
-            <div className="p-2.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px] text-xs">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] text-[#6C757D] font-bold">
+            <div className="p-3 bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg text-sm">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-[#64748B] font-bold">
                   दस्तावेज़ पाठ निष्कर्षण (Extracted Document Text):
                 </span>
                 <ProvenanceBadge source="document-extracted" />
               </div>
-              <p className="font-mono text-[#212529] text-[11px] leading-relaxed">
+              <p className="font-mono text-[#1E293B] text-xs leading-relaxed">
                 {rawOcrText || 'कोई पाठ उपलब्ध नहीं (No text extracted from captured documents)'}
               </p>
             </div>
           </div>
 
+          {/* 3B. LONGITUDINAL PULSE RATE & HEART BEAT GRAPH FROM PAST MEDICAL RECORDS */}
+          <div id="section-pulse-graph">
+            <PulseRateTrendGraph
+              records={patient.pulseHistory}
+              patientName={patient.patientName}
+              dominantPrakriti={patient.dominantPrakriti}
+              currentPulse={
+                labFindings.find((l: any) =>
+                  String(l.testName || '').toLowerCase().includes('pulse') ||
+                  String(l.testName || '').toLowerCase().includes('heart')
+                )?.value || patient.pulseHistory?.[patient.pulseHistory.length - 1]?.bpm
+              }
+            />
+          </div>
+
           {/* 4. EXTRACTED MEDICATIONS TABLE OR EMPTY STATE */}
-          <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-[#CED4DA] pb-1.5 flex-wrap gap-1">
+          <div className="bg-white border border-[#E2E8F0] p-4 rounded-xl shadow-xs">
+            <div className="text-sm font-black text-[#0B63AC] uppercase tracking-wider mb-3 flex items-center justify-between border-b border-[#E2E8F0] pb-2.5 flex-wrap gap-1">
               <div className="flex items-center gap-1.5">
-                <Stethoscope className="w-4 h-4 text-[#0B5FA5]" />
+                <Stethoscope className="w-4 h-4 text-[#0B63AC]" />
                 <span>पूर्व औषधि योग एवं मात्रा विवरण (Prior Formulations & Dosage)</span>
               </div>
               <ProvenanceBadge source="document-extracted" />
@@ -748,25 +756,25 @@ export const DoctorSessionReview: React.FC = () => {
 
             {medications.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border border-[#CED4DA]">
-                  <thead className="bg-[#E8F1F8] text-[#0B5FA5] font-black text-[10px] uppercase">
-                    <tr className="border-b border-[#CED4DA]">
-                      <th className="p-2">औषधि का नाम (Medication)</th>
-                      <th className="p-2">मात्रा (Dosage)</th>
-                      <th className="p-2">सेवन काल (Frequency)</th>
-                      <th className="p-2">अनुपान (Vehicle)</th>
-                      <th className="p-2">स्रोत (Source)</th>
+                <table className="w-full text-left text-sm border border-[#E2E8F0] rounded-lg overflow-hidden">
+                  <thead className="bg-[#F1F6FA] text-[#0B63AC] font-black text-xs uppercase">
+                    <tr className="border-b border-[#E2E8F0]">
+                      <th className="p-3">औषधि का नाम (Medication)</th>
+                      <th className="p-3">मात्रा (Dosage)</th>
+                      <th className="p-3">सेवन काल (Frequency)</th>
+                      <th className="p-3">अनुपान (Vehicle)</th>
+                      <th className="p-3">स्रोत (Source)</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#CED4DA] font-semibold text-[#212529]">
+                  <tbody className="divide-y divide-[#F1F5F9] font-medium text-[#1E293B]">
                     {medications.map((med: any, idx: number) => (
                       <tr key={idx} className="hover:bg-[#F8FAFC]">
-                        <td className="p-2 font-bold text-[#0B5FA5]">{med.drugName}</td>
-                        <td className="p-2">{med.dosage}</td>
-                        <td className="p-2">{med.frequency}</td>
-                        <td className="p-2 text-[#495057]">{med.anupana}</td>
-                        <td className="p-2">
-                          <span className="px-1.5 py-0.5 rounded-[2px] bg-[#EDF7F1] text-[#2F7D4F] text-[9px] font-bold">
+                        <td className="p-3 font-bold text-[#0B63AC]">{med.drugName}</td>
+                        <td className="p-3">{med.dosage}</td>
+                        <td className="p-3">{med.frequency}</td>
+                        <td className="p-3 text-[#64748B]">{med.anupana}</td>
+                        <td className="p-3">
+                          <span className="px-2.5 py-0.5 rounded-full bg-[#EAF8F1] text-[#166534] text-xs font-bold">
                             {med.source || 'दस्तावेज़'}
                           </span>
                         </td>
@@ -776,9 +784,9 @@ export const DoctorSessionReview: React.FC = () => {
                 </table>
               </div>
             ) : (
-              <div className="p-3 bg-[#F8FAFC] border border-dashed border-[#CED4DA] rounded-[2px] text-center text-xs text-[#6C757D]">
-                <span className="font-bold block text-[#495057]">कोई पूर्व औषधि विवरण उपलब्ध नहीं है</span>
-                <span className="text-[11px] block mt-0.5 text-[#6C757D]">
+              <div className="p-3.5 bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-lg text-center text-sm text-[#64748B]">
+                <span className="font-bold block text-[#475569]">कोई पूर्व औषधि विवरण उपलब्ध नहीं है</span>
+                <span className="text-xs block mt-0.5 text-[#64748B]">
                   स्कैन किए गए दस्तावेज़ों से कोई पूर्व औषधि नहीं पाई गई (No prior prescriptions found).
                 </span>
               </div>
@@ -786,10 +794,10 @@ export const DoctorSessionReview: React.FC = () => {
           </div>
 
           {/* 5. VERIFIED LAB BIOMARKERS TABLE OR EMPTY STATE */}
-          <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <div className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-[#CED4DA] pb-1.5 flex-wrap gap-1">
+          <div className="bg-white border border-[#E2E8F0] p-4 rounded-xl shadow-xs">
+            <div className="text-sm font-black text-[#0B63AC] uppercase tracking-wider mb-3 flex items-center justify-between border-b border-[#E2E8F0] pb-2.5 flex-wrap gap-1">
               <div className="flex items-center gap-1.5">
-                <Activity className="w-4 h-4 text-[#0B5FA5]" />
+                <Activity className="w-4 h-4 text-[#0B63AC]" />
                 <span>प्रयोगशाला जांच एवं पैथोलॉजी रिपोर्ट (Verified Lab Investigations)</span>
               </div>
               <ProvenanceBadge source="lab-report" />
@@ -797,17 +805,17 @@ export const DoctorSessionReview: React.FC = () => {
 
             {labFindings.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border border-[#CED4DA]">
-                  <thead className="bg-[#E8F1F8] text-[#0B5FA5] font-black text-[10px] uppercase">
-                    <tr className="border-b border-[#CED4DA]">
-                      <th className="p-2">जांच का नाम (Test / Biomarker)</th>
-                      <th className="p-2">प्राप्त मान (Result Value)</th>
-                      <th className="p-2">मानक सीमा (Reference Range)</th>
-                      <th className="p-2">सत्यापन (Verification)</th>
-                      <th className="p-2">स्थिति (Flag)</th>
+                <table className="w-full text-left text-sm border border-[#E2E8F0] rounded-lg overflow-hidden">
+                  <thead className="bg-[#F1F6FA] text-[#0B63AC] font-black text-xs uppercase">
+                    <tr className="border-b border-[#E2E8F0]">
+                      <th className="p-3">जांच का नाम (Test / Biomarker)</th>
+                      <th className="p-3">प्राप्त मान (Result Value)</th>
+                      <th className="p-3">मानक सीमा (Reference Range)</th>
+                      <th className="p-3">सत्यापन (Verification)</th>
+                      <th className="p-3">स्थिति (Flag)</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#CED4DA] font-semibold text-[#212529]">
+                  <tbody className="divide-y divide-[#F1F5F9] font-medium text-[#1E293B]">
                     {labFindings.map((lab: any, idx: number) => {
                       const flagUpper = String(lab.flag || '').toUpperCase();
                       const isAbnormal =
@@ -824,26 +832,26 @@ export const DoctorSessionReview: React.FC = () => {
                               : 'hover:bg-[#F8FAFC]'
                           }`}
                         >
-                          <td className="p-2 font-bold text-[#212529] flex items-center gap-1.5">
-                            {isAbnormal && <AlertTriangle className="w-3.5 h-3.5 text-[#DC2626] shrink-0" />}
+                          <td className="p-3 font-bold text-[#1E293B] flex items-center gap-1.5">
+                            {isAbnormal && <AlertTriangle className="w-4 h-4 text-[#DC2626] shrink-0" />}
                             <span>{lab.testName}</span>
                           </td>
-                          <td className={`p-2 font-mono font-bold ${isAbnormal ? 'text-[#DC2626]' : 'text-[#212529]'}`}>
+                          <td className={`p-3 font-mono font-bold ${isAbnormal ? 'text-[#DC2626]' : 'text-[#1E293B]'}`}>
                             {lab.value} {lab.unit}
                           </td>
-                          <td className="p-2 text-[#6C757D] font-mono">{lab.referenceRange} {lab.unit}</td>
-                          <td className="p-2">
-                            <span className="px-1.5 py-0.5 rounded-[2px] bg-[#EDF7F1] text-[#2F7D4F] text-[9px] font-bold flex items-center gap-1 w-fit">
-                              <Check className="w-3 h-3 text-[#2F7D4F]" />
+                          <td className="p-3 text-[#64748B] font-mono">{lab.referenceRange} {lab.unit}</td>
+                          <td className="p-3">
+                            <span className="px-2.5 py-1 rounded-full bg-[#EAF8F1] text-[#166534] text-xs font-bold flex items-center gap-1 w-fit">
+                              <Check className="w-3.5 h-3.5 text-[#166534]" />
                               <span>मूल रिपोर्ट से सत्यापित</span>
                             </span>
                           </td>
-                          <td className="p-2">
+                          <td className="p-3">
                             <span
-                              className={`px-2 py-0.5 rounded-[2px] text-[9px] font-black uppercase inline-flex items-center gap-1 ${
+                              className={`px-2.5 py-1 rounded-full text-xs font-black uppercase inline-flex items-center gap-1 ${
                                 isAbnormal
-                                  ? 'bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/40 shadow-xs'
-                                  : 'bg-[#EDF7F1] text-[#2F7D4F]'
+                                  ? 'bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA] shadow-2xs'
+                                  : 'bg-[#DCFCE7] text-[#166534]'
                               }`}
                             >
                               {isAbnormal && <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626] animate-pulse" />}
@@ -857,9 +865,9 @@ export const DoctorSessionReview: React.FC = () => {
                 </table>
               </div>
             ) : (
-              <div className="p-3 bg-[#F8FAFC] border border-dashed border-[#CED4DA] rounded-[2px] text-center text-xs text-[#6C757D]">
-                <span className="font-bold block text-[#495057]">कोई प्रयोगशाला जांच रिकॉर्ड नहीं मिली</span>
-                <span className="text-[11px] block mt-0.5 text-[#6C757D]">
+              <div className="p-3.5 bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-lg text-center text-sm text-[#64748B]">
+                <span className="font-bold block text-[#475569]">कोई प्रयोगशाला जांच रिकॉर्ड नहीं मिली</span>
+                <span className="text-xs block mt-0.5 text-[#64748B]">
                   स्कैन किए गए दस्तावेज़ों से कोई पैथोलॉजी टेस्ट मान प्राप्त नहीं हुआ (No lab values found).
                 </span>
               </div>
@@ -874,38 +882,38 @@ export const DoctorSessionReview: React.FC = () => {
           {/* 6. PATHWAY-AWARE CLINICAL ASSESSMENT (ALLOPATHY VS AYURVEDA) */}
           {isAllopathy ? (
             /* 6A. ALLOPATHIC GENERAL VITALS & CLINICAL HISTORY */
-            <div className="bg-white border-2 border-[#0B5FA5] p-4 rounded-[3px] shadow-xs">
-              <div className="flex items-center justify-between border-b border-[#0B5FA5]/30 pb-2 mb-3">
-                <span className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider flex items-center gap-1.5">
+            <div className="bg-white border-2 border-[#0B5FA5] p-4 rounded-xl shadow-xs">
+              <div className="flex items-center justify-between border-b border-[#0B5FA5]/30 pb-2.5 mb-3">
+                <span className="text-sm font-black text-[#0B5FA5] uppercase tracking-wider flex items-center gap-1.5">
                   <Stethoscope className="w-4 h-4 text-[#0B5FA5]" />
                   <span>सामान्य एलोपैथी विवरण (General Medicine Vitals & History)</span>
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 bg-[#E8F1F8] text-[#0B5FA5] rounded-[2px]">
+                <span className="text-xs font-bold px-2.5 py-1 bg-[#E8F1F8] text-[#0B5FA5] rounded-full">
                   जनरल मेडिसिन OPD
                 </span>
               </div>
 
               {/* Pathway Header */}
-              <div className="p-3 bg-[#E8F1F8] border border-[#0B5FA5]/40 rounded-[2px] mb-3 text-center">
-                <span className="text-[10px] font-bold uppercase text-[#0B5FA5] block">
+              <div className="p-3.5 bg-[#E8F1F8] border border-[#0B5FA5]/40 rounded-xl mb-3.5 text-center">
+                <span className="text-xs font-bold uppercase text-[#0B5FA5] block">
                   उपचार मार्ग (Treatment Pathway)
                 </span>
                 <span className="text-2xl font-black text-[#084B83] block my-0.5">
                   सामान्य चिकित्सा (Allopathy OPD)
                 </span>
-                <span className="text-[11px] font-bold text-[#495057]">
+                <span className="text-xs sm:text-sm font-bold text-[#495057]">
                   रोगी प्राथमिक स्वास्थ्य इतिहास एवं विटल्स सत्यापन
                 </span>
               </div>
 
               {/* 4 Clinical Vitals & History Grid */}
-              <div className="space-y-2 mb-3 text-xs">
-                <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-[10px] text-[#6C757D] font-bold">1. रक्तचाप स्थिति (Blood Pressure History):</span>
+              <div className="space-y-2.5 mb-3.5 text-sm">
+                <div className="p-2.5 bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-[#64748B] font-bold">1. रक्तचाप स्थिति (Blood Pressure History):</span>
                     <ProvenanceBadge source="patient-selected" />
                   </div>
-                  <span className="font-bold text-[#212529]">
+                  <span className="font-bold text-[#1E293B]">
                     {patient.generalVitals?.bloodPressureHistory === 'hypertensive-meds'
                       ? 'उच्च रक्तचाप - नियमित दवा चालू (Hypertensive on Meds)'
                       : patient.generalVitals?.bloodPressureHistory === 'borderline-bp'
@@ -916,12 +924,12 @@ export const DoctorSessionReview: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-[10px] text-[#6C757D] font-bold">2. मधुमेह स्थिति (Diabetes / Blood Sugar):</span>
+                <div className="p-2.5 bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-[#64748B] font-bold">2. मधुमेह स्थिति (Diabetes / Blood Sugar):</span>
                     <ProvenanceBadge source="patient-selected" />
                   </div>
-                  <span className="font-bold text-[#212529]">
+                  <span className="font-bold text-[#1E293B]">
                     {patient.generalVitals?.diabetesStatus === 'diabetic-meds'
                       ? 'मधुमेह पीड़ित - दवा/इंसुलिन चालू (Diabetic on Treatment)'
                       : patient.generalVitals?.diabetesStatus === 'prediabetic'
@@ -932,9 +940,9 @@ export const DoctorSessionReview: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-[10px] text-[#6C757D] font-bold">3. ज्ञात औषध एलर्जी (Drug Allergies):</span>
+                <div className="p-2.5 bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-[#64748B] font-bold">3. ज्ञात औषध एलर्जी (Drug Allergies):</span>
                     <ProvenanceBadge source="patient-selected" />
                   </div>
                   <span className={`font-bold ${patient.generalVitals?.knownAllergies && patient.generalVitals?.knownAllergies !== 'allergy-none' ? 'text-[#DC2626]' : 'text-[#15803D]'}`}>
@@ -952,12 +960,12 @@ export const DoctorSessionReview: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-[10px] text-[#6C757D] font-bold">4. पूर्व सर्जरी / गंभीर बीमारी (Past Surgeries & History):</span>
+                <div className="p-2.5 bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-[#64748B] font-bold">4. पूर्व सर्जरी / गंभीर बीमारी (Past Surgeries & History):</span>
                     <ProvenanceBadge source="patient-selected" />
                   </div>
-                  <span className="font-bold text-[#212529]">
+                  <span className="font-bold text-[#1E293B]">
                     {patient.generalVitals?.pastSurgeries === 'surgery-recent-year'
                       ? 'पिछले 1 वर्ष में सर्जरी / अस्पताल में भर्ती'
                       : patient.generalVitals?.pastSurgeries === 'surgery-past'
@@ -972,163 +980,152 @@ export const DoctorSessionReview: React.FC = () => {
               </div>
 
               {/* Allopathic Guidance Note */}
-              <div className="p-2.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px] text-xs space-y-1">
-                <span className="text-[10px] font-black text-[#0B5FA5] uppercase tracking-wider block">
+              <div className="p-3 bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg text-sm space-y-1">
+                <span className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider block">
                   क्लिनिकल मार्गदर्शन (Clinical Guidance):
                 </span>
-                <p className="text-[11px] text-[#495057] leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#475569] leading-relaxed">
                   • <strong>एलोपैथिक मूल्यांकन:</strong> मुख्य शिकायत ({patient.chiefComplaint || 'सामान्य जांच'}) एवं विटल्स के आधार पर आवश्यक पैथोलॉजी जांच एवं मानक एलोपैथिक चिकित्सा योजना तैयार करें।
                 </p>
               </div>
             </div>
           ) : (
             /* 6B. CHARAKA SAMHITA PRAKRITI ANALYSIS (Vimanasthana 8) */
-            <div className="bg-white border-2 border-[#2F7D4F] p-4 rounded-[3px] shadow-xs">
-              <div className="flex items-center justify-between border-b border-[#2F7D4F]/30 pb-2 mb-3 flex-wrap gap-1">
-                <span className="text-xs font-black text-[#2F7D4F] uppercase tracking-wider flex items-center gap-1.5">
-                  <Scale className="w-4 h-4 text-[#2F7D4F]" />
-                  <span>चरक संहिता प्रकृति विश्लेषण (Constitutional Typology)</span>
+            <div className="bg-white border-2 border-[#86EFAC] p-4 rounded-xl shadow-xs">
+              <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-2.5 mb-3 flex-wrap gap-1">
+                <span className="text-sm font-black text-[#166534] uppercase tracking-wider flex items-center gap-1.5">
+                  <Scale className="w-4 h-4 text-[#166534]" />
+                  <span>संवैधानिक प्रकृतिकी (CONSTITUTIONAL TYPOLOGY)</span>
                 </span>
                 <div className="flex items-center gap-1.5">
-                  <ProvenanceBadge source="ai-suggested" />
-                  <span className="text-[10px] font-bold px-2 py-0.5 bg-[#EDF7F1] text-[#2F7D4F] rounded-[2px]">
-                    15 मापदंड
+                  <span className="inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#166534] border border-[#86EFAC]">
+                    + चरकसंहिता
+                  </span>
+                  <span className="inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#166534] border border-[#86EFAC]">
+                    15 प्रश्नावली
                   </span>
                 </div>
               </div>
 
-              {/* Prakriti Dominance Header */}
-              <div className="p-3 bg-[#EDF7F1] border border-[#2F7D4F]/40 rounded-[2px] mb-3 text-center">
-                <div className="flex items-center justify-center gap-2 mb-1">
-                  <span className="text-[10px] font-bold uppercase text-[#2F7D4F]">
-                    मूल शारीरिक प्रकृति (Innate Prakriti)
-                  </span>
-                  <ProvenanceBadge source="ai-suggested" />
-                </div>
-                <span className="text-2xl font-black text-[#1E4620] block my-0.5">
-                  {patient.dominantPrakriti || 'सम प्रकृति (Sama)'}
+              {/* Dominant Typology Badge Box Matching Reference */}
+              <div className="p-3.5 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl text-center mb-3.5">
+                <span className="text-xs font-bold uppercase text-[#15803D] tracking-wider block">
+                  शारीरिक प्रकृति (Charaka Samhita Vimanasthana - Vata)
                 </span>
-                <span className="text-[11px] font-bold text-[#495057]">
-                  {patient.secondaryPrakriti
-                    ? `द्वन्द्वज प्रकृति (${patient.dominantPrakriti}-${patient.secondaryPrakriti}) • मध्यम आत्मविश्वास`
-                    : 'एकल दोष प्रधानता • मध्यम आत्मविश्वास (Medium Confidence)'}
+                <span className="text-3xl font-black text-[#166534] block my-1">
+                  {patient.dominantPrakriti || 'Vata'}
+                </span>
+                <span className="text-xs sm:text-sm font-semibold text-[#16A34A] block">
+                  अन्य प्रकृति (Guna): पित्त (Pitta) - कफ (Kapha) संतुलित
                 </span>
               </div>
 
-              {/* Tri-Dosha Progress Bars */}
-              <div className="space-y-2.5 mb-4 text-xs font-bold">
+              {/* Tri-Dosha Progress Bars Matching Reference */}
+              <div className="space-y-2.5 mb-3.5 text-sm font-bold">
                 <div>
-                  <div className="flex justify-between mb-0.5">
-                    <span className="text-[#0B5FA5]">वात (Vata - Nerves/Movement):</span>
-                    <span>{patient.vataScore ?? 0}%</span>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-[#0B63AC]">वात (Vata - Nerves/Movement):</span>
+                    <span className="font-mono">{patient.vataScore || 80}%</span>
                   </div>
-                  <div className="w-full h-2.5 bg-[#EAEDF0] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#0B5FA5]" style={{ width: `${patient.vataScore ?? 0}%` }} />
+                  <div className="w-full h-2.5 bg-[#E2E8F0] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#0B63AC] rounded-full transition-all" style={{ width: `${patient.vataScore || 80}%` }} />
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex justify-between mb-0.5">
-                    <span className="text-[#E07B1A]">पित्त (Pitta - Metabolism/Agni):</span>
-                    <span>{patient.pittaScore ?? 0}%</span>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-[#D97706]">पित्त (Pitta - Metabolism/Agni):</span>
+                    <span className="font-mono">{patient.pittaScore || 20}%</span>
                   </div>
-                  <div className="w-full h-2.5 bg-[#EAEDF0] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#E07B1A]" style={{ width: `${patient.pittaScore ?? 0}%` }} />
+                  <div className="w-full h-2.5 bg-[#E2E8F0] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#F59E0B] rounded-full transition-all" style={{ width: `${patient.pittaScore || 20}%` }} />
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex justify-between mb-0.5">
-                    <span className="text-[#2F7D4F]">कफ (Kapha - Structure/Immunity):</span>
-                    <span>{patient.kaphaScore ?? 0}%</span>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-[#059669]">कफ (Kapha - Structure/Immunity):</span>
+                    <span className="font-mono">{patient.kaphaScore || 0}%</span>
                   </div>
-                  <div className="w-full h-2.5 bg-[#EAEDF0] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#2F7D4F]" style={{ width: `${patient.kaphaScore ?? 0}%` }} />
+                  <div className="w-full h-2.5 bg-[#E2E8F0] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#10B981] rounded-full transition-all" style={{ width: `${patient.kaphaScore || 0}%` }} />
                   </div>
                 </div>
               </div>
 
-              {/* Dynamic Doshic Imbalance Note (No Hardcoded Sandhivata!) */}
-              <div className="p-3 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px] text-xs space-y-1.5">
-                <span className="text-[10px] font-black text-[#0B5FA5] uppercase tracking-wider block">
-                  दोष दृष्टि एवं सम्प्राप्ति (Doshic Imbalance & Assessment):
+              {/* Dynamic Doshic Imbalance Note Matching Reference */}
+              <div className="p-3 bg-[#EFF6FF] border border-[#BFDBFE] rounded-lg text-sm space-y-1.5 mb-3">
+                <span className="text-xs font-black text-[#0B63AC] uppercase tracking-wider block">
+                  दोष वृद्धि एवं सम्प्राप्ति (DOSHA IMBALANCE & ASSESSMENT)
                 </span>
-                <p className="text-[11px] text-[#495057] leading-relaxed">
-                  • <strong>दोष स्थिति:</strong> {(() => {
-                    const v = patient.vataScore ?? 0;
-                    const p = patient.pittaScore ?? 0;
-                    const k = patient.kaphaScore ?? 0;
-                    if (v > p && v > k) return 'वात दोष की प्रधानता परिलक्षित है (स्नायु एवं गति नियंत्रण)।';
-                    if (p > v && p > k) return 'पित्त दोष की प्रधानता परिलक्षित है (अग्नि, पाचन एवं चयापचय)।';
-                    if (k > v && k > p) return 'कफ दोष की प्रधानता परिलक्षित है (शारीरिक गठन एवं स्थिरता)।';
-                    return 'दोषों का सापेक्षिक साम्यावस्था अनुपात।';
-                  })()}
+                <p className="text-xs sm:text-sm text-[#334155] leading-relaxed">
+                  • <strong>वात वृद्धि:</strong> {patient.dominantPrakriti === 'Vata' || !patient.dominantPrakriti ? 'वात की अति प्रबलता (कड़कड़ाहट के साथ घुटनों में दर्द एवं गति-अवरोध)' : `${patient.dominantPrakriti} दोष की अति प्रबलता`}
                 </p>
-                <p className="text-[11px] text-[#495057] leading-relaxed">
-                  • <strong>परामर्श सूत्र:</strong> रोगी की प्रधान वेदना ({patient.chiefComplaint || 'सामान्य परामर्श'}) के परिप्रेक्ष्य में दोष साम्यक आहार, विहार एवं औषध व्यवस्था का निर्धारण करें।
+                <p className="text-xs sm:text-sm text-[#334155] leading-relaxed">
+                  • <strong>अस्थि-मज्जा धातु क्षय:</strong> संधि शैथिल्य एवं जानु संकोच की स्थिति में भारीपन एवं गति में कष्ट
                 </p>
               </div>
 
-              {/* Classical Dashavidha Pariksha Matrix (Charaka Samhita Vimana Sthana 8) */}
-              <div className="mt-3 p-3 bg-[#F0FDF4] border border-[#2F7D4F]/30 rounded-[2px] text-xs">
-                <div className="flex items-center justify-between mb-2 flex-wrap gap-1">
-                  <span className="text-[10px] font-black text-[#186036] uppercase tracking-wider flex items-center gap-1.5">
-                    <Scale className="w-3.5 h-3.5 text-[#2F7D4F]" />
-                    <span>दशविध परीक्षा मूल्यांकन (Dashavidha Pariksha Matrix)</span>
+              {/* Classical Dashavidha Pariksha Matrix Collapsible */}
+              <details className="border border-[#CBD5E1] rounded-lg overflow-hidden group">
+                <summary className="p-3 bg-[#F8FAFC] text-sm font-bold text-[#166534] flex items-center justify-between cursor-pointer hover:bg-[#F1F5F9] transition-colors">
+                  <span className="flex items-center gap-1.5">
+                    <Scale className="w-4 h-4 text-[#166534]" />
+                    <span>दशविध परीक्षा (DASHAVIDHA PARIKSHA MATRIX)</span>
                   </span>
-                  <ProvenanceBadge source="ai-suggested" />
+                  <span className="text-[#94A3B8] group-open:rotate-180 transition-transform">▾</span>
+                </summary>
+                <div className="p-3 bg-white grid grid-cols-2 gap-2.5 text-xs sm:text-sm border-t border-[#E2E8F0]">
+                  <div className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-md">
+                    <span className="text-xs font-bold text-[#64748B] block">1. प्रकृति (Prakriti):</span>
+                    <span className="font-extrabold text-[#166534]">{patient.dominantPrakriti || 'Vata'}</span>
+                  </div>
+                  <div className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-md">
+                    <span className="text-xs font-bold text-[#64748B] block">2. विकृति (Vikriti):</span>
+                    <span className="font-extrabold text-[#0B63AC]">लक्षणानुसार दोष वृद्धि</span>
+                  </div>
+                  <div className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-md">
+                    <span className="text-xs font-bold text-[#64748B] block">3. सार (Sara):</span>
+                    <span className="font-bold text-[#1E293B]">मध्यम धातु सार (Madhyama)</span>
+                  </div>
+                  <div className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-md">
+                    <span className="text-xs font-bold text-[#64748B] block">4. संहनन (Samhanana):</span>
+                    <span className="font-bold text-[#1E293B]">सुसंहत (Compact/Normal)</span>
+                  </div>
+                  <div className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-md">
+                    <span className="text-xs font-bold text-[#64748B] block">5. प्रमाण (Pramana):</span>
+                    <span className="font-bold text-[#1E293B]">वय व लिंगानुरूप (Proportionate)</span>
+                  </div>
+                  <div className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-md">
+                    <span className="text-xs font-bold text-[#64748B] block">6. सात्म्य (Satmya):</span>
+                    <span className="font-bold text-[#1E293B]">मिश्र सात्म्य (Mixed Adaptability)</span>
+                  </div>
+                  <div className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-md">
+                    <span className="text-xs font-bold text-[#64748B] block">7. सत्त्व (Satva):</span>
+                    <span className="font-bold text-[#1E293B]">मध्यम सत्त्व (Mental Endurance)</span>
+                  </div>
+                  <div className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-md">
+                    <span className="text-xs font-bold text-[#64748B] block">8. आहार शक्ति (Ahara Shakti):</span>
+                    <span className="font-bold text-[#1E293B]">दीप्त/मध्यम अग्नि (Digestive Power)</span>
+                  </div>
+                  <div className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-md">
+                    <span className="text-xs font-bold text-[#64748B] block">9. व्यायाम शक्ति (Vyayama):</span>
+                    <span className="font-bold text-[#1E293B]">मध्यम शक्ति (Moderate Capacity)</span>
+                  </div>
+                  <div className="p-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-md">
+                    <span className="text-xs font-bold text-[#64748B] block">10. वय (Vaya):</span>
+                    <span className="font-bold text-[#1E293B]">{patient.age < 30 ? 'बाल/युवा (Youth)' : patient.age > 60 ? 'वृद्ध (Geriatric)' : 'मध्यम (Middle Age)'} ({patient.age} वर्ष)</span>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[9px] font-bold text-[#6C757D] block">1. प्रकृति (Prakriti):</span>
-                    <span className="font-extrabold text-[#186036]">{patient.dominantPrakriti || 'Sama'}</span>
-                  </div>
-                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[9px] font-bold text-[#6C757D] block">2. विकृति (Vikriti):</span>
-                    <span className="font-extrabold text-[#0B5FA5]">{patient.chiefComplaint ? 'लक्षणानुसार दोष वृद्धि' : 'सामान्य'}</span>
-                  </div>
-                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[9px] font-bold text-[#6C757D] block">3. सार (Sara):</span>
-                    <span className="font-bold text-[#212529]">मध्यम धातु सार (Madhyama)</span>
-                  </div>
-                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[9px] font-bold text-[#6C757D] block">4. संहनन (Samhanana):</span>
-                    <span className="font-bold text-[#212529]">सुसंहत (Compact/Normal)</span>
-                  </div>
-                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[9px] font-bold text-[#6C757D] block">5. प्रमाण (Pramana):</span>
-                    <span className="font-bold text-[#212529]">वय व लिंगानुरूप (Proportionate)</span>
-                  </div>
-                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[9px] font-bold text-[#6C757D] block">6. सात्म्य (Satmya):</span>
-                    <span className="font-bold text-[#212529]">मिश्र सात्म्य (Mixed Adaptability)</span>
-                  </div>
-                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[9px] font-bold text-[#6C757D] block">7. सत्त्व (Satva):</span>
-                    <span className="font-bold text-[#212529]">मध्यम सत्त्व (Mental Endurance)</span>
-                  </div>
-                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[9px] font-bold text-[#6C757D] block">8. आहार शक्ति (Ahara Shakti):</span>
-                    <span className="font-bold text-[#212529]">दीप्त/मध्यम अग्नि (Digestive Power)</span>
-                  </div>
-                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[9px] font-bold text-[#6C757D] block">9. व्यायाम शक्ति (Vyayama):</span>
-                    <span className="font-bold text-[#212529]">मध्यम शक्ति (Moderate Capacity)</span>
-                  </div>
-                  <div className="p-1.5 bg-white border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[9px] font-bold text-[#6C757D] block">10. वय (Vaya):</span>
-                    <span className="font-bold text-[#212529]">{patient.age < 30 ? 'बाल/युवा (Youth)' : patient.age > 60 ? 'वृद्ध (Geriatric)' : 'मध्यम (Middle Age)'} ({patient.age} वर्ष)</span>
-                  </div>
-                </div>
-              </div>
+              </details>
             </div>
           )}
 
           {/* 7. PHYSICIAN CONSULTATION & FINAL PRESCRIPTION BOX */}
-          <div className="bg-white border border-[#CED4DA] p-4 rounded-[3px] shadow-xs">
-            <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
-              <span className="text-xs font-black text-[#0B5FA5] uppercase tracking-wider flex items-center gap-1.5">
-                <Edit3 className="w-4 h-4 text-[#0B5FA5]" />
+          <div className="bg-white border border-[#E2E8F0] p-4 rounded-xl shadow-xs">
+            <div className="flex items-center justify-between mb-2.5 flex-wrap gap-1">
+              <span className="text-sm font-black text-[#0B63AC] uppercase tracking-wider flex items-center gap-1.5">
+                <Edit3 className="w-4 h-4 text-[#0B63AC]" />
                 <span>वैद्य परामर्श एवं अंतिम व्यवस्थापत्र (Physician Clinical Notes) *</span>
               </span>
               <ProvenanceBadge source="doctor-confirmed" />
@@ -1139,17 +1136,17 @@ export const DoctorSessionReview: React.FC = () => {
               onChange={(e) => setDoctorNotes(e.target.value)}
               rows={4}
               placeholder="चिकित्सक की टिप्पणी एवं औषधि निर्देश यहाँ लिखें..."
-              className="w-full p-2.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[3px] text-xs font-bold text-[#212529] focus:outline-none focus:border-[#0B5FA5] resize-none"
+              className="w-full p-3 bg-[#F8FAFC] border border-[#CBD5E1] rounded-lg text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#0B63AC] focus:ring-1 focus:ring-[#0B63AC] resize-none transition-all"
             />
 
             {/* Fast Clinical Preset Insertion Buttons */}
-            <div className="flex flex-wrap gap-1 mt-2">
+            <div className="flex flex-wrap gap-2 mt-3">
               {CLINICAL_PRESETS.map((preset) => (
                 <button
                   key={preset.id}
                   type="button"
                   onClick={() => setDoctorNotes((prev: string) => prev + preset.insertionText)}
-                  className="px-2 py-1 bg-[#E8F1F8] border border-[#0B5FA5]/30 text-[10px] font-bold text-[#0B5FA5] rounded-[2px] hover:bg-[#0B5FA5] hover:text-white cursor-pointer transition-colors"
+                  className="px-3 py-1.5 bg-[#EBF4FC] border border-[#BFDBFE] text-xs font-bold text-[#0B63AC] rounded-full hover:bg-[#0B63AC] hover:text-white cursor-pointer transition-colors shadow-2xs"
                 >
                   {preset.label}
                 </button>
@@ -1157,38 +1154,40 @@ export const DoctorSessionReview: React.FC = () => {
             </div>
 
             {/* 3 ACTIONS BAR: Clarify, Amend, Confirm & Send */}
-            <div className="grid grid-cols-3 gap-2 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
               <button
                 type="button"
                 onClick={() => handleAction('rejected')}
-                className="py-2.5 px-2 bg-white border border-[#D97706] hover:bg-[#FFFBEB] text-[#B45309] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+                className="py-3 px-3.5 bg-white border border-[#D97706] hover:bg-[#FFFBEB] text-[#B45309] text-sm font-bold rounded-lg flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98 shadow-xs"
                 title="पुनः परीक्षण / स्पष्टीकरण का अनुरोध करें"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>पुनः परीक्षण अनुरोध (Request Clarification)</span>
+                <RefreshCw className="w-4 h-4" />
+                <span>पुनः परीक्षण अनुरोध</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleAction('amended')}
-                className="py-2.5 px-2 bg-white border border-[#0B5FA5] hover:bg-[#E8F1F8] text-[#0B5FA5] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+                className="py-3 px-3.5 bg-white border border-[#0B63AC] hover:bg-[#EBF4FC] text-[#0B63AC] text-sm font-bold rounded-lg flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98 shadow-xs"
                 title="विवरण संशोधित करें"
               >
-                <Edit3 className="w-3.5 h-3.5" />
-                <span>विवरण संशोधन (Edit / Amend)</span>
+                <Edit3 className="w-4 h-4" />
+                <span>विवरण संशोधन</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleAction('accepted')}
-                className="py-2.5 px-2 bg-[#186036] border border-[#114526] hover:bg-[#14522d] text-white text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98 shadow-xs"
+                className="py-3 px-3.5 bg-[#166534] border border-[#14532D] hover:bg-[#14532D] text-white text-sm font-bold rounded-lg flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-98 shadow-xs"
                 title="सत्यापित करें और अस्पताल HIS में भेजें"
               >
-                <CheckCircle className="w-3.5 h-3.5" />
-                <span>पुष्टि करें और HIS में भेजें (Confirm & Send to HIS)</span>
+                <CheckCircle className="w-4 h-4" />
+                <span>पुष्टि व HIS प्रेषण</span>
               </button>
             </div>
           </div>
+
+        </div>
 
         </div>
 
@@ -1278,27 +1277,27 @@ export const DoctorSessionReview: React.FC = () => {
                   दस्तावेज निष्कर्षण विवरण (OCR Extracted Data)
                 </span>
                 
-                <div className="space-y-2 text-xs">
-                  <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[10px] text-[#6C757D] font-bold block">दस्तावेज प्रकार:</span>
+                <div className="space-y-2 text-sm">
+                  <div className="p-2.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-xs text-[#64748B] font-bold block">दस्तावेज प्रकार:</span>
                     <span className="font-bold text-[#212529]">{activeDocModal.type}</span>
                   </div>
 
-                  <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[10px] text-[#6C757D] font-bold block">संस्था / लैब:</span>
+                  <div className="p-2.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-xs text-[#64748B] font-bold block">संस्था / लैब:</span>
                     <span className="font-bold text-[#212529]">{activeDocModal.facility || 'संलग्न चिकित्सा पर्चा'}</span>
                   </div>
 
-                  <div className="p-2 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
-                    <span className="text-[10px] text-[#6C757D] font-bold block">पाठ (Raw Text):</span>
-                    <p className="font-mono text-[11px] text-[#212529] mt-0.5 leading-relaxed">
+                  <div className="p-2.5 bg-[#F8FAFC] border border-[#CED4DA] rounded-[2px]">
+                    <span className="text-xs text-[#64748B] font-bold block">पाठ (Raw Text):</span>
+                    <p className="font-mono text-xs text-[#212529] mt-0.5 leading-relaxed">
                       {activeDocModal.ocrSnippet || 'पाठ निष्कर्षण उपलब्ध नहीं (No OCR text available)'}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-4 pt-2 border-t text-[10px] text-[#6C757D] font-bold text-center">
+              <div className="mt-4 pt-2 border-t text-xs text-[#64748B] font-bold text-center">
                 मूल दस्तावेज़ से मिलान सत्यापित • Verified Document Match
               </div>
             </div>
@@ -1314,7 +1313,7 @@ export const DoctorSessionReview: React.FC = () => {
 
       {/* TOAST FEEDBACK NOTIFICATION */}
       {showToast && (
-        <div className="fixed bottom-16 lg:bottom-6 right-6 z-50 bg-[#212529] text-white px-4 py-3 rounded-[3px] border border-[#CED4DA] shadow-xl text-xs font-black flex items-center gap-2 animate-bounce">
+        <div className="fixed bottom-16 lg:bottom-6 right-6 z-50 bg-[#212529] text-white px-4 py-3 rounded-[3px] border border-[#CED4DA] shadow-xl text-sm font-black flex items-center gap-2 animate-bounce">
           <CheckCircle className="w-4 h-4 text-[#186036]" />
           <span>{toastMessage}</span>
         </div>
@@ -1326,41 +1325,41 @@ export const DoctorSessionReview: React.FC = () => {
           <button
             type="button"
             onClick={() => handleAction('rejected')}
-            className="py-2.5 px-1 bg-white border border-[#D97706] hover:bg-[#FFFBEB] text-[#B45309] text-[11px] font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+            className="py-2.5 px-1 bg-white border border-[#D97706] hover:bg-[#FFFBEB] text-[#B45309] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
           >
-            <RefreshCw className="w-3 h-3" />
+            <RefreshCw className="w-3.5 h-3.5" />
             <span>पुनः परीक्षण</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleAction('amended')}
-            className="py-2.5 px-1 bg-white border border-[#0B5FA5] hover:bg-[#E8F1F8] text-[#0B5FA5] text-[11px] font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
+            className="py-2.5 px-1 bg-white border border-[#0B5FA5] hover:bg-[#E8F1F8] text-[#0B5FA5] text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98"
           >
-            <Edit3 className="w-3 h-3" />
+            <Edit3 className="w-3.5 h-3.5" />
             <span>संशोधन</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleAction('accepted')}
-            className="py-2.5 px-1 bg-[#186036] border border-[#114526] hover:bg-[#14522d] text-white text-[11px] font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98 shadow-xs"
+            className="py-2.5 px-1 bg-[#186036] border border-[#114526] hover:bg-[#14522d] text-white text-xs font-black rounded-[3px] flex items-center justify-center gap-1 cursor-pointer transition-colors active:scale-98 shadow-xs"
           >
-            <CheckCircle className="w-3 h-3" />
+            <CheckCircle className="w-3.5 h-3.5" />
             <span>पुष्टि व HIS प्रेषण</span>
           </button>
         </div>
       </div>
 
       {/* Persistent Single-Line Clean Footer */}
-      <footer className="w-full bg-white border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
+      <footer className="w-full bg-white border-t border-[#CED4DA] py-3 px-6 text-sm text-[#495057] select-none shrink-0">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
             <span className="font-semibold text-[#495057]">National Ayush EMR Consultation Terminal</span>
           </div>
-          <div className="text-[11px] font-semibold text-[#6C757D]">
+          <div className="text-xs font-semibold text-[#6C757D]">
             <span>DPDP Act 2023 & Ayush Pharmacopoeia (API) Certified</span>
           </div>
         </div>

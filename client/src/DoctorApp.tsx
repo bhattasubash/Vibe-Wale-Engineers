@@ -7,7 +7,7 @@ import { DoctorSessionReview } from '@/pages/physician/DoctorSessionReview';
 export const DoctorApp: React.FC = () => {
   return (
     <HashRouter>
-      <div className="min-h-screen bg-[#EAEDF0] text-[#212529] font-sans">
+      <div className="min-h-screen bg-gradient-to-b from-[#EBF5FB] via-[#F4F9FD] to-[#E3EFF9] text-[#1E293B] font-sans antialiased">
         <Routes>
           {/* Doctor Portal Login */}
           <Route path="/" element={<DoctorLoginScreen />} />

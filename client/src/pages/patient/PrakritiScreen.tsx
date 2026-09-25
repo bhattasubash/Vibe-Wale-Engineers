@@ -6,6 +6,7 @@ import { VoiceAnswerButton } from '@/components/ui/VoiceAnswerButton';
 import { useSessionStore } from '@/stores/sessionStore';
 import { PRAKRITI_15_QUESTIONS } from '@/config/prakritiQuestions';
 import { speechEngine } from '@/lib/speech';
+import dashavidhaBg from '@/assets/dashavidha-bg.png';
 
 export const PrakritiScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -146,10 +147,24 @@ export const PrakritiScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-transparent text-[#212529] justify-between font-sans select-none overflow-hidden relative">
       
+      {/* High-Resolution Dedicated Dashavidha Pariksha Background (Lightened for Government Portal) */}
+      <div className="fixed inset-0 pointer-events-none z-0 bg-[#FAFBF8]" aria-hidden="true">
+        <div
+          className="absolute inset-0 bg-no-repeat bg-cover bg-center opacity-65"
+          style={{
+            backgroundImage: `url(${dashavidhaBg})`,
+            backgroundPosition: 'center center',
+            backgroundSize: 'cover',
+          }}
+        />
+        {/* Subtle luminous wash for clean government contrast */}
+        <div className="absolute inset-0 bg-white/25" />
+      </div>
+
       {/* Non-Scrollable Centered Main Container */}
-      <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-2 flex-1 flex flex-col justify-evenly items-center">
+      <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-2 flex-1 flex flex-col justify-evenly items-center relative z-10">
         
         {/* Top Prompter */}
         <div className="shrink-0">
@@ -164,19 +179,12 @@ export const PrakritiScreen: React.FC = () => {
         {/* Progress & Category Header */}
         <div className="w-full max-w-2xl shrink-0">
           <div className="flex items-center justify-between mb-1.5">
-            <div
-              className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[3px] border text-[11px] font-bold uppercase tracking-wider"
-              style={{
-                backgroundColor: '#EDF7F1',
-                borderColor: 'rgba(24, 96, 54, 0.4)',
-                color: '#186036',
-              }}
-            >
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#186036]">
               <Scale className="w-3.5 h-3.5 text-[#186036]" />
               <span>
                 {language === 'hi'
-                  ? `प्रकृति परीक्षण • प्रश्न ${currentIndex + 1} / 15`
-                  : `Prakriti Assessment • Question ${currentIndex + 1} of 15`}
+                  ? `दशविध परीक्षा • प्रश्न ${currentIndex + 1} / 15`
+                  : `Dashavidha Pariksha • Question ${currentIndex + 1} of 15`}
               </span>
             </div>
 
@@ -195,17 +203,6 @@ export const PrakritiScreen: React.FC = () => {
             />
           </div>
         </div>
-
-        {/* Friendly Reassuring Intro Banner (on Question 1) */}
-        {currentIndex === 0 && (
-          <div className="w-full max-w-2xl p-2.5 bg-[#EDF7F1] border border-[#186036]/30 rounded-[3px] text-left shrink-0">
-            <p className="text-xs text-[#186036] font-bold leading-relaxed">
-              {language === 'hi'
-                ? '🌿 प्रकृति परीक्षण: यह प्रश्नावली आपके स्वाभाविक स्वास्थ्य, स्वभाव और पाचन की प्रकृति समझने के लिए है। कृपया अपनी सामान्य स्थिति के अनुसार उत्तर दें।'
-                : '🌿 Body Constitution Assessment: These 15 questions help your Ayurvedic physician understand your natural body constitution and digestive habits.'}
-            </p>
-          </div>
-        )}
 
         {/* Current Question Container */}
         <div className="w-full max-w-2xl bg-white border border-[#CED4DA] rounded-[3px] p-4 sm:p-5 shrink-0">
@@ -329,7 +326,7 @@ export const PrakritiScreen: React.FC = () => {
       </main>
 
       {/* Persistent Single-Line Clean Footer */}
-      <footer className="w-full bg-white border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
+      <footer className="w-full bg-white/90 backdrop-blur-sm border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0 relative z-10">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>

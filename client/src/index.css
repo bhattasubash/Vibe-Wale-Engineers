@@ -5,7 +5,6 @@
 @layer base {
   * {
     -webkit-tap-highlight-color: transparent;
-    box-shadow: none !important;
   }
   
   html, body {
@@ -13,11 +12,6 @@
     color: #212529;
     font-family: "Noto Sans", "Noto Sans Devanagari", Arial, Helvetica, sans-serif;
     font-optical-sizing: auto;
-  }
-
-  /* GIGW Strict Flat 2px Corners */
-  button, input, select, textarea, div {
-    border-radius: 2px !important;
   }
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, Scale, FileText, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mic, Scale, FileText, ArrowRight, ShieldCheck, Stethoscope } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { useSessionStore } from '@/stores/sessionStore';
 
@@ -20,25 +20,11 @@ export const WelcomeScreen: React.FC = () => {
     'Welcome to All India Institute of Ayurveda. To record your health details and Ayurvedic body constitution before consultation, please tap the start button below.';
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none">
+    <div className="flex flex-col min-h-[calc(100vh-76px)] bg-transparent text-[#212529] justify-between font-sans select-none">
       
       {/* Central Focused Walk-Up Kiosk Container (ABDM / CoWIN Visual Standard) */}
       <main className="max-w-3xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-1 flex flex-col justify-center items-center text-center">
         
-        {/* Sub-Badge in Trust Blue Tint */}
-        <div
-          className="inline-block px-3.5 py-1 rounded-[3px] border text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2.5"
-          style={{
-            backgroundColor: '#E8F1F8',
-            borderColor: 'rgba(11, 95, 165, 0.3)',
-            color: '#0B5FA5',
-          }}
-        >
-          {language === 'hi'
-            ? 'रोगी स्वयं-पंजीकरण एवं प्रकृति परीक्षण केंद्र'
-            : 'Patient Intake & Ayurvedic Constitution Kiosk'}
-        </div>
-
         {/* Headline in Trust Blue */}
         <h1
           className="text-3xl sm:text-5xl font-black tracking-tight leading-tight max-w-2xl"
@@ -193,9 +179,9 @@ export const WelcomeScreen: React.FC = () => {
 
       </main>
 
-      {/* Persistent Single-Line Clean Kiosk Footer (Without Doctor Link) */}
-      <footer className="w-full bg-white border-t border-[#CED4DA] py-2.5 px-6 text-xs text-[#495057] select-none">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
+      {/* Persistent Clean Kiosk Footer with Doctor Portal Access */}
+      <footer className="w-full bg-white/90 backdrop-blur-sm border-t border-[#CED4DA] py-2.5 px-6 text-xs text-[#495057] select-none">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
             <span className="text-[#CED4DA]">|</span>
@@ -203,6 +189,15 @@ export const WelcomeScreen: React.FC = () => {
           </div>
           <div className="flex items-center gap-3 text-[11px] font-semibold text-[#6C757D]">
             <span>सहायता डेस्क: Room 04 • हेल्पलाइन: 1800-11-2233</span>
+            <span className="text-[#CED4DA]">|</span>
+            <button
+              type="button"
+              onClick={() => navigate('/doctor/login')}
+              className="inline-flex items-center gap-1 font-bold text-[#0B5FA5] hover:text-[#084B83] hover:underline cursor-pointer"
+            >
+              <Stethoscope className="w-3 h-3" />
+              <span>चिकित्सक पोर्टल (Doctor Portal)</span>
+            </button>
           </div>
         </div>
       </footer>

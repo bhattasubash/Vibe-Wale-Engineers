@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Activity, Check, Volume2, Sparkles, PenLine } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Volume2, PenLine } from 'lucide-react';
 import { AudioSpeaker } from '@/components/ui/AudioSpeaker';
 import { VoiceAnswerButton } from '@/components/ui/VoiceAnswerButton';
 import { useSessionStore } from '@/stores/sessionStore';
@@ -243,12 +243,8 @@ export const SocratesScreen: React.FC = () => {
     }
   };
 
-  const hasDynamicAiQuestions = Boolean(
-    activeQuestionSet?.title || (dynamicQuestions && dynamicQuestions.length > 0)
-  );
-
   return (
-    <div className="flex flex-col min-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-y-auto">
+    <div className="flex flex-col min-h-[calc(100vh-76px)] bg-transparent text-[#212529] justify-between font-sans select-none overflow-y-auto">
       
       {/* Centered Main Container */}
       <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-3 flex-1 flex flex-col justify-evenly items-center">
@@ -263,39 +259,8 @@ export const SocratesScreen: React.FC = () => {
           />
         </div>
 
-        {/* Progress & Dynamic AI Badge Header */}
-        <div className="w-full max-w-2xl shrink-0 mb-2">
-          
-          {/* DYNAMIC GEMINI CLINICAL BANNER */}
-          <div
-            className="w-full px-3 py-1.5 rounded-[3px] border mb-2 flex items-center justify-between text-xs shadow-2xs"
-            style={{
-              backgroundColor: hasDynamicAiQuestions ? '#E8F1F8' : '#F8FAFC',
-              borderColor: hasDynamicAiQuestions ? 'rgba(11, 95, 165, 0.4)' : '#CED4DA',
-            }}
-          >
-            <div className="flex items-center gap-2 truncate">
-              {hasDynamicAiQuestions ? (
-                <Sparkles className="w-4 h-4 text-[#0B5FA5] shrink-0" />
-              ) : (
-                <Activity className="w-4 h-4 text-[#0B5FA5] shrink-0" />
-              )}
-              <span className="font-extrabold text-[#0B5FA5] truncate">
-                {hasDynamicAiQuestions
-                  ? (language === 'hi'
-                      ? `✨ Gemini AI द्वारा आपके लक्षणों के आधार पर तैयार 5 प्रश्न (${activeQuestionSet?.title || chiefComplaint || 'लक्षण'})`
-                      : `✨ 5 Clinical Questions tailored by Gemini AI (${activeQuestionSet?.title || chiefComplaint || 'Symptoms'})`)
-                  : (language === 'hi'
-                      ? `प्राथमिक 5 नैदानिक प्रश्न • लक्षण: ${chiefComplaint || 'सामान्य'}`
-                      : `Primary 5 Clinical Questions • Symptoms: ${chiefComplaint || 'General'}`)}
-              </span>
-            </div>
-
-            <span className="text-[11px] font-black text-[#495057] bg-white px-2 py-0.5 rounded border border-[#CED4DA] shrink-0 ml-2">
-              {currentTurn + 1} / {totalQuestions}
-            </span>
-          </div>
-
+        {/* Progress Header */}
+        <div className="w-full max-w-2xl shrink-0 mb-3">
           <div className="w-full h-1.5 bg-[#CED4DA] rounded-full overflow-hidden">
             <div
               className="h-full transition-all duration-300"
@@ -494,7 +459,7 @@ export const SocratesScreen: React.FC = () => {
       </main>
 
       {/* Persistent Single-Line Clean Footer */}
-      <footer className="w-full bg-white border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
+      <footer className="w-full bg-white/90 backdrop-blur-sm border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>

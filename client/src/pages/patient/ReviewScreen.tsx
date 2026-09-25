@@ -24,7 +24,7 @@ export const ReviewScreen: React.FC = () => {
     'Please review your case summary. If all details are accurate, proceed to photograph old prescriptions.';
 
   return (
-    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-[#EAEDF0] text-[#212529] justify-between font-sans select-none overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-76px)] max-h-[calc(100vh-76px)] bg-transparent text-[#212529] justify-between font-sans select-none overflow-hidden">
       
       {/* Non-Scrollable Centered Main Container */}
       <main className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-2 flex-1 flex flex-col justify-evenly items-center">
@@ -38,20 +38,8 @@ export const ReviewScreen: React.FC = () => {
           />
         </div>
 
-        {/* Header Badge */}
+        {/* Header Title */}
         <div className="text-center shrink-0">
-          <div
-            className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-[3px] border text-[11px] font-bold uppercase tracking-wider mb-1"
-            style={{
-              backgroundColor: isAyurveda ? '#EDF7F1' : '#E8F1F8',
-              borderColor: isAyurveda ? 'rgba(47, 125, 79, 0.4)' : 'rgba(11, 95, 165, 0.3)',
-              color: isAyurveda ? '#2F7D4F' : '#0B5FA5',
-            }}
-          >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{language === 'hi' ? 'विवरण समीक्षा' : 'Case Summary Review'}</span>
-          </div>
-
           <h1
             className="text-2xl sm:text-3xl font-black tracking-tight"
             style={{ color: '#0B5FA5' }}
@@ -325,7 +313,7 @@ export const ReviewScreen: React.FC = () => {
       </main>
 
       {/* Persistent Single-Line Clean Footer */}
-      <footer className="w-full bg-white border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
+      <footer className="w-full bg-white/90 backdrop-blur-sm border-t border-[#CED4DA] py-2 px-6 text-xs text-[#495057] select-none shrink-0">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
           <div className="flex items-center gap-2 font-bold" style={{ color: '#0B5FA5' }}>
             <span>अखिल भारतीय आयुर्वेद संस्थान (AIIA)</span>
